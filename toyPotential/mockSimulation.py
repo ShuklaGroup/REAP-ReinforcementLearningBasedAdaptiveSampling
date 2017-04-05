@@ -98,6 +98,20 @@ class mockSimulation:
                 for j in range(1,4):
                         V1 =  V1 + AA[j]*np.exp(aa[j]*np.square(xx-XX[j]) + bb[j]*(xx-XX[j])*(yy-YY[j]) + cc[j]*np.square(yy-YY[j]))
                 
-                
+                #figure(1);
+                #clf;
+                #contourf(xx,yy,min(V1,200),40);
+                #hold on
+                #plot(xi,yi,'.-w','MarkerSize',14)
+                #set(gca,'XTick',-1.5:.5:1,'YTick',0:.5:2);
+                #xlabel('x','FontAngle','italic');
+                #ylabel('y','FontAngle','italic');
+                #title('Initial string');
+                #drawnow
+
+                plt.contourf(xx,yy,V1, 40)
+                plt.plot(xi, yi, '-')
+                plt.xlabel('x')
+                plt.ylabel('y')
                 
                 
