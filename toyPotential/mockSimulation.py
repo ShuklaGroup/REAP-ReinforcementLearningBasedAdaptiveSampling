@@ -84,8 +84,11 @@ class mockSimulation:
                 YY = [0, 0.5, 1.5, 1]
 
                 #[xx,yy] = meshgrid(-1.5:0.01:1.2,-0.2:0.01:2)
-                xx = np.mgrid[-1.5:1.2:0.01]
-                yy = np.mgrid[-0.2:2:0.01] ###
+                xx = np.mgrid[-1.5:1.21:0.01]
+                yy_1 = np.mgrid[-0.2:2.01:0.01]
+                a = len(xx)-len(yy_1)
+                yy_2 = np.mgrid[-0.2:(-0.2+a*0.01):0.01]
+                yy = np.append(yy_1, yy_2)
 
                 #V1 = AA(1)*exp(aa(1)*(xx-XX(1)).^2+bb(1)*(xx-XX(1)).*(yy-YY(1))+cc(1)*(yy-YY(1)).^2)
                 #for j=2:4
@@ -93,6 +96,8 @@ class mockSimulation:
                 #end
                 V1 = AA[0]*np.exp(aa[0] * np.square(xx-XX[0]) + bb[0] * (xx-XX[0]) * (yy-YY[0]) +cc[0]*np.square(yy-YY[0]))
                 for j in range(1,4):
-                        V1 =  V1 + AA[j]*np.exp(aa[j]*np.square(xx-XX[j]) + bb[j]*(xx-XX[j])*(yy-YY[j]) + cc(j)*np.square(yy-YY[j]))
+                        V1 =  V1 + AA[j]*np.exp(aa[j]*np.square(xx-XX[j]) + bb[j]*(xx-XX[j])*(yy-YY[j]) + cc[j]*np.square(yy-YY[j]))
+                
+                
                 
                 
