@@ -15,9 +15,11 @@ class mockSimulation:
                 ## 1st: Mueller potential
                 import numpy as np
                 from scipy.interpolate import interp1d
-
+                # temperature ###?!!!
+                mu=9
                 # max number of iterations
                 nstepmax = 2e3
+                nstepmax = 10
                 # frequency of plotting
                 nstepplot = 1e1
 
@@ -113,5 +115,22 @@ class mockSimulation:
                 plt.plot(xi, yi, '-')
                 plt.xlabel('x')
                 plt.ylabel('y')
-                
+                for nstep in range(int(nstepmax)):
+                 # calculation of the x and y-components of the force, dVx and dVy respectively
+                        ee = AA[0]*np.exp(aa[0]*np.square(x-XX[0])+bb[0]*(x-XX[0])*(y-YY[0])+cc[0]*np.square(y-YY[0]))
+                        dVx = (2*aa[0]*(x-XX[0])+bb[0]*(y-YY[0]))*ee
+                        dVy = (bb[0]*(x-XX[0])+2*cc[0]*(y-YY[0]))*ee
+                        for j in range(1,4):
+                                ee = AA[j]*np.exp(aa[j]*np.square(x-XX[j])+bb[j]*(x-XX[j])*(y-YY[j])+cc[j]*np.square(y-YY[j]))
+                                dVx = dVx + (2*aa[j]*(x-XX[j])+bb[j]*(y-YY[j]))*ee
+                                dVy = dVy + (bb[j]*(x-XX[j])+2*cc[j]*(y-YY[j]))*ee
+                        x0 = x
+                        y0 = y
+                        x = x - h*dVx + np.sqrt(2*h*mu)*np.random.randn(1,n1)
+                        y = y - h*dVy + np.sqrt(2*h*mu)*np.random.randn(1,n1) ## ?!!!! n2?!!!
+                        plt.contourf(xx,yy,V1, 40)
+                        plt.xlabel('x')
+                        plt.ylabel('y')
+                        plt.plot(x,y, 'o', color='w')
+                        plt.show()
                 
