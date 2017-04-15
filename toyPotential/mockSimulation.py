@@ -1,20 +1,23 @@
 class mockSimulation:
-        r = #number of rounds
-        s = # length of simulations
-        N = # number of parallel simulations
+        r = 1#number of rounds
+        s = 1# length of simulations
+        N = 1# number of parallel simulations
         ## public
+        
+        def run_multipleSim():
+                return True
         def runNxtRound():
-                
+                return True
                 
         
         ## private
         def adaptiveSampling():
-                
+                return True
                 
         def creatPotentioal():
+                return True
                 
-                
-        def run():
+        def run(inits_x, inits_y):
                 import numpy as np
                 import time 
                 from scipy.interpolate import interp1d
@@ -44,17 +47,18 @@ class mockSimulation:
                 # notice that they do NOT have to be at minima of V -- the method finds
                 # those automatically
 
-                xa = 1.5
-                ya = 0.3
-
-                xb = 1.7
-                yb = 0.3
-
                 # initialization
-                g1 = np.linspace(0,0.5,n1)
-                x = (xb-xa)*g1+xa
-                y = (x-xa)*(yb-ya)/(xb-xa)+ya
+                #xa = 1.5
+                #ya = 0.3
 
+                #xb = 1.7
+                #yb = 0.3                
+                #g1 = np.linspace(0,0.5,n1)
+                #x = (xb-xa)*g1+xa
+                #y = (x-xa)*(yb-ya)/(xb-xa)+ya
+                
+                x = inits_x
+                y = inits_y
 
                 dx = x-np.roll(x, 1)
                 dy = y-np.roll(y, 1)
@@ -130,7 +134,8 @@ class mockSimulation:
                         ax.plot(x,y, 'o', color='r')
                         fig.canvas.draw()
                         #print('zz')
-
+                        
+                return trj_x, trj_y          
 
  
 
