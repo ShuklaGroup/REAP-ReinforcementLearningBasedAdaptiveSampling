@@ -132,6 +132,7 @@ class mockSimulation:
                         
                 return trj_x, trj_y          
 
- 
+# output size :
+# 2 * simu length * number of parallel sims
 
 
