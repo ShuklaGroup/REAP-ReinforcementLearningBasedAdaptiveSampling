@@ -39,7 +39,7 @@ class mockSimulation:
                 n2 = 1e1;
                 # number of images along the string (try from  n1 = 3 up to n1 = 1e4)
                 n1 = 25
-                n1 = 50
+                n1 = len(inits_x)
                 # time-step (limited by the ODE step on line 83 & 84 but independent of n1)
                 h = 1e-4
 
@@ -56,26 +56,21 @@ class mockSimulation:
                 #g1 = np.linspace(0,0.5,n1)
                 #x = (xb-xa)*g1+xa
                 #y = (x-xa)*(yb-ya)/(xb-xa)+ya
-                
-                x = inits_x
-                y = inits_y
 
+                #lxy = np.cumsum(np.sqrt(np.square(dx)+np.square(dy)))
+                #lxy = lxy/lxy[n1-1]
+
+                #set_interp1 = interp1d(lxy, x, kind='linear')
+                #x = set_interp1(g1)
+                #set_interp2 = interp1d(lxy, y, kind='linear')
+                #y = set_interp2(g1)
+                
+                x = np.array(inits_x)
+                y = np.array(inits_y)
                 dx = x-np.roll(x, 1)
                 dy = y-np.roll(y, 1)
-
-
                 dx[0] = 0
                 dy[0] = 0
-
-
-                lxy = np.cumsum(np.sqrt(np.square(dx)+np.square(dy)))
-                lxy = lxy/lxy[n1-1]
-
-                set_interp1 = interp1d(lxy, x, kind='linear')
-                x = set_interp1(g1)
-                set_interp2 = interp1d(lxy, y, kind='linear')
-                y = set_interp2(g1)
-
                 xi = x
                 yi = y
 
