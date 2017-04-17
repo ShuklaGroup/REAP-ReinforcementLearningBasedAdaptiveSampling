@@ -29,13 +29,13 @@ class mockSimulation:
                 update weigths 
                 """
                 alpha = 0.05
-                r_0 = reward(trj_Sp_theta, weigths = W_0)
+                r_0 = reward_trj(trj_Sp_theta, weigths = W_0)
                 
                 W_a = [W_0[0]-alpha, W_0[1]+alpha]
-                r_a = reward(trj_Sp_theta, weigths = W_a)
+                r_a = reward_trj(trj_Sp_theta, weigths = W_a)
                 
                 W_b = [W_0[0]+alpha, W_0[1]-alpha]
-                r_b = reward(trj_Sp_theta, weigths = W_b)
+                r_b = reward_trj(trj_Sp_theta, weigths = W_b)
                 
                 max_r = np.max(r_0, r_a, a_b)
                 
@@ -50,7 +50,7 @@ class mockSimulation:
                         
                 return W_1  
         
-        def Reward(trj_Sp_theta, W_):
+        def reward_trj(trj_Sp_theta, W_):
                 """
                 
                 """
@@ -62,29 +62,45 @@ class mockSimulation:
                         theta_std.append(np.std(trj_Sp_theta[theta]))
                 
                 r = []
-                for s in range(len(trj_Sp_theta)):
-                        r_s = 0
-                        for k in range(len(W_)):
-                                r_s = r_s + W_[k]*((trj_Sp_theta[k][s] - theta_mean[k])/theta_std[k])
+                # for over all dicovered states
+                for state_index in range(len(trj_Sp_theta)):
+                        state_theta = trj_Sp_theta[:][state_index]
+                        r_s = reward(state_theta, theta_mean, theta_std, W_)
+                        
+                        #for k in range(len(W_)):
+                        #        r_s = r_s + W_[k]*((trj_Sp_theta[k][s] - theta_mean[k])/theta_std[k])
                         r.append(r_s)
                         
                 R = np.sum(np.array(r))
                 return R
                 
                 
-        def reward( S, theta_mean, theta_std, W_):
+        def reward_state( S, theta_mean, theta_std, W_):
                 
                 r_s = 0
                 for k in range(len(W_)):
                         r_s = r_s + W_[k]*((S[k] - theta_mean[k])/theta_std[k])
-                
+                return r_s
                 
                 
                 
         def findStarting(trj_Sp_theta, W_1, starting_n = 10 , method = 'RL'):
                 # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
                 
+                theta_mean = []
+                theta_std = []
+                for theta in range(len(W_)):
+                        theta_mean.append(np.mean(trj_Sp_theta[theta]))
+                        theta_std.append(np.std(trj_Sp_theta[theta]))
+                        
+                # self.theta_mean
+                # self.theta_std
                 
+                ranks = {}
+                for state_index in range(len(trj_Sp_theta)):
+                        state_theta = trj_Sp_theta[:][state_index]
+                        r = reward_state( state_theta, theta_mean, theta_std, W_1)
+                        rank[state_index] = r
                 
                 
                 return newPoints_index
