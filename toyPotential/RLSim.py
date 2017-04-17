@@ -50,7 +50,7 @@ class mockSimulation:
                         
                 return W_1  
         
-        def reward(trj_Sp_theta, W_):
+        def Reward(trj_Sp_theta, W_):
                 """
                 
                 """
@@ -70,6 +70,15 @@ class mockSimulation:
                         
                 R = np.sum(np.array(r))
                 return R
+                
+                
+        def reward( S, theta_mean, theta_std, W_):
+                
+                r_s = 0
+                for k in range(len(W_)):
+                        r_s = r_s + W_[k]*((S[k] - theta_mean[k])/theta_std[k])
+                
+                
                 
                 
         def findStarting(trj_Sp_theta, W_1, starting_n = 10 , method = 'RL'):
