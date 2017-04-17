@@ -24,9 +24,10 @@ class mockSimulation:
                 trj_Sp_theta = trj_Sp
                 return trj_Sp_theta
         
-        def updateW(trj_Sp_theta, prior_weigths = W_0):
+        def updateW(trj_Sp_theta, W_0):
                 """
                 update weigths 
+                prior_weigths = W_0
                 """
                 alpha = 0.05
                 r_0 = reward_trj(trj_Sp_theta, weigths = W_0)
@@ -102,7 +103,7 @@ class mockSimulation:
                         r = reward_state( state_theta, theta_mean, theta_std, W_1)
                         rank[state_index] = r
                 
-                
+                newPoints_index = sorted(ranks.items(), key=lambda x: x[1], reverse=True)[0:starting_n] #?!!
                 return newPoints_index
         
         
