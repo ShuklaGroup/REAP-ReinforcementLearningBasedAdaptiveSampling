@@ -11,25 +11,77 @@ class mockSimulation:
                 
         
         ## private
-        def PreSamp(trj1):
-                # choose states with min count or newly discovered
-                trj1_Sp = trj1 # pick all
-                return trj1_Sp
+        def PreSamp(trj):
+                """
+                Pre-Sampling:
+                        choose states with minimum counts or newly discovered states
+                """
+                trj_Sp = trj # pick all
+                return trj_Sp
                 
-        def map(trj1_Sp):
+        def map(trj_Sp):
                 # map coordinate space to reaction coorinates space
-                trj1_Sp_theta = trj1_Sp
-                return trj1_Sp_theta
+                trj_Sp_theta = trj_Sp
+                return trj_Sp_theta
         
+        def updateW(trj_Sp_theta, prior_weigths = W_0):
+                """
+                update weigths 
+                """
+                alpha = 0.05
+                r_0 = reward(trj_Sp_theta, weigths = W_0)
+                
+                W_a = [W_0[0]-alpha, W_0[1]+alpha]
+                r_a = reward(trj_Sp_theta, weigths = W_a)
+                
+                W_b = [W_0[0]+alpha, W_0[1]-alpha]
+                r_b = reward(trj_Sp_theta, weigths = W_b)
+                
+                max_r = np.max(r_0, r_a, a_b)
+                
+                if max_r == r_0:
+                        W_1 = W_0
+                        
+                elif max_r == r_a:
+                        W_1 = W_a
+                        
+                elif max_r == r_b:
+                        W_1 = W_b
+                        
+                return W_1  
         
-        def findStarting(trj1_Sp_theta, starting_n = N ,weigths = W_1, method = 'RL'):
+        def reward(trj_Sp_theta, W_):
+                """
+                
+                """
+                import numpy as np
+                theta_mean = []
+                theta_std = []
+                for theta in range(len(W_)):
+                        theta_mean.append(np.mean(trj_Sp_theta[theta]))
+                        theta_std.append(np.std(trj_Sp_theta[theta]))
+                
+                r = []
+                for s in range(len(trj_Sp_theta)):
+                        r_s = 0
+                        for k in range(len(W_)):
+                                r_s = r_s + W_[k]*((trj_Sp_theta[k][s] - theta_mean[k])/theta_std[k])
+                        r.append(r_s)
+                        
+                R = np.sum(np.array(r))
+                return R
+                
+                
+        def findStarting(trj_Sp_theta, W_1, starting_n = 10 , method = 'RL'):
                 # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
+                
+                
+                
+                
                 return newPoints_index
         
         
-        def updateW(trj1_Sp_theta, prior_weigths = W_0):
-                # update weigths 
-                return W_1
+
 
         
         
