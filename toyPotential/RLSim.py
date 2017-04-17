@@ -11,8 +11,26 @@ class mockSimulation:
                 
         
         ## private
-        def adaptiveSampling():
-                return True
+        def PreSamp(trj1):
+                # choose states with min count or newly discovered
+                
+                return trj1_Sp
+                
+        def map(trj1_Sp):
+                # map coordinate space to reaction coorinates space
+                
+                return trj1_Sp_theta
+        
+        
+        def findStarting(trj1_Sp_theta, starting_n = N ,weigths = W_1, method = 'RL'):
+                # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
+                return newPoints_index
+        
+        
+        def updateW(trj1_Sp_theta, prior_weigths = W_0):
+                # update weigths 
+                return W_1
+                
                 
         def creatPotentioal():
                 return True
