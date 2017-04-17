@@ -1,9 +1,12 @@
 class mockSimulation:
-        r = 1#number of rounds
-        s = 1# length of simulations
-        N = 1# number of parallel simulations
+
         ## public
-        
+        def __init__(self):
+                self.r = 1#number of rounds
+                self.s = 1# length of simulations
+                self.N = 1# number of parallel simulations
+                
+                
         def run_multipleSim():
                 return True
         def runNxtRound():
@@ -24,14 +27,14 @@ class mockSimulation:
                 trj_Sp_theta = trj_Sp
                 return trj_Sp_theta
 
-        def reward_state( S, theta_mean, theta_std, W_):
+        def reward_state(self, S, theta_mean, theta_std, W_):
                 
                 r_s = 0
                 for k in range(len(W_)):
                         r_s = r_s + W_[k]*((S[k] - theta_mean[k])/theta_std[k])
                 return r_s
         
-        def reward_trj(trj_Sp_theta, W_):
+        def reward_trj(self, trj_Sp_theta, W_):
                 """
                 
                 """
@@ -46,7 +49,7 @@ class mockSimulation:
                 # for over all dicovered states
                 for state_index in range(len(trj_Sp_theta)):
                         state_theta = trj_Sp_theta[:][state_index]
-                        r_s = reward_state(state_theta, theta_mean, theta_std, W_)
+                        r_s = self.reward_state(state_theta, theta_mean, theta_std, W_)
                         
                         #for k in range(len(W_)):
                         #        r_s = r_s + W_[k]*((trj_Sp_theta[k][s] - theta_mean[k])/theta_std[k])
@@ -57,19 +60,19 @@ class mockSimulation:
                 
         
         
-        def updateW(trj_Sp_theta, W_0):
+        def updateW(self, trj_Sp_theta, W_0):
                 """
                 update weigths 
                 prior_weigths = W_0
                 """
                 alpha = 0.05
-                r_0 = reward_trj(trj_Sp_theta, W_0)
+                r_0 = self.reward_trj(trj_Sp_theta, W_0)
                 
                 W_a = [W_0[0]-alpha, W_0[1]+alpha]
-                r_a = reward_trj(trj_Sp_theta, W_a)
+                r_a = self.reward_trj(trj_Sp_theta, W_a)
                 
                 W_b = [W_0[0]+alpha, W_0[1]-alpha]
-                r_b = reward_trj(trj_Sp_theta, W_b)
+                r_b = self.reward_trj(trj_Sp_theta, W_b)
                 
                 max_r = np.max(r_0, r_a, a_b)
                 
@@ -87,7 +90,7 @@ class mockSimulation:
 
                               
                 
-        def findStarting(trj_Sp_theta, W_1, starting_n = 10 , method = 'RL'):
+        def findStarting(self, trj_Sp_theta, W_1, starting_n = 10 , method = 'RL'):
                 # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
                 
                 theta_mean = []
@@ -102,7 +105,7 @@ class mockSimulation:
                 ranks = {}
                 for state_index in range(len(trj_Sp_theta)):
                         state_theta = trj_Sp_theta[:][state_index]
-                        r = reward_state( state_theta, theta_mean, theta_std, W_1)
+                        r = self.reward_state( state_theta, theta_mean, theta_std, W_1)
                         rank[state_index] = r
                 
                 newPoints_index = sorted(ranks.items(), key=lambda x: x[1], reverse=True)[0:starting_n] #?!!
