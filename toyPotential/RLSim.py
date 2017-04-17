@@ -13,12 +13,12 @@ class mockSimulation:
         ## private
         def PreSamp(trj1):
                 # choose states with min count or newly discovered
-                
+                trj1_Sp = trj1 # pick all
                 return trj1_Sp
                 
         def map(trj1_Sp):
                 # map coordinate space to reaction coorinates space
-                
+                trj1_Sp_theta = trj1_Sp
                 return trj1_Sp_theta
         
         
@@ -30,8 +30,22 @@ class mockSimulation:
         def updateW(trj1_Sp_theta, prior_weigths = W_0):
                 # update weigths 
                 return W_1
-                
-                
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         def creatPotentioal():
                 return True
                 
