@@ -17,7 +17,7 @@ trj1_Sp_theta = RLSim.mockSimulation.map(trj1_Sp)
 W_0 = [1/2, 1/2]
 
 # update weigths 
-W_1 = RLSim.mockSimulation.updateW(trj1_Sp_theta, prior_weigths = W_0)
+W_1 = RLSim.mockSimulation.updateW(trj1_Sp_theta, W_0)
 
 # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
 newPoints_index = RLSim.mockSimulation.findStarting(trj1_Sp_theta, starting_n = N ,weigths = W_1, method = 'RL')
