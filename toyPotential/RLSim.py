@@ -18,8 +18,16 @@ class mockSimulation:
                 """
                 Pre-Sampling:
                         choose states with minimum counts or newly discovered states
+                        
+                output:
+                        trj with shape of [[Xs][Ys]]
                 """
-                trj_Sp = trj # pick all
+                import numpy as np
+                comb_trj = []
+                for theta in range(len(trj)):
+                        comb_trj.append(np.concatenate(np.concatenate(trj[theta])))
+                trj_Sp = np.array(comb_trj) # pick all
+                
                 return trj_Sp
                 
         def map(self, trj_Sp):
@@ -48,7 +56,7 @@ class mockSimulation:
                 r = []
                 # for over all dicovered states
                 for state_index in range(len(trj_Sp_theta)):
-                        state_theta = trj_Sp_theta[:][state_index]
+                        state_theta = trj_Sp_theta[:, state_index]
                         r_s = self.reward_state(state_theta, theta_mean, theta_std, W_)
                         
                         #for k in range(len(W_)):
@@ -65,6 +73,8 @@ class mockSimulation:
                 update weigths 
                 prior_weigths = W_0
                 """
+                import numpy as np
+                
                 alpha = 0.05
                 r_0 = self.reward_trj(trj_Sp_theta, W_0)
                 
@@ -74,7 +84,7 @@ class mockSimulation:
                 W_b = [W_0[0]+alpha, W_0[1]-alpha]
                 r_b = self.reward_trj(trj_Sp_theta, W_b)
                 
-                max_r = np.max(r_0, r_a, a_b)
+                max_r = np.max([r_0, r_a, r_b])
                 
                 if max_r == r_0:
                         W_1 = W_0
@@ -87,15 +97,13 @@ class mockSimulation:
                         
                 return W_1  
         
-
-                              
-                
+          
         def findStarting(self, trj_Sp_theta, W_1, starting_n = 10 , method = 'RL'):
                 # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
                 
                 theta_mean = []
                 theta_std = []
-                for theta in range(len(W_)):
+                for theta in range(len(W_1)):
                         theta_mean.append(np.mean(trj_Sp_theta[theta]))
                         theta_std.append(np.std(trj_Sp_theta[theta]))
                         
@@ -104,7 +112,8 @@ class mockSimulation:
                 
                 ranks = {}
                 for state_index in range(len(trj_Sp_theta)):
-                        state_theta = trj_Sp_theta[:][state_index]
+                        state_theta = trj_Sp_theta[:,state_index]
+                        print(state_theta)
                         r = self.reward_state( state_theta, theta_mean, theta_std, W_1)
                         rank[state_index] = r
                 
