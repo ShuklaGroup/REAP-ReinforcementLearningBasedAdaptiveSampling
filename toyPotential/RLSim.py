@@ -55,7 +55,7 @@ class mockSimulation:
                 
                 r = []
                 # for over all dicovered states
-                for state_index in range(len(trj_Sp_theta)):
+                for state_index in range(len(trj_Sp_theta[0])):
                         state_theta = trj_Sp_theta[:, state_index]
                         r_s = self.reward_state(state_theta, theta_mean, theta_std, W_)
                         
@@ -98,9 +98,9 @@ class mockSimulation:
                 return W_1  
         
           
-        def findStarting(self, trj_Sp_theta, W_1, starting_n = 10 , method = 'RL'):
+        def findStarting(self, trj_Sp_theta, trj_Sp, W_1, starting_n = 10 , method = 'RL'):
                 # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
-                
+                import numpy as np
                 theta_mean = []
                 theta_std = []
                 for theta in range(len(W_1)):
@@ -110,14 +110,25 @@ class mockSimulation:
                 # self.theta_mean
                 # self.theta_std
                 
-                ranks = {}
-                for state_index in range(len(trj_Sp_theta)):
+                ranks = []
+                for state_index in range(len(trj_Sp_theta[0])):
                         state_theta = trj_Sp_theta[:,state_index]
-                        print(state_theta)
+                        
                         r = self.reward_state( state_theta, theta_mean, theta_std, W_1)
-                        rank[state_index] = r
+                        #print(state_theta, r)
+                        ranks.append([r, state_index]
+                ranks1 = np.array(ranks)
+                print(ranks1)
+                newPoints_index0 = sorted(ranks.items(), key=lambda x: x[1], reverse=True)[0:starting_n] 
+                newPoints_index = np.array(newPoints_index0)[:,0]   
                 
-                newPoints_index = sorted(ranks.items(), key=lambda x: x[1], reverse=True)[0:starting_n] #?!!
+                n_coord = len(trj_Sp)
+                                     
+                newPoints = []
+                for coord in range(n_coord):
+                          newPoints.append([trj_Sp[coord][int(i)] for i in newPoints_index])
+                                     
+                #newPoints =  [trj_Sp[int(i)] for i in newPoints_index]                 
                 return newPoints_index
         
         
