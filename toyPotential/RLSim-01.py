@@ -74,21 +74,48 @@ class mockSimulation:
                 update weigths 
                 prior_weigths = W_0
                 """
+                def fun(x):
+                        global trj_Sp_theta_z
+                        W_0 = [[x[0], x[1]],[x[2], x[3]]]
+                        r_0 = self.reward_trj(trj_Sp_theta, W_0)
+                        return r_0
+                        
                 import numpy as np
+                from scipy.optimize import minimize
                 
+                global trj_Sp_theta_z 
+                trj_Sp_theta_z = trj_Sp_theta
+                cons = ({'type': 'eq',
+                          'fun' : lambda x: np.array([x[0]+x[1]+x[2]+x[3]-1])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[1]])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[0]])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[2]])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[3]])})
+                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]    
+                
+                res = minimize(fun, x0, constraints=cons)
+                x = res.x
+                W = [[x[0], x[1]],[x[2], x[3]]]
+                return W
+        
+                """
                 alpha = 0.06
                 r_0 = self.reward_trj(trj_Sp_theta, W_0)
                 
-                W_a = [[W_0[0][0]-alpha, W_0[0][1]+alpha/3], [W_0[1][0]+alpha/3, W_0[1][1]+alpha/3]]
+                W_a = [[W_0[0][0]+alpha, W_0[0][1]-alpha/3], [W_0[1][0]-alpha/3, W_0[1][1]-alpha/3]]
                 r_a = self.reward_trj(trj_Sp_theta, W_a)
                 
-                W_b = [[W_0[0][0]+alpha/3, W_0[0][1]-alpha], [W_0[1][0]+alpha/3, W_0[1][1]+alpha/3]]
+                W_b = [[W_0[0][0]-alpha/3, W_0[0][1]+alpha], [W_0[1][0]-alpha/3, W_0[1][1]-alpha/3]]
                 r_b = self.reward_trj(trj_Sp_theta, W_b)
 
-                W_a_ = [[W_0[0][0]+alpha/3, W_0[0][1]+alpha/3], [W_0[1][0]-alpha, W_0[1][1]+alpha/3]]
+                W_a_ = [[W_0[0][0]-alpha/3, W_0[0][1]-alpha/3], [W_0[1][0]+alpha, W_0[1][1]-alpha/3]]
                 r_a_ = self.reward_trj(trj_Sp_theta, W_a_)
                 
-                W_b_ = [[W_0[0][0]+alpha/3, W_0[0][1]+alpha/3], [W_0[1][0]+alpha/3, W_0[1][1]-alpha]]
+                W_b_ = [[W_0[0][0]-alpha/3, W_0[0][1]-alpha/3], [W_0[1][0]-alpha/3, W_0[1][1]+alpha]]
                 r_b_ = self.reward_trj(trj_Sp_theta, W_b_)
                 
                 max_r = np.max([r_0, r_a, r_b, r_a_, r_b_])
@@ -109,8 +136,8 @@ class mockSimulation:
                         W_1 = W_b_
                 print(W_1)        
                 return W_1  
-        
-          
+                """
+                
         def findStarting(self, trj_Sp_theta, trj_Sp, W_1, starting_n=10 , method = 'RL'):
                 # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
                 import numpy as np
