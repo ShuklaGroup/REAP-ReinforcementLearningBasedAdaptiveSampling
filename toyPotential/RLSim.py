@@ -135,11 +135,13 @@ class mockSimulation:
         def creatPotentioal(self):
                 return True
                 
-        def run(self, inits_x, inits_y):
+        def run(self, inits):
                 import numpy as np
                 import time 
                 from scipy.interpolate import interp1d
                 import matplotlib.pyplot as plt
+                inits_x = inits[0]
+                inits_y = inits[1]                    
                 plt.ion()
                 # max number of iterations
                 nstepmax = 20
