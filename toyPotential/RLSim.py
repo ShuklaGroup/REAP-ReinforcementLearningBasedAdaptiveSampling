@@ -94,7 +94,7 @@ class mockSimulation:
                         
                 elif max_r == r_b:
                         W_1 = W_b
-                        
+                print(W_1)        
                 return W_1  
         
           
@@ -120,7 +120,7 @@ class mockSimulation:
                         ranks[state_index] = r
                         #ranks.append([r, state_index]
                 #ranks1 = np.array(ranks)
-                print(ranks)
+                #print(ranks)
                 newPoints_index0 = sorted(ranks.items(), key=lambda x: x[1], reverse=True)[0:starting_n] 
                 newPoints_index = np.array(newPoints_index0)[:,0]   
                 
@@ -137,7 +137,7 @@ class mockSimulation:
         def creatPotentioal(self):
                 return True
                 
-        def run(self, inits):
+        def run(self, inits, nstepmax = 10):
                 import numpy as np
                 import time 
                 from scipy.interpolate import interp1d
@@ -146,7 +146,7 @@ class mockSimulation:
                 inits_y = inits[1]                    
                 plt.ion()
                 # max number of iterations
-                nstepmax = 20
+                
                 # frequency of plotting
                 nstepplot = 1e1
                 # plot string every nstepplot if flag1 = 1 
@@ -163,8 +163,8 @@ class mockSimulation:
                 n1 = 25
                 n1 = len(inits_x)
                 # time-step (limited by the ODE step on line 83 & 84 but independent of n1)
-                h = 1e-4
-
+                #h = 1e-4
+                h = 5e-5
                 # end points of the initial string
                 # notice that they do NOT have to be at minima of V -- the method finds
                 # those automatically
@@ -198,22 +198,24 @@ class mockSimulation:
 
                                 # parameters in Mueller potential
 
-                aa = [-0.8, -8, -10] # inverse radius in x
-                bb = [0, 0, 0] # radius in xy
-                cc = [-10, -8, -0.8] # inverse radius in y
-                AA = [-100, -50, -100] # strength
+                aa = [-2, -20, -20, -20, -20] # inverse radius in x
+                bb = [0, 0, 0, 0, 0] # radius in xy
+                cc = [-20, -20, -2, -20, -20] # inverse radius in y
+                AA = [-200, -120, -200, -100, -100] # strength
 
+                #XX = [1.5, 0, 0] # center_x
+                #YY = [0, 0, 1.5] # center_y
 
-                XX = [1.5, 0, 0] # center_x
-                YY = [0, 0, 1.5] # center_y
+                XX = [1, 0, 0, 0, 0.4] # center_x
+                YY = [0, 0, 1, 0.4, 0] # center_y
 
-                zxx = np.mgrid[-1:3.01:0.01]
-                zyy = np.mgrid[-1:3.01:0.01]
+                zxx = np.mgrid[-1:2.01:0.01]
+                zyy = np.mgrid[-1:2.01:0.01]
                 xx, yy = np.meshgrid(zxx, zyy)
 
 
                 V1 = AA[0]*np.exp(aa[0] * np.square(xx-XX[0]) + bb[0] * (xx-XX[0]) * (yy-YY[0]) +cc[0]*np.square(yy-YY[0]))
-                for j in range(1,3):
+                for j in range(1,5):
                         V1 =  V1 + AA[j]*np.exp(aa[j]*np.square(xx-XX[j]) + bb[j]*(xx-XX[j])*(yy-YY[j]) + cc[j]*np.square(yy-YY[j]))
 
                 fig = plt.figure()
@@ -235,7 +237,7 @@ class mockSimulation:
                         ee = AA[0]*np.exp(aa[0]*np.square(x-XX[0])+bb[0]*(x-XX[0])*(y-YY[0])+cc[0]*np.square(y-YY[0]))
                         dVx = (2*aa[0]*(x-XX[0])+bb[0]*(y-YY[0]))*ee
                         dVy = (bb[0]*(x-XX[0])+2*cc[0]*(y-YY[0]))*ee
-                        for j in range(1,3):
+                        for j in range(1,5):
                                 ee = AA[j]*np.exp(aa[j]*np.square(x-XX[j])+bb[j]*(x-XX[j])*(y-YY[j])+cc[j]*np.square(y-YY[j]))
                                 dVx = dVx + (2*aa[j]*(x-XX[j])+bb[j]*(y-YY[j]))*ee
                                 dVy = dVy + (bb[j]*(x-XX[j])+2*cc[j]*(y-YY[j]))*ee
@@ -256,5 +258,6 @@ class mockSimulation:
 
 # output size :
 # 2 * simu length * number of parallel sims
+
 
 
