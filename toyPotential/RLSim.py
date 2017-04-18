@@ -7,14 +7,14 @@ class mockSimulation:
                 self.N = 1# number of parallel simulations
                 
                 
-        def run_multipleSim():
+        def run_multipleSim(self):
                 return True
-        def runNxtRound():
+        def runNxtRound(self):
                 return True
                 
         
         ## private
-        def PreSamp(trj):
+        def PreSamp(self, trj):
                 """
                 Pre-Sampling:
                         choose states with minimum counts or newly discovered states
@@ -22,7 +22,7 @@ class mockSimulation:
                 trj_Sp = trj # pick all
                 return trj_Sp
                 
-        def map(trj_Sp):
+        def map(self, trj_Sp):
                 # map coordinate space to reaction coorinates space
                 trj_Sp_theta = trj_Sp
                 return trj_Sp_theta
@@ -112,27 +112,10 @@ class mockSimulation:
                 return newPoints_index
         
         
-
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        def creatPotentioal():
+        def creatPotentioal(self):
                 return True
                 
-        def run(inits_x, inits_y):
+        def run(self, inits_x, inits_y):
                 import numpy as np
                 import time 
                 from scipy.interpolate import interp1d
