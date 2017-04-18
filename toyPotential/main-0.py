@@ -9,7 +9,8 @@ N = len(X_0)
 # run first round of simulation
 my_sim = RLSim.mockSimulation()
 trj1 = my_sim.run([X_0, Y_0])
-W_0 = [1/2, 1/2]
+#W_0 = [1/2, 1/2]
+W_0 = [[1/4, 1/4], [1/4, 1/4]]
 Ws = []
 trjs = trj1
 for round in range(25):
