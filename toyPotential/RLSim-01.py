@@ -16,11 +16,11 @@ class mockSimulation:
         ## private
         def PreSamp(self, trj):
                 """
-                Pre-Sampling:
-                        choose states with minimum counts or newly discovered states
-                        
+                Pre-Sampling, choose states with minimum counts or newly discovered states
+                trj :
+                        list of parallel trajectories
                 output:
-                        trj with shape of [[Xs][Ys]]
+                        combined trj with shape of [[Xs][Ys]]
                 """
                 import numpy as np
                 comb_trj = []
