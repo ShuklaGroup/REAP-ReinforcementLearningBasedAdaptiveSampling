@@ -5,7 +5,8 @@ class mockSimulation:
                 self.r = 1#number of rounds
                 self.s = 1# length of simulations
                 self.N = 1# number of parallel simulations
-                
+                self.newlyDisc = []
+                self.allTrjs = []
                 
         def run_multipleSim(self):
                 return True
