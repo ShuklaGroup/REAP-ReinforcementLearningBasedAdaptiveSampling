@@ -29,7 +29,20 @@ class mockSimulation:
                 trj_Sp = np.array(comb_trj) # pick all
                 
                 return trj_Sp
+         
+        def isNew(self, allTrjs, my_state):
+                isNew = True
+                for state in allTrjs:
+                        if self.distance(state, mystate)< delta:
+                                isNew = False
+                                break
                 
+                return isNew
+        
+        def distance(self, state1, state2):
+                dist = sqrt((state1[0]-state2[0])^2 + (state1[1]-state2[1])^2 
+                return dist
+                            
         def map(self, trj_Sp):
                 # map coordinate space to reaction coorinates space
                 trj_Sp_theta = trj_Sp
