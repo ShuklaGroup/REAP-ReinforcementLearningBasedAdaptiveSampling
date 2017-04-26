@@ -14,7 +14,8 @@ N = len(X_0)
 my_sim = RLSim.mockSimulation()
 trj1 = my_sim.run([X_0, Y_0])
 
-### Choose states with min count or newly discovered
+### Choose states which have been discovered whitin the last 5 rounds
+#### states with min count or newly discovered
 trj1_Sp = my_sim.PreSamp(trj1)
 
 ### Map coordinate space to reaction coorinates space
