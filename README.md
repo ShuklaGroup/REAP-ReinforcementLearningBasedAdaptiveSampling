@@ -28,6 +28,7 @@ W_0 = [1/2, 1/2]
 W_1 = my_sim.updateW(trj1_Sp_theta, W_0)
 
 ### Get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
+select the next round points from the least populated states. (cluster and find least pop)
 newPoints_index = my_sim.findStarting(trj1_Sp_theta, W_1, starting_n = N , method = 'RL')
 
 X_1, Y_1 = trj1_Sp[newPoints_index]
