@@ -25,7 +25,9 @@ for round in range(25):
 	trj1_Sp_theta = my_sim.map(trj1_Sp)
 	
 	newPoints = my_sim.findStarting(trj1_Sp_theta, trj1_Sp, W_1, starting_n = N , method = 'RL')
+	
 	trj2 = my_sim.run(newPoints)
+	
 	trj1 = trj2
 	trjs = [np.concatenate((trj2[0],trjs[0])), np.concatenate((trj2[1],trjs[1]))]
 
