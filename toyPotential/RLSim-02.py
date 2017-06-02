@@ -25,15 +25,32 @@ class mockSimulation:
                 # least count
                 #from msmbuilder.cluster import KMeans
                 from sklearn.cluster import KMeans
-                myn_clusters = 10
                 import numpy as np
+                
+                myn_clusters = 10
+                method=='leastPop'
                 comb_trj = []
                 for theta in range(len(trj)):
                         comb_trj.append(np.concatenate(np.concatenate(trj[theta])))
                 #comb_trj = np.array(comb_trj) # pick all
+                
                 comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
                 cluster = KMeans(n_clusters=myn_clusters)
                 cluster.fit(comb_trj_xy)
+                cl_trjs = cluster.labels_
+                
+                #if method=='leastPop': # N: number of chosen min pop clusters
+                N = 1
+                unique, counts = np.unique(cl_trjs, return_counts=True)
+                leastPop = counts.argsort()[:N]
+                init_cl = [unique[i] for i in leastPop]
+                #init = np.array(init)
+                #init = init.astype(int)
+		
+                counter = 0
+                
+                
+                
                 
                 return trj_Sp
                 
