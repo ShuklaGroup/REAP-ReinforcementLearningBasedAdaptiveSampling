@@ -22,11 +22,18 @@ class mockSimulation:
                 output:
                         combined trj with shape of [[Xs][Ys]]
                 """
+                # least count
+                #from msmbuilder.cluster import KMeans
+                from sklearn.cluster import KMeans
+                myn_clusters = 10
                 import numpy as np
                 comb_trj = []
                 for theta in range(len(trj)):
                         comb_trj.append(np.concatenate(np.concatenate(trj[theta])))
-                trj_Sp = np.array(comb_trj) # pick all
+                #comb_trj = np.array(comb_trj) # pick all
+                comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
+                cluster = KMeans(n_clusters=myn_clusters)
+                cluster.fit(comb_trj_xy)
                 
                 return trj_Sp
                 
