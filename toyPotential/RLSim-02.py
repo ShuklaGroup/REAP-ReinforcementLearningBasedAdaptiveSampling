@@ -97,8 +97,7 @@ class mockSimulation:
                         
                 R = np.sum(np.array(r))
                 return R
-                
-        
+                      
         
         def updateW(self, trj_Sp_theta, W_0):
                 """
@@ -172,6 +171,13 @@ class mockSimulation:
         def findStarting(self, trj_Sp_theta, trj_Sp, W_1, starting_n=10 , method = 'RL'):
                 # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
                 import numpy as np
+		while len(trj_Sp_theta)<starting_n:
+			trj_Sp_theta = [[np.concatenate([trj_Sp_theta[0], trj_Sp_theta[0]])], 
+					... [np.concatenate([trj_Sp_theta[1], trj_Sp_theta[1]])]]
+		
+		while len(trj_Sp)<starting_n:
+			trj_Sp = [[np.concatenate([trj_Sp[0], trj_Sp[0]])], [np.concatenate([trj_Sp[1], trj_Sp[1]])]]
+			
                 theta_mean = []
                 theta_std = []
                 for theta in range(len(W_1)):
