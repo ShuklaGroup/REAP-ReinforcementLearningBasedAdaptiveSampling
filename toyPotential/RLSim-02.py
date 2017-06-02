@@ -48,8 +48,15 @@ class mockSimulation:
                 #init = init.astype(int)
 		
                 counter = 0
-                
-                
+		init_index = []
+		init_trj_xy = []
+                for i in range(len(cl_trjs)):
+			if cl_trjs[i]==init_cl:
+				counter = counter + 1
+				init_index.append(i)
+				init_trj_xy.append(comb_trj_xy[i])
+		init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))]]		
+                trj_Sp = init_trj
                 
                 
                 return trj_Sp
