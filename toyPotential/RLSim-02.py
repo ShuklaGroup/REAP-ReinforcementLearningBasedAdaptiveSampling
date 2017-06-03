@@ -48,7 +48,7 @@ class mockSimulation:
                 #init = init.astype(int)
 		
                 counter = 0
-		init_index = []
+                init_index = []
 		init_trj_xy = []
                 for i in range(len(cl_trjs)):
 			if cl_trjs[i]==init_cl:
