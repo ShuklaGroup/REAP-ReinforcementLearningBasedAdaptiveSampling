@@ -1,7 +1,5 @@
-import RLSim205
+import RLSim as rl
 import numpy as np 
-#X_0 = [1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1]
-#Y_0 = [0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01]
 Y_0 = [0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01]
 X_0 = [0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01]
 
@@ -9,7 +7,7 @@ X_0 = [0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.0
 N = len(X_0) # number of parallel runs 
 
 # run first round of simulation
-my_sim = RLSim205.mockSimulation()
+my_sim = rl.mockSimulation()
 W_0 = [[1/4, 1/4], [1/4, 1/4]] # initial geuss of weights for + - in x and y directions
 Ws = [] # series of weights
 
@@ -31,7 +29,6 @@ for round in range(40):
 	#my_sim.updateStat(trjs_Sp_theta) # based on min count trajectories
 	my_sim.updateStat(trjs_theta) # based on all trajectories
 	W_1 = my_sim.updateW(trj1_Sp_theta, W_0) # rewigth weigths using last round
-	#W_1 = my_sim.updateW(trjs_Sp_theta, W_0)
 	W_0 = W_1
 	Ws.append(W_0)
 	print('Weight', W_0)
@@ -39,13 +36,10 @@ for round in range(40):
 	trj1 = my_sim.run(newPoints, nstepmax = 10)
 	trj1 = my_sim.PreAll(trj1) # 2 x all points of this round
 
-	#trjs = np.array([np.array(np.concatenate((trj1[0],trjs[0]))), np.array(np.concatenate((trj1[1],trjs[1])))])  # 2 x all points
 	com_trjs = []
 
 	for theta in range(len(trj1)):
-		#print('theta', theta)
 		com_trjs.append(np.concatenate((trjs[theta], trj1[theta])))
-		#print(len(trjs[theta]))
 	
 	trjs = np.array(com_trjs)
 	trjs_theta = np.array(my_sim.map(trjs))
