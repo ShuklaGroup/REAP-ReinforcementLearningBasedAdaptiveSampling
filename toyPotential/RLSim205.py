@@ -49,7 +49,7 @@ class mockSimulation:
                 comb_trj = trj
                 
 
-                myn_clusters = 10
+                myn_clusters = 40
                 from sklearn.cluster import KMeans
                 comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
                 cluster = KMeans(n_clusters=myn_clusters)
@@ -57,7 +57,7 @@ class mockSimulation:
                 cl_trjs = cluster.labels_
                 
                 #if method=='leastPop': # N: number of chosen min pop clusters
-                N = 1
+                N = 3
                 unique, counts = np.unique(cl_trjs, return_counts=True)
                 leastPop = counts.argsort()[:N]
                 init_cl = [unique[i] for i in leastPop]
@@ -68,7 +68,8 @@ class mockSimulation:
                 init_index = []
                 init_trj_xy = []
                 for i in range(len(cl_trjs)):
-                        if cl_trjs[i]==init_cl:
+                        if cl_trjs[i] in init_cl:
+                                print(cl_trjs[i])
                                 counter = counter + 1
                                 init_index.append(i)
                                 init_trj_xy.append(comb_trj_xy[i])
@@ -134,6 +135,7 @@ class mockSimulation:
 
                 r = []
                 # for over all dicovered states
+                trj_Sp_theta = np.array(trj_Sp_theta)
                 for state_index in range(len(trj_Sp_theta[0])):
                         #print('trj_Sp_theta', trj_Sp_theta)
                         state_theta = trj_Sp_theta[:, state_index]
@@ -197,7 +199,7 @@ class mockSimulation:
                         print(len(trj_Sp[0]), starting_n)
                         trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
                 
-                print('trj_Sp', trj_Sp)
+                #print('trj_Sp', trj_Sp)
                 """
                 
                 theta_mean = []
