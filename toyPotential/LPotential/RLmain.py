@@ -27,8 +27,8 @@ for round in range(30):
 	# updates the std and mean 
 	#my_sim.updateStat(trjs_Sp_theta) # based on min count trajectories
 	my_sim.updateStat(trjs_theta) # based on all trajectories
-	W_1 = my_sim.updateW(trj1_Sp_theta, W_0) # rewigth weigths using last round
-	#W_1 = my_sim.updateW(trjs_Sp_theta, W_0)
+	#W_1 = my_sim.updateW(trj1_Sp_theta, W_0) # rewigth weigths using last round
+	W_1 = my_sim.updateW(trjs_Sp_theta, W_0) # important
 	W_0 = W_1
 	Ws.append(W_0)
 	print('Weight', W_0)
