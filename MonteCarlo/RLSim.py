@@ -6,7 +6,7 @@ class mockSimulation:
                 self.r = 1#number of rounds
                 self.s = 1# length of simulations
                 self.N = 1# number of parallel simulations
-                
+                self.msm = None
                 
         def run_multipleSim(self):
                 return True
@@ -24,10 +24,11 @@ class mockSimulation:
                         trj with shape of [[Xs][Ys]]
                 """
                 import numpy as np
-                comb_trj = []
-                for theta in range(len(trj)):
-                        comb_trj.append(np.concatenate(np.concatenate(trj[theta])))
-                trj_Sp = np.array(comb_trj) # pick all
+                comb_trj = np.concatenate(trj)
+		
+                #for theta in range(len(trj)):
+                #        comb_trj.append(np.concatenate(np.concatenate(trj[theta])))
+                #trj_Sp = np.array(comb_trj) # pick all
                 
                 return trj_Sp
 
@@ -242,28 +243,29 @@ class mockSimulation:
         def creatPotentioal(self):
                 return True
                 
-        def run(self, init, nstepmax = 10):
- 	        """
-	        Parameters
-	        ----------
-	        initi : 
-	        	initial state (singe state)
-	        msm :
-	        	reference MSM
-	        s :
-	        	lenght (number of steps) of each simulation	
-	        
-	        output :
-	        	final trajectory
-	        """
-                msm = self.msm
+        def run(self, inits, nstepmax = 10):
+                 """
+                Parameters
+                ----------
+                initi : 
+                        initial state (singe state)
+                msm :
+                        reference MSM
+                s :
+                        lenght (number of steps) of each simulation	
                 
-                trj = np.empty([N,s])
+                output :
+                        final trajectory
+                """
+                import numpy as np
+                msm = self.msm
+                N = len(inits)
+                trj = np.empty([N, nstepmax])
                 for n in range(N):
                         init = np.int(inits[n])
                         trj = msm.sample_discrete(state=init, n_steps=nstepmax, random_state=None)
                 
-                return trjs
+                return trj
                 
     
 
