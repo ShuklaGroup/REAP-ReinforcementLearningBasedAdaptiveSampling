@@ -49,10 +49,24 @@ class mockSimulation:
                 return init_cl
 
                 
-        def map(self, trj_Sp):
+        def map(self, trj_Ps):
+		"""
+		
+		output:
+			n_ec x n_frames
+		"""
                 # map coordinate space to reaction coorinates space
-                trj_Sp_theta = trj_Sp
-                return trj_Sp_theta
+                trj_Ps_theta = []
+                for frame in trj_Ps:
+                        theta = np.loadtxt('MSMStatesAllVals_1000/cluster'+str(frame)+'-1')
+                        trj_Ps_theta.append(theta)
+                #trj_Sp_theta = trj_Sp
+		
+		# change the format
+		trj_Ps_theta_2 = []
+		##############
+		
+                return trj_Ps_theta
 
         def reward_state(self, S, theta_mean, theta_std, W_):
                 
@@ -167,25 +181,14 @@ class mockSimulation:
                 W = [[x[0], x[1]],[x[2], x[3]]]
                 return W
                 
-        def findStarting(self, trj_Sp_theta, trj_Sp, W_1, starting_n=10 , method = 'RL'):
+        def findStarting(self, trj_Ps_theta, trj_Ps, W_1, starting_n=10 , method = 'RL'):
+		"""
+		trj_Ps_theta: 
+			size n_theta x n_frames
+		trj_Ps:
+		"""
                 # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
-                import numpy as np
-                """
-                print(len(trj_Sp_theta[0]), starting_n)
-                
-                while len(trj_Sp_theta[0])<starting_n:
-                        print(len(trj_Sp_theta[0]), starting_n)
-                        print('trj_Sp_theta<starting_n')
-                        trj_Sp_theta = np.array([np.concatenate([trj_Sp_theta[0], trj_Sp_theta[0]]), np.concatenate([trj_Sp_theta[1], trj_Sp_theta[1]])])
-        
-                while len(trj_Sp[0])<starting_n:
-                        print('trj_Sp<starting_n')
-                        print(len(trj_Sp[0]), starting_n)
-                        trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
-                
-                #print('trj_Sp', trj_Sp)
-                """
-                
+                import numpy as np               
                 theta_mean = []
                 theta_std = []
                 for theta in range(len(W_1)):
