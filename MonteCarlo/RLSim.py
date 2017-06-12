@@ -33,49 +33,21 @@ class mockSimulation:
                 return trj_Sp
 
 
-        def PreSamp(self, trj, starting_n=10, myn_clusters = 40, N = 2):
+        def PreSamp_MC(self, trj, N = 20):
                 """
-                Pre-Sampling:
+                Pre-Sampling for Monte Carlo simulations:
                         choose states with minimum counts or newly discovered states
                         
                 output:
-                        trj with shape of [[Xs][Ys]]
+                        trj with shape of 
                 """
                 import numpy as np
-                comb_trj = trj
-                
-                from sklearn.cluster import KMeans
-
-                comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
-                cluster = KMeans(n_clusters=myn_clusters)
-                cluster.fit(comb_trj_xy)
-                cl_trjs = cluster.labels_
-                
-                #if method=='leastPop': # N: number of chosen min pop clusters
-                
+                cl_trjs = trj             
                 unique, counts = np.unique(cl_trjs, return_counts=True)
                 leastPop = counts.argsort()[:N]
                 init_cl = [unique[i] for i in leastPop]
+                return init_cl
 
-        
-                counter = 0
-                init_index = []
-                init_trj_xy = []
-                for i in range(len(cl_trjs)):
-                        if cl_trjs[i] in init_cl:
-                                counter = counter + 1
-                                init_index.append(i)
-                                init_trj_xy.append(comb_trj_xy[i])
-                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))]]     
-                trj_Sp = init_trj
-
-                while len(trj_Sp[0])<starting_n:
-                        print('trj_Sp<starting_n')
-                        print(len(trj_Sp[0]), starting_n)
-                        trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
-                
-
-                return trj_Sp
                 
         def map(self, trj_Sp):
                 # map coordinate space to reaction coorinates space
@@ -260,12 +232,12 @@ class mockSimulation:
                 import numpy as np
                 msm = self.msm
                 N = len(inits)
-                trj = np.empty([N, nstepmax])
+                trjs = np.empty([N, nstepmax])
                 for n in range(N):
                         init = np.int(inits[n])
                         trj = msm.sample_discrete(state=init, n_steps=nstepmax, random_state=None)
-                
-                return trj
+                        trjs[n] = trj
+                return trjs
                 
     
 
