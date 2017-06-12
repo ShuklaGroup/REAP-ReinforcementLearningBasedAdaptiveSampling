@@ -7,6 +7,8 @@ msm = pickle.load(open('MSM.pkl','rb'))
 init = 132
 N = 10 # number of parallel runs 
 inits = [init for i in range(N)]
+
+
 # run first round of simulation
 my_sim = rl.mockSimulation()
 my_sim.msm = msm
@@ -18,10 +20,16 @@ Ws = [] # series of weights
 
 # first round
 trj1 = my_sim.run(inits, nstepmax = 10)
-trj1 = my_sim.PreAll(trj1)
+comb_trj1 = np.concatenate(trj1)
+#trj1 = my_sim.PreAll(trj1)
 
-trjs = trj1
-trj1_Sp = my_sim.PreSamp(trj1, starting_n = N) # pre analysis
+# comb_trj1 = first trajectory in the format of 1x(N*step) and cluster labels
+trjs = comb_trj1
+
+# trj1_Ps= presampled (least count,...) from first trajectory in the format of cluster labels
+trj1_Ps = my_sim.PreSamp_MC(trj1, N = 3*N) # pre analysis
+
+
 trj1_Sp_theta = my_sim.map(trj1_Sp)
 newPoints = my_sim.findStarting(trj1_Sp_theta, trj1_Sp, W_0, starting_n = N , method = 'RL')
 
