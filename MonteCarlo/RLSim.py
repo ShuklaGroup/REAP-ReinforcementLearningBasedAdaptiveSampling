@@ -25,7 +25,7 @@ class mockSimulation:
                 """
                 import numpy as np
                 comb_trj = np.concatenate(trj)
-		
+
                 #for theta in range(len(trj)):
                 #        comb_trj.append(np.concatenate(np.concatenate(trj[theta])))
                 #trj_Sp = np.array(comb_trj) # pick all
@@ -50,23 +50,27 @@ class mockSimulation:
 
                 
         def map(self, trj_Ps):
-		"""
-		
-		output:
-			n_ec x n_frames
-		"""
+                """
+
+                output:
+                      n_ec x n_frames
+                """
                 # map coordinate space to reaction coorinates space
+                import numpy as np
                 trj_Ps_theta = []
+                msm = self.msm
                 for frame in trj_Ps:
-                        theta = np.loadtxt('MSMStatesAllVals_1000/cluster'+str(frame)+'-1')
+                        theta = np.loadtxt('MSMStatesAllVals_1000/cluster'+str(msm.mapping_[int(frame)])+'-1')
                         trj_Ps_theta.append(theta)
                 #trj_Sp_theta = trj_Sp
-		
-		# change the format
-		trj_Ps_theta_2 = []
-		##############
-		
-                return trj_Ps_theta
+
+                # change the format
+                trj_Ps_theta_2 = []
+                ##############
+                trj_Ps_theta = np.array(trj_Ps_theta) 
+                for theta_index in range(len(trj_Ps_theta[0])):
+                        trj_Ps_theta_2.append(trj_Ps_theta[:,theta_index])
+                return trj_Ps_theta_2
 
         def reward_state(self, S, theta_mean, theta_std, W_):
                 
@@ -174,31 +178,34 @@ class mockSimulation:
 
 
 
-                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]    
-                
-                res = minimize(fun, x0, constraints=cons)
+                #x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]    
+                x0 = W_0
+                #res = minimize(fun, x0, constraints=cons)
+                res = minimize(fun, x0)
                 x = res.x
-                W = [[x[0], x[1]],[x[2], x[3]]]
+                #W = [[x[0], x[1]],[x[2], x[3]]]
+                W = x
                 return W
                 
         def findStarting(self, trj_Ps_theta, trj_Ps, W_1, starting_n=10 , method = 'RL'):
-		"""
-		trj_Ps_theta: 
-			size n_theta x n_frames
-		trj_Ps:
-		"""
+                """
+                trj_Ps_theta: 
+                         size n_theta x n_frames
+                trj_Ps:
+                """
                 # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
                 import numpy as np               
                 theta_mean = []
                 theta_std = []
                 for theta in range(len(W_1)):
-                        theta_mean.append(np.mean(trj_Sp_theta[theta]))
-                        theta_std.append(np.std(trj_Sp_theta[theta]))
+                        theta_mean.append(np.mean(trj_Ps_theta[theta]))
+                        theta_std.append(np.std(trj_Ps_theta[theta]))
                         
                 ranks = {}
-                for state_index in range(len(trj_Sp_theta[0])):
+                trj_Ps_theta = np.array(trj_Ps_theta)
+                for state_index in range(len(trj_Ps_theta[0])):
                         #print(len(trj_Sp_theta[0]))
-                        state_theta = trj_Sp_theta[:,state_index]
+                        state_theta = trj_Ps_theta[:,state_index]
                         
                         r = self.reward_state( state_theta, theta_mean, theta_std, W_1)
                         
@@ -207,7 +214,7 @@ class mockSimulation:
                 newPoints_index0 = sorted(ranks.items(), key=lambda x: x[1], reverse=True)[0:starting_n] 
                 newPoints_index = np.array(newPoints_index0)[:,0]   
                 
-                n_coord = len(trj_Sp)
+                n_coord = len(trj_Ps)
                                      
                 newPoints = []
                 for coord in range(n_coord):
@@ -219,7 +226,7 @@ class mockSimulation:
                 return True
                 
         def run(self, inits, nstepmax = 10):
-                 """
+                """
                 Parameters
                 ----------
                 initi : 
