@@ -76,20 +76,27 @@ class mockSimulation:
                 
                 r_s = 0
                 for k in range(len(W_)):
+                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
+                        """
                         if (S[k] - theta_mean[k]) < 0: 
                                 r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k])
                         else:
                                 r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k])
+                        """
                 return r_s
 
         def reward_state_withoutStd(self, S, theta_mean, theta_std, W_):
                 
                 r_s = 0
                 for k in range(len(W_)):
+                        
+                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])) # no direction
+                        """
                         if (S[k] - theta_mean[k]) < 0: 
                                 r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k]))
                         else:
                                 r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k]))
+                        """
                 return r_s
 
 
@@ -138,7 +145,8 @@ class mockSimulation:
                 """
                 def fun(x):
                         global trj_Sp_theta_z
-                        W_0 = [[x[0], x[1]],[x[2], x[3]]]
+                        #W_0 = [[x[0], x[1]],[x[2], x[3]]]
+                        W_0 = x
                         r_0 = self.reward_trj(trj_Sp_theta, W_0)
                         return -1*r_0                        
                 import numpy as np
@@ -148,6 +156,8 @@ class mockSimulation:
                 trj_Sp_theta_z = trj_Sp_theta
                 alpha = 0.2
                 delta = alpha
+                cons = ({'type': 'eq',
+                          'fun' : lambda x: np.array([np.sum(x)-1])})
                 cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([x[0]+x[1]+x[2]+x[3]-1])},
                          {'type': 'ineq',
@@ -177,11 +187,16 @@ class mockSimulation:
                           )
 
 
-
+                cons = ({'type': 'eq',
+                          'fun' : lambda x: np.array([np.sum(x)-1])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([np.min(x)])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([np.abs(np.sum(x-x0))+delta])})
                 #x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]    
                 x0 = W_0
-                #res = minimize(fun, x0, constraints=cons)
-                res = minimize(fun, x0)
+                res = minimize(fun, x0, constraints=cons)
+                #res = minimize(fun, x0)
                 x = res.x
                 #W = [[x[0], x[1]],[x[2], x[3]]]
                 W = x
@@ -204,7 +219,6 @@ class mockSimulation:
                 ranks = {}
                 trj_Ps_theta = np.array(trj_Ps_theta)
                 for state_index in range(len(trj_Ps_theta[0])):
-                        #print(len(trj_Sp_theta[0]))
                         state_theta = trj_Ps_theta[:,state_index]
                         
                         r = self.reward_state( state_theta, theta_mean, theta_std, W_1)
@@ -214,11 +228,12 @@ class mockSimulation:
                 newPoints_index0 = sorted(ranks.items(), key=lambda x: x[1], reverse=True)[0:starting_n] 
                 newPoints_index = np.array(newPoints_index0)[:,0]   
                 
-                n_coord = len(trj_Ps)
-                                     
-                newPoints = []
-                for coord in range(n_coord):
-                          newPoints.append([trj_Sp[coord][int(i)] for i in newPoints_index])                                   
+                #n_coord = len(trj_Ps)
+                n_coord = 1                     
+                #newPoints = []
+                newPoints = [trj_Ps[int(i)] for i in newPoints_index]
+                #for coord in range(n_coord):
+                #          newPoints.append([trj_Ps[coord][int(i)] for i in newPoints_index])                                   
                 return newPoints
         
         
@@ -249,8 +264,22 @@ class mockSimulation:
                         trjs[n] = trj
                 return trjs
                 
-    
+                
+        def isActive_singleTrj(self, trjs):	
+                frames = len(trjs)
+                for frame in range(frames):
+                        if isActive(trjs[frame]):
+                                return True
+                return False
 
+########################################################################################################################
+# From calculated and saved files reads if the state is an active state or not
+########################################################################################################################	
+
+        def isActive(state):
+                import numpy as np
+                isActive = np.load('isActive/isActive'+str(int(state))+'.npy')
+                return isActive
 
 
 
