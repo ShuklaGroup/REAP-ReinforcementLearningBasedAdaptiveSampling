@@ -29,9 +29,11 @@ trjs = comb_trj1
 # trj1_Ps= presampled (least count,...) from first trajectory in the format of cluster labels
 trj1_Ps = my_sim.PreSamp_MC(trj1, N = 3*N) # pre analysis
 
+# trj1_Ps_theta = presampled (least count,..) from first trajectory in the format of n_ec x n_frames and theta (evolutionary couplings,..)
+trj1_Ps_theta = my_sim.map(trj1_Ps)
 
-trj1_Sp_theta = my_sim.map(trj1_Sp)
-newPoints = my_sim.findStarting(trj1_Sp_theta, trj1_Sp, W_0, starting_n = N , method = 'RL')
+# 
+newPoints = my_sim.findStarting(trj1_Ps_theta, trj1_Ps, W_0, starting_n = N , method = 'RL')
 
 trjs_theta = trj1_Sp_theta
 
