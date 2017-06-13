@@ -268,7 +268,7 @@ class mockSimulation:
         def isActive_singleTrj(self, trjs):	
                 frames = len(trjs)
                 for frame in range(frames):
-                        if isActive(trjs[frame]):
+                        if self.isActive(trjs[frame]):
                                 return True
                 return False
 
@@ -276,11 +276,111 @@ class mockSimulation:
 # From calculated and saved files reads if the state is an active state or not
 ########################################################################################################################	
 
-        def isActive(state):
+        def isActive(self, state):
                 import numpy as np
                 isActive = np.load('isActive/isActive'+str(int(state))+'.npy')
                 return isActive
 
 
+        def runSimulation(self, s=s, R=r, N=N, method='RL'):
+                import numpy as np
+                activeTime = -1
+                init = 132
+                inits = [init for i in range(N)]
+                n_ec = 1000
+                W_0 = [1/n_ec for i in range(n_ec)]
+                Ws = []
+                trj1 = self.run(inits, nstepmax = s)
+                comb_trj1 = np.concatenate(trj1)
+                trjs = comb_trj1
+                trj1_Ps = self.PreSamp_MC(trj1, N = 3*N) # pre analysis , 1 x n_frames
+                trj1_Ps_theta = self.map(trj1_Ps)
+                newPoints = self.findStarting(trj1_Ps_theta, trj1_Ps, W_0, starting_n = N , method = 'RL')
+                trjs_theta = trj1_Ps_theta
+                trjs_Ps_theta = trj1_Ps_theta
+                
+                count = 1
+                for round in range(r):
+                        self.updateStat(trjs_theta) # based on all trajectories
+                        W_1 = self.updateW(trjs_Ps_theta, W_0)
+                        W_0 = W_1
+                        Ws.append(W_0)
+                        
+                        trj1 = self.run(newPoints, nstepmax = s) # N (number of parallel) x n_all_frames
+                        trj1 = np.concatenate(trj1) # 1 x n_all_frames
+                        isActive = self.isActive_singleTrj(trj1)
+                        if isActive:
+                                print('Active')
+                                activeTime = count*s*N
+                                break
+                                
+                        com_trjs = np.concatenate((trjs, trj1))
+                        trjs = np.array(com_trjs)
+                        trjs_theta = np.array(my_sim.map(trjs))
+                        trjs_Ps = self.PreSamp_MC(trjs, N = 4*N)
+                        trjs_Ps_theta = np.array(self.map(trjs_Ps))
+                        newPoints = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
+                        count = count + 1
+                        
+                np.save('activeTime_'+'r'+str(r)+'N'+str(N)+'s'+str(s), activeTime)
+                np.save('w_'+'r'+str(r)+'N'+str(N)+'s'+str(s), Ws)
+                return activeTime
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                
+                
+         
+################
+        def multiSim_multiP_timeCal(self, method='RL'):
+                """
+                Parameters
+                ----------
+                method :
+                characteristics for adaptive sampling:
+                'Reinforcement learning'
+                output :
+                time to reach the active state
+                saves text files in the format of 'time_'+str(i)+'_'+str(j)+'.txt' which contains time to reach active state for the point 
+                [i, j]
+                """
+                
+                import numpy as np
+                from multiprocessing import Pool
+                T_len = [1,2,3,4,5,6,7,8,9]
+                T_n = range(10,1010,10)
+                l = len(T_len)
+                n = len(T_n)
+                arg = []
+                for i in range(l):
+                        for j in range(n):
+                                T_len1 = T_len[i]
+                                T_n1 = T_n[j]
+                                r=T_n1/10
+                                N=10
+                                s=T_len1
+                                arg.append([s, r, N, method, i, j])
+                                
+                p = Pool(9)
+                S = p.map(multi_run_wrapper_multiSim_timeCal, arg)
+	
 
+        def multi_run_wrapper_multiSim_timeCal(args):
+                return f_multiSimTimeCal(*args)
 
+        def f_multiSimTimeCal(self, s, r, N, method, i, j):
+                import numpy as np
+                print("s :", s, " r:" ,r)
+                trjs = self.runSimulation(s=s, R=r, N=N, method=method)
+                time = activeTimeCal(trjs)
+                print(time)
+                np.savetxt('time_'+str(i)+'_'+str(j)+'.txt', [time])
+                return time
+
+        
+        
