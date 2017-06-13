@@ -230,7 +230,7 @@ class mockSimulation:
                         trjs[n] = trj
                 return trjs
                 
-		
+
         def isActive_singleRound(self, trjs):
                 time = -1
                 n_parTrjs = len(trjs)
@@ -301,8 +301,8 @@ class mockSimulation:
 
                 T_len = [1,2,3,4,5,6,7,8,9] # lenght of trajectories
                 T_n = range(10,1010,10) # number of trajectories
-		N=10
-		r = T_n1/N
+                N=10
+                r = T_n1/N
                 l = len(T_len)
                 n = len(T_n)
                 for i in range(l):
@@ -313,7 +313,7 @@ class mockSimulation:
                                 N=10
                                 s=T_len1
                                 arg.append([s, r, N, method, i, j])
-				myfile = open('run_.'+'r'+str(r)+'N'+str(N)+'s'+str(s)+'py','w')
+                                myfile = open('run_.'+'r'+str(r)+'N'+str(N)+'s'+str(s)+'py','w')
                                 myfile.write('import pickle \n')
                                 myfile.write('import RLSim as rl \n')
                                 myfile.write('import numpy as np \n')
@@ -321,10 +321,9 @@ class mockSimulation:
                                 myfile.write('my_sim = rl.mockSimulation() \n')
                                 myfile.write('my_sim.msm = msm \n')
                                 myfile.write('my_sim.runSimulation(s='+str(s)+', R='+ str(r) +', N='+ str(N)+') \n')
-				myfile.close()
-				
+                                myfile.close()
                 return
-				
+
 ################
         def multiSim_multiP_timeCal(self, method='RL'):
                 """
