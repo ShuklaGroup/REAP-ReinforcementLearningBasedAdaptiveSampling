@@ -237,7 +237,7 @@ class mockSimulation:
                 for trj in range(n_parTrjs):
                         for frame in range(len(trj)):
                                 if self.isActive(trjs[frame]):
-					time = n_parTrjs * frame
+                                        time = n_parTrjs * frame
                                         return time
                 return time
 
@@ -277,7 +277,7 @@ class mockSimulation:
                         
                         trj1 = self.run(newPoints, nstepmax = s) # N (number of parallel) x n_all_frames
                         isActive = self.isActive_singleRound(trj1)
-			trj1 = np.concatenate(trj1) # 1 x n_all_frames
+                        trj1 = np.concatenate(trj1) # 1 x n_all_frames
                         
                         if int(isActive)!=-1:
                                 print('Active')
