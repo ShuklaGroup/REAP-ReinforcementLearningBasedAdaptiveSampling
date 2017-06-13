@@ -282,7 +282,7 @@ class mockSimulation:
                 return isActive
 
 
-        def runSimulation(self, s=s, R=r, N=N, method='RL'):
+        def runSimulation(self, R=30,N=10,s=80, method='RL'):
                 import numpy as np
                 activeTime = -1
                 init = 132
