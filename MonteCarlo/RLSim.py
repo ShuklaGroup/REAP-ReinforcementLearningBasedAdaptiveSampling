@@ -282,12 +282,12 @@ class mockSimulation:
                 return isActive
 
 
-        def runSimulation(self, R=30,N=10,s=80, method='RL'):
+        def runSimulation(self, R=3,N=10,s=8, method='RL'):
                 import numpy as np
                 activeTime = -1
                 init = 132
                 inits = [init for i in range(N)]
-                n_ec = 1000
+                n_ec = 900
                 W_0 = [1/n_ec for i in range(n_ec)]
                 Ws = []
                 trj1 = self.run(inits, nstepmax = s)
@@ -316,7 +316,7 @@ class mockSimulation:
                                 
                         com_trjs = np.concatenate((trjs, trj1))
                         trjs = np.array(com_trjs)
-                        trjs_theta = np.array(my_sim.map(trjs))
+                        trjs_theta = np.array(self.map(trjs))
                         trjs_Ps = self.PreSamp_MC(trjs, N = 4*N)
                         trjs_Ps_theta = np.array(self.map(trjs_Ps))
                         newPoints = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
