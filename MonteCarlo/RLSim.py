@@ -145,7 +145,7 @@ class mockSimulation:
                 """
                 def fun(x):
                         global trj_Sp_theta_z
-                        #W_0 = [[x[0], x[1]],[x[2], x[3]]]
+
                         W_0 = x
                         r_0 = self.reward_trj(trj_Sp_theta, W_0)
                         return -1*r_0                        
@@ -157,48 +157,17 @@ class mockSimulation:
                 alpha = 0.2
                 delta = alpha
                 cons = ({'type': 'eq',
-                          'fun' : lambda x: np.array([np.sum(x)-1])})
-                cons = ({'type': 'eq',
-                          'fun' : lambda x: np.array([x[0]+x[1]+x[2]+x[3]-1])},
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[1]])},
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[0]])},
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[2]])},
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[3]])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[0]-x0[0]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x0[0]-x[0]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[1]-x0[1]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x0[1]-x[1]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[2]-x0[2]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x0[2]-x[2]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[3]-x0[3]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x0[3]-x[3]+delta])},
-                          )
-
-
-                cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([np.sum(x)-1])},
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([np.min(x)])},
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([np.abs(np.sum(x-x0))+delta])})
-                #x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]    
+
                 x0 = W_0
                 res = minimize(fun, x0, constraints=cons)
-                #res = minimize(fun, x0)
+
                 x = res.x
-                #W = [[x[0], x[1]],[x[2], x[3]]]
+
                 W = x
                 return W
                 
@@ -228,12 +197,9 @@ class mockSimulation:
                 newPoints_index0 = sorted(ranks.items(), key=lambda x: x[1], reverse=True)[0:starting_n] 
                 newPoints_index = np.array(newPoints_index0)[:,0]   
                 
-                #n_coord = len(trj_Ps)
+
                 n_coord = 1                     
-                #newPoints = []
-                newPoints = [trj_Ps[int(i)] for i in newPoints_index]
-                #for coord in range(n_coord):
-                #          newPoints.append([trj_Ps[coord][int(i)] for i in newPoints_index])                                   
+                newPoints = [trj_Ps[int(i)] for i in newPoints_index]                              
                 return newPoints
         
         
@@ -264,13 +230,16 @@ class mockSimulation:
                         trjs[n] = trj
                 return trjs
                 
-                
-        def isActive_singleTrj(self, trjs):	
-                frames = len(trjs)
-                for frame in range(frames):
-                        if self.isActive(trjs[frame]):
-                                return True
-                return False
+		
+        def isActive_singleRound(self, trjs):
+                time = -1
+                n_parTrjs = len(trjs)
+                for trj in range(n_parTrjs):
+                        for frame in range(len(trj)):
+                                if self.isActive(trjs[frame]):
+					time = n_parTrjs * frame
+                                        return time
+                return time
 
 ########################################################################################################################
 # From calculated and saved files reads if the state is an active state or not
@@ -287,7 +256,7 @@ class mockSimulation:
                 activeTime = -1
                 init = 132
                 inits = [init for i in range(N)]
-                n_ec = 900
+                n_ec = 200
                 W_0 = [1/n_ec for i in range(n_ec)]
                 Ws = []
                 trj1 = self.run(inits, nstepmax = s)
@@ -307,11 +276,12 @@ class mockSimulation:
                         Ws.append(W_0)
                         
                         trj1 = self.run(newPoints, nstepmax = s) # N (number of parallel) x n_all_frames
-                        trj1 = np.concatenate(trj1) # 1 x n_all_frames
-                        isActive = self.isActive_singleTrj(trj1)
-                        if isActive:
+                        isActive = self.isActive_singleRound(trj1)
+			trj1 = np.concatenate(trj1) # 1 x n_all_frames
+                        
+                        if int(isActive)!=-1:
                                 print('Active')
-                                activeTime = count*s*N
+                                activeTime = (round)*N*s+isActive
                                 break
                                 
                         com_trjs = np.concatenate((trjs, trj1))
@@ -326,16 +296,7 @@ class mockSimulation:
                 np.save('w_'+'r'+str(R)+'N'+str(N)+'s'+str(s), Ws)
                 return activeTime
                         
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                
-                
-         
+
 ################
         def multiSim_multiP_timeCal(self, method='RL'):
                 """
