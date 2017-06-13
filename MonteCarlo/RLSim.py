@@ -300,7 +300,7 @@ class mockSimulation:
                 trjs_Ps_theta = trj1_Ps_theta
                 
                 count = 1
-                for round in range(r):
+                for round in range(R):
                         self.updateStat(trjs_theta) # based on all trajectories
                         W_1 = self.updateW(trjs_Ps_theta, W_0)
                         W_0 = W_1
@@ -322,8 +322,8 @@ class mockSimulation:
                         newPoints = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
                         count = count + 1
                         
-                np.save('activeTime_'+'r'+str(r)+'N'+str(N)+'s'+str(s), activeTime)
-                np.save('w_'+'r'+str(r)+'N'+str(N)+'s'+str(s), Ws)
+                np.save('activeTime_'+'r'+str(R)+'N'+str(N)+'s'+str(s), activeTime)
+                np.save('w_'+'r'+str(R)+'N'+str(N)+'s'+str(s), Ws)
                 return activeTime
                         
                         
