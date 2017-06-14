@@ -299,8 +299,9 @@ class mockSimulation:
 
         def multiSim_timeCal_script(self, method='RL'):
 
-                T_len = [1,2,3,4,5,6,7,8,9] # lenght of trajectories
+                # T_len = [1,2,3,4,5,6,7,8,9] # lenght of trajectories
                 T_n = range(10,1010,10) # number of trajectories
+                T_len = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000]
                 N=10
                 l = len(T_len)
                 n = len(T_n)
@@ -324,7 +325,8 @@ class mockSimulation:
 
         def collect_times(self):
                 import numpy as np
-                T_len = [1,2,3,4,5,6,7,8,9] # lenght of trajectories
+                #T_len = [1,2,3,4,5,6,7,8,9] # lenght of trajectories
+                T_len = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000]
                 T_n = range(10,1010,10) # number of trajectories
                 N=10
                 l = len(T_len)
