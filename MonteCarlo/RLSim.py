@@ -322,51 +322,61 @@ class mockSimulation:
                                 myfile.close()
                 return
 
-################
-        def multiSim_multiP_timeCal(self, method='RL'):
-                """
-                Parameters
-                ----------
-                method :
-                characteristics for adaptive sampling:
-                'Reinforcement learning'
-                output :
-                time to reach the active state
-                saves text files in the format of 'time_'+str(i)+'_'+str(j)+'.txt' which contains time to reach active state for the point 
-                [i, j]
-                """
-                
+        def collect_times(self):
                 import numpy as np
-                from multiprocessing import Pool
-                T_len = [1,2,3,4,5,6,7,8,9]
-                T_n = range(10,1010,10)
+                T_len = [1,2,3,4,5,6,7,8,9] # lenght of trajectories
+                T_n = range(10,1010,10) # number of trajectories
+                N=10
                 l = len(T_len)
                 n = len(T_n)
-                arg = []
+                time = np.empty([l, n])
                 for i in range(l):
                         for j in range(n):
-                                T_len1 = T_len[i]
+				T_len1 = T_len[i]
                                 T_n1 = T_n[j]
-                                r=T_n1/10
+                                r=T_n1/N
                                 N=10
                                 s=T_len1
-                                arg.append([s, r, N, method, i, j])
-                                
-                p = Pool(9)
-                S = p.map(multi_run_wrapper_multiSim_timeCal, arg)
-	
-
-        def multi_run_wrapper_multiSim_timeCal(args):
-                return f_multiSimTimeCal(*args)
-
-        def f_multiSimTimeCal(self, s, r, N, method, i, j):
-                import numpy as np
-                print("s :", s, " r:" ,r)
-                trjs = self.runSimulation(s=s, R=r, N=N, method=method)
-                time = activeTimeCal(trjs)
-                print(time)
-                np.savetxt('time_'+str(i)+'_'+str(j)+'.txt', [time])
+                                t = np.load('activeTime_'+'r'+str(r)+'N'+str(N)+'s'+str(s)+'.npy')
+                                print(t)
+                                time[i][j] = t.item()
+                np.savetxt('times.txt', time)
                 return time
 
-        
-        
+"""
+def pltTimes(times, filename='pcolormesh_timeReachingActive.png'):
+	
+	import matplotlib.pyplot as plt
+	from matplotlib.colors import LogNorm
+	font = {'family':'Times New Roman', 'size': 22}
+	plt.rc('font', **font)
+
+	T_len = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000]
+	T_n = range(10,1000,10)
+	
+	fig, ax = plt.subplots(1)
+	#p = ax.pcolormesh(times, norm=LogNorm(vmin=1000, vmax=1000000))
+	p = ax.pcolormesh(times, norm=LogNorm(vmin=1000, vmax=5000000))
+	xticks = range(len(T_n))
+	yticks = range(len(T_len))
+	
+	#T_n1 = [10, 200,400,600,800,1000]
+	T_n1 = [1, 20,40,60,80,100] # Number of rounds
+	ax.set_xticklabels(T_n1)
+	T_len1 = [' ', 5,10,50,100,500,1000, 5000]
+	T_len1 = [' ', 5,100,50,' ' ,500, 5000]
+	
+	ax.set_yticklabels(T_len1)
+	
+	cbar = fig.colorbar(p, label='ms')
+	cbar.ax.set_yticklabels([0.05,0.5,5,50])
+	#ax.set(xlabel='# Trajectories', ylabel=r'Trajectory Length/$\tau$')
+	ax.set(xlabel='# Rounds of Simulation', ylabel=r'Trajectory Length/$\tau$')
+	ax.set_xlim([0,99])
+	ax.set_ylim([0,32])
+	
+	fig.set_size_inches(9, 7)
+
+	fig.savefig(filename, dpi=300)
+	fig.show()
+"""
