@@ -1,4 +1,23 @@
 
+def resIndex(trj, pdbIndex):
+	"""
+	Parameters
+	----------
+	trj : 
+		Trajectory containing the structure 
+	pdbIndex :
+		residue index in pdb format
+	"""
+	
+	output = []
+	
+	for rs in trj.topology.residues:
+		if rs.resSeq==pdbIndex and rs.is_protein:
+			output = rs.index
+			break
+		
+	return output
+
 def readCouplings(couplingFN, n_EC=5000, revFlag=False, scores=False):
 	"""
 	Parameters
@@ -30,7 +49,7 @@ def readCouplings(couplingFN, n_EC=5000, revFlag=False, scores=False):
 	return coupling
         
 
- def refineCouplingIndx(trj, coupling, scFlag=False):
+def refineCouplingIndx(trj, coupling, scFlag=False):
 	"""
 	Parameters
 	----------
@@ -61,21 +80,23 @@ import numpy as np
 
 referenceStructure='ww_index_ref.pdb'
 couplingFN = 'Fip35_CouplingScores.csv'
+n_clusters = 2000
+n_samples = 10
 coupling = readCouplings(couplingFN)
 
 ref = md.load(referenceStructure)
 couplingIndxRef = refineCouplingIndx(ref, coupling)
 
 for cl in range(n_clusters):
-        dists = []
-        for s in range(n_samples):
-                pdb_name = '/Users/ZahraSh/Desktop/Projects/MSM\ Adaptive\ Sampling/Folding-ww/revision1/sample_pdbs/cluster'+str(cl)+'_'+str(s)+'.pdb '
-                str = md.load(pdb_name)
-                dist = md.compute_contacts(str, couplingIndxRef, scheme='closest-heavy')
-                dists.append(dist)
-        dists = np.array(dists)
-        ave_dist = np.average(dists, axis=0)
-        np.savetxt('Ave_AllECdist_cluster'+str(cl), ave_dist)
+	dists = []
+	for s in range(n_samples):
+		pdb_name = '/Users/ZahraSh/Desktop/Projects/MSM\ Adaptive\ Sampling/Folding-ww/revision1/sample_pdbs/cluster'+str(cl)+'_'+str(s)+'.pdb '
+		str = md.load(pdb_name)
+		dist = md.compute_contacts(str, couplingIndxRef, scheme='closest-heavy')
+		dists.append(dist)
+	dists = np.array(dists)
+	ave_dist = np.average(dists, axis=0)
+	np.save('Ave_AllECdist_cluster'+str(cl), ave_dist)
                 
                         
        
