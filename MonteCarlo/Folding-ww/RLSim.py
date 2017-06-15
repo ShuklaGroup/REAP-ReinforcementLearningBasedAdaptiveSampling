@@ -1,8 +1,8 @@
 class mockSimulation:
         ## public
         def __init__(self):
-                self.theta_mean = [0, 0]
-                self.theta_std = [0, 0]
+                self.theta_mean = []
+                self.theta_std = []
                 self.r = 1#number of rounds
                 self.s = 1# length of simulations
                 self.N = 1# number of parallel simulations
@@ -60,7 +60,7 @@ class mockSimulation:
                 trj_Ps_theta = []
                 msm = self.msm
                 for frame in trj_Ps:
-                        theta = np.load('MSMStatesAllVals/Ave_AllECdist_cluster'+str(cl)+'.npy')
+                        theta = np.load('MSMStatesAllVals/Ave_AllECdist_cluster'+str(int(frame))+'.npy')[0][0] ## changed
                         trj_Ps_theta.append(theta)
                 #trj_Sp_theta = trj_Sp
 
@@ -260,7 +260,7 @@ class mockSimulation:
                 #init = 132 GPCRs B2AR
                 init = 120 # WW domain
                 inits = [init for i in range(N)]
-                n_ec = 100
+                n_ec = 10
                 W_0 = [1/n_ec for i in range(n_ec)]
                 Ws = []
                 trj1 = self.run(inits, nstepmax = s)
@@ -308,6 +308,7 @@ class mockSimulation:
                 N=10
                 l = len(T_len)
                 n = len(T_n)
+                count = 1
                 for i in range(l):
                         for j in range(n):
                                 T_len1 = T_len[i]
@@ -319,10 +320,14 @@ class mockSimulation:
                                 myfile.write('import pickle \n')
                                 myfile.write('import RLSim as rl \n')
                                 myfile.write('import numpy as np \n')
-                                myfile.write('msm =  pickle.load(open(\'MSM150.pkl\',\'rb\')) \n')
+                                myfile.write('msm =  pickle.load(open(\'MSM.pkl\',\'rb\'), encoding=\'latin1\') \n')
                                 myfile.write('my_sim = rl.mockSimulation() \n')
                                 myfile.write('my_sim.msm = msm \n')
-                                myfile.write('my_sim.runSimulation(s='+str(s)+', R='+ str(int(r)) +', N='+ str(N)+') \n')
+                                myfile.write('my_sim.runSimulation(s='+str(int(s))+', R='+ str(int(r)) +', N='+ str(N)+') \n')
+                                myRun = open('Run_'+str(count),'w')
+                                myRun.write('ipython run_'+'r'+str(int(r))+'N'+str(N)+'s'+str(int(s))+'.py')
+                                myRun.close()
+                                count = count + 1
                                 myfile.close()
                 return
 
@@ -347,40 +352,3 @@ class mockSimulation:
                 np.savetxt('times.txt', time)
                 return time
 
-"""
-def pltTimes(times, filename='pcolormesh_timeReachingActive.png'):
-	
-	import matplotlib.pyplot as plt
-	from matplotlib.colors import LogNorm
-	font = {'family':'Times New Roman', 'size': 22}
-	plt.rc('font', **font)
-
-	T_len = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000]
-	T_n = range(10,1000,10)
-	
-	fig, ax = plt.subplots(1)
-	#p = ax.pcolormesh(times, norm=LogNorm(vmin=1000, vmax=1000000))
-	p = ax.pcolormesh(times, norm=LogNorm(vmin=1000, vmax=5000000))
-	xticks = range(len(T_n))
-	yticks = range(len(T_len))
-	
-	#T_n1 = [10, 200,400,600,800,1000]
-	T_n1 = [1, 20,40,60,80,100] # Number of rounds
-	ax.set_xticklabels(T_n1)
-	T_len1 = [' ', 5,10,50,100,500,1000, 5000]
-	T_len1 = [' ', 5,100,50,' ' ,500, 5000]
-	
-	ax.set_yticklabels(T_len1)
-	
-	cbar = fig.colorbar(p, label='ms')
-	cbar.ax.set_yticklabels([0.05,0.5,5,50])
-	#ax.set(xlabel='# Trajectories', ylabel=r'Trajectory Length/$\tau$')
-	ax.set(xlabel='# Rounds of Simulation', ylabel=r'Trajectory Length/$\tau$')
-	ax.set_xlim([0,99])
-	ax.set_ylim([0,32])
-	
-	fig.set_size_inches(9, 7)
-
-	fig.savefig(filename, dpi=300)
-	fig.show()
-"""
