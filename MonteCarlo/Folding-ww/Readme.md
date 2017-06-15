@@ -9,3 +9,5 @@ calculate all EC distances for each state.
 > z = rl.mockSimulation()
 > z.multiSim_timeCal_script()
 > 
+
+## step 3
