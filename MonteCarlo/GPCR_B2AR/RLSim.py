@@ -305,6 +305,7 @@ class mockSimulation:
                 N=10
                 l = len(T_len)
                 n = len(T_n)
+                count = 1
                 for i in range(l):
                         for j in range(n):
                                 T_len1 = T_len[i]
@@ -321,6 +322,10 @@ class mockSimulation:
                                 myfile.write('my_sim.msm = msm \n')
                                 myfile.write('my_sim.runSimulation(s='+str(s)+', R='+ str(int(r)) +', N='+ str(N)+') \n')
                                 myfile.close()
+                                myRun = open('Run_'+str(count),'w')
+                                myRun.write('ipython run_'+'r'+str(r)+'N'+str(N)+'s'+str(s)+'.py','w')
+                                myRun.close()
+                                count = count + 1
                 return
 
         def collect_times(self):
@@ -334,7 +339,7 @@ class mockSimulation:
                 time = np.empty([l, n])
                 for i in range(l):
                         for j in range(n):
-				T_len1 = T_len[i]
+                                T_len1 = T_len[i]
                                 T_n1 = T_n[j]
                                 r=T_n1/N
                                 N=10
