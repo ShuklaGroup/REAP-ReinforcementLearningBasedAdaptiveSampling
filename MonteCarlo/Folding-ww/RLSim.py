@@ -60,7 +60,7 @@ class mockSimulation:
                 trj_Ps_theta = []
                 msm = self.msm
                 for frame in trj_Ps:
-###?!                        theta = np.loadtxt('MSMStatesAllVals_1000/cluster'+str(msm.mapping_[int(frame)])+'-1')
+                        theta = np.load('MSMStatesAllVals/Ave_AllECdist_cluster'+str(cl)+'.npy')
                         trj_Ps_theta.append(theta)
                 #trj_Sp_theta = trj_Sp
 
