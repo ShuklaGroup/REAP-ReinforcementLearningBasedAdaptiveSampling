@@ -296,8 +296,8 @@ class mockSimulation:
                         newPoints = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
                         count = count + 1
                         
-                np.save('foldTime_'+'r'+str(R)+'N'+str(N)+'s'+str(s), activeTime)
-                np.save('w_'+'r'+str(R)+'N'+str(N)+'s'+str(s), Ws)
+                np.save('foldTime_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), activeTime)
+                np.save('w_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), Ws)
                 return activeTime
                         
 
@@ -316,7 +316,7 @@ class mockSimulation:
                                 r=T_n1/N
                                 N=10
                                 s=T_len1
-                                myfile = open('run_'+'r'+str(r)+'N'+str(N)+'s'+str(s)+'.py','w')
+                                myfile = open('run_'+'r'+str(int(r))+'N'+str(N)+'s'+str(s)+'.py','w')
                                 myfile.write('import pickle \n')
                                 myfile.write('import RLSim as rl \n')
                                 myfile.write('import numpy as np \n')
