@@ -350,7 +350,8 @@ class mockSimulation:
                 np.savetxt('times.txt', time)
                 return time
 
-"""
+	
+
 def pltTimes(times, filename='pcolormesh_timeReachingActive.png'):
 	
 	import matplotlib.pyplot as plt
@@ -362,12 +363,11 @@ def pltTimes(times, filename='pcolormesh_timeReachingActive.png'):
 	T_n = range(10,1000,10)
 	
 	fig, ax = plt.subplots(1)
-	#p = ax.pcolormesh(times, norm=LogNorm(vmin=1000, vmax=1000000))
+
 	p = ax.pcolormesh(times, norm=LogNorm(vmin=1000, vmax=5000000))
 	xticks = range(len(T_n))
 	yticks = range(len(T_len))
 	
-	#T_n1 = [10, 200,400,600,800,1000]
 	T_n1 = [1, 20,40,60,80,100] # Number of rounds
 	ax.set_xticklabels(T_n1)
 	T_len1 = [' ', 5,10,50,100,500,1000, 5000]
@@ -377,7 +377,6 @@ def pltTimes(times, filename='pcolormesh_timeReachingActive.png'):
 	
 	cbar = fig.colorbar(p, label='ms')
 	cbar.ax.set_yticklabels([0.05,0.5,5,50])
-	#ax.set(xlabel='# Trajectories', ylabel=r'Trajectory Length/$\tau$')
 	ax.set(xlabel='# Rounds of Simulation', ylabel=r'Trajectory Length/$\tau$')
 	ax.set_xlim([0,99])
 	ax.set_ylim([0,32])
@@ -386,4 +385,4 @@ def pltTimes(times, filename='pcolormesh_timeReachingActive.png'):
 
 	fig.savefig(filename, dpi=300)
 	fig.show()
-"""
+
