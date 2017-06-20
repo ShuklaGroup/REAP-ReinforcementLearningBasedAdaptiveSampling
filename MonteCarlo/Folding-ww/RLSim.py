@@ -178,7 +178,9 @@ class mockSimulation:
                 res = minimize(fun, x0, constraints=cons)
 
                 x = res.x
+                x = x/(np.sum(x))
                 W = x.reshape(n_ec, 2)
+                
                 #W = x
                 return W
  
