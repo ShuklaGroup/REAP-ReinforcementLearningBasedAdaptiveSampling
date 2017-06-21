@@ -401,37 +401,37 @@ class mockSimulation:
                 np.savetxt('times.txt', time)
                 return time
 
-        def pltTimes(times, filename='pcolormesh_timeReachingActive.png'):
-                """
-                Parameters
-                ----------
-                times : 
-                       2D array of (number of trajectory(x or j axis) x each trajectory length(y or i axis)
-                       containing relative entropy of different simulations on MSM with respect to original MSM
-                output:
-                       plots and saves the plot of 2D array
-                """
-                import matplotlib.pyplot as plt
-                from matplotlib.colors import LogNorm
-                font = {'family':'Times New Roman', 'size': 22}
-                plt.rc('font', **font)
-                T_len = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30] # lenght of trajectories
-                T_n = range(10,1000,10)
-                fig, ax = plt.subplots(1)
-                stepS = 100*2 # ns
-                vmax = stepS*times.max()
-                p = ax.pcolormesh(stepS*times, norm=LogNorm(vmin=1000, vmax=5000000))
-                xticks = range(len(T_n))
-                yticks = range(len(T_len))
-                T_n1 = [1, 20,40,60,80,100] # Number of rounds
-                ax.set_xticklabels(T_n1)
-                T_len1 = [' ', 5,10,50,100,500,1000, 5000]
-                T_len1 = [' ', 5,100,50,' ' ,500, 5000]
-                ax.set_yticklabels(T_len1)
-                cbar = fig.colorbar(p, label='ms')
-                cbar.ax.set_yticklabels([0.05,0.5,5,50])
-                ax.set(xlabel='# Rounds of Simulation', ylabel=r'Trajectory Length/$\tau$')
-                ax.set_xlim([0,99])
-                ax.set_ylim([0,32])
-                fig.set_size_inches(9, 7)
-                fig.savefig(filename, dpi=300)
+def pltTimes_folding(times, filename='pcolormesh_timeReachingActive.png'):
+        """
+        Parameters
+        ----------
+        times :
+                2D array of (number of trajectory(x or j axis) x each trajectory length(y or i axis)
+                containing relative entropy of different simulations on MSM with respect to original MSM
+        output:
+                plots and saves the plot of 2D array
+        """
+
+        import matplotlib.pyplot as plt
+        from matplotlib.colors import LogNorm
+        font = {'family':'Times New Roman', 'size': 22}
+        plt.rc('font', **font)
+
+        T_len = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+        T_n = range(10,1000,10)
+
+        fig, ax = plt.subplots(1)
+        p = ax.pcolormesh(times, norm=LogNorm(vmin=83, vmax=8300)) # Values used for ww
+        xticks = range(len(T_n))
+        yticks = range(len(T_len))
+
+        T_n1 = [10, 200,400,600,800,1000]
+        ax.set_xticklabels(T_n1)
+        cbar = fig.colorbar(p)
+        ax.set(xlabel='Number of trajectories', ylabel=r'Scaled trajectory Length/$\tau$')
+        ax.set_xlim([0,99])
+        ax.set_ylim([0,30])
+
+        fig.set_size_inches(9, 7)
+        fig.savefig(filename, dpi=300)
+        fig.show()
