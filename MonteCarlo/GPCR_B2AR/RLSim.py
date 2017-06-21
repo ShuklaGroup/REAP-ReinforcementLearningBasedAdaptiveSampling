@@ -367,7 +367,7 @@ class mockSimulation:
                                 myfile.write('my_sim.runSimulation(s='+str(s)+', R='+ str(int(r)) +', N='+ str(N)+') \n')
                                 myfile.close()
                                 myRun = open('Run_'+str(count),'w')
-                                myRun.write('ipython run_'+'r'+str(r)+'N'+str(N)+'s'+str(s)+'.py','w')
+                                myRun.write('ipython run_'+'r'+str(r)+'N'+str(N)+'s'+str(s)+'.py')
                                 myRun.close()
                                 count = count + 1
                 return
