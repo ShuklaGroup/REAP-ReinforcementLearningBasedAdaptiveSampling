@@ -73,16 +73,26 @@ class mockSimulation:
                 return trj_Ps_theta_2
 
         def reward_state(self, S, theta_mean, theta_std, W_):
-                
+                """
+                with direction
+                """
                 r_s = 0
                 for k in range(len(W_)):
+                        """
                         r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
                         """
                         if (S[k] - theta_mean[k]) < 0: 
                                 r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k])
                         else:
                                 r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k])
-                        """
+                        
+                return r_s
+ 
+        def reward_state_noDir(self, S, theta_mean, theta_std, W_):
+                # no direction
+                r_s = 0
+                for k in range(len(W_)):
+                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
                 return r_s
 
         def reward_state_withoutStd(self, S, theta_mean, theta_std, W_):
@@ -91,12 +101,6 @@ class mockSimulation:
                 for k in range(len(W_)):
                         
                         r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])) # no direction
-                        """
-                        if (S[k] - theta_mean[k]) < 0: 
-                                r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k]))
-                        else:
-                                r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k]))
-                        """
                 return r_s
 
 
@@ -116,18 +120,11 @@ class mockSimulation:
                 
                 """
                 import numpy as np
-                #theta_mean = []
-                #theta_std = []
-                #for theta in range(len(W_)):
-                #        theta_mean.append(np.mean(trj_Sp_theta[theta]))
-                #        theta_std.append(np.std(trj_Sp_theta[theta]))
-                
 
                 r = []
                 # for over all dicovered states
                 trj_Sp_theta = np.array(trj_Sp_theta)
                 for state_index in range(len(trj_Sp_theta[0])):
-                        #print('trj_Sp_theta', trj_Sp_theta)
                         state_theta = trj_Sp_theta[:, state_index]
                         r_s = self.reward_state(state_theta, self.theta_mean, self.theta_std, W_)
                         
@@ -142,6 +139,50 @@ class mockSimulation:
                 """
                 update weigths 
                 prior_weigths = W_0
+                with considering direction
+                """
+                def fun(x):
+                        global trj_Sp_theta_z
+                        global n_ec
+                        import numpy as np
+                        x = np.array(x)
+                        W_0 = x.reshape(n_ec, 2)
+                        # W_0 = x
+                        r_0 = self.reward_trj(trj_Sp_theta, W_0)
+                        return -1*r_0     
+                
+                import numpy as np
+                from scipy.optimize import minimize
+                
+                global trj_Sp_theta_z 
+                global n_ec
+                
+                trj_Sp_theta_z = trj_Sp_theta
+                alpha = 0.2
+                delta = alpha
+                cons = ({'type': 'eq',
+                          'fun' : lambda x: np.array([np.sum(x)-1])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([np.min(x)])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([np.abs(np.sum(x-x0))+delta])})
+
+                #x0 = W_0
+                x0 = np.concatenate(W_0)
+                res = minimize(fun, x0, constraints=cons)
+
+                x = res.x
+                x = x/(np.sum(x))
+                W = x.reshape(n_ec, 2)
+                
+                #W = x
+                return W
+ 
+        def updateW_noDir(self, trj_Sp_theta, W_0):
+                """
+                update weigths 
+                prior_weigths = W_0
+                no direction
                 """
                 def fun(x):
                         global trj_Sp_theta_z
@@ -169,8 +210,9 @@ class mockSimulation:
                 x = res.x
 
                 W = x
-                return W
-                
+                return W    
+	
+	
         def findStarting(self, trj_Ps_theta, trj_Ps, W_1, starting_n=10 , method = 'RL'):
                 """
                 trj_Ps_theta: 
@@ -253,11 +295,13 @@ class mockSimulation:
 
         def runSimulation(self, R=3,N=10,s=8, method='RL'):
                 import numpy as np
+                global n_ec
                 activeTime = -1
                 init = 132
                 inits = [init for i in range(N)]
-                n_ec = 200
-                W_0 = [1/n_ec for i in range(n_ec)]
+                n_ec = 50
+                #W_0 = [1/n_ec for i in range(n_ec)] # no direction
+                W_0 = [[1/(2*n_ec), 1/(2*n_ec)] for i in range(n_ec)] # consider direction
                 Ws = []
                 trj1 = self.run(inits, nstepmax = s)
                 comb_trj1 = np.concatenate(trj1)
