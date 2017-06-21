@@ -354,7 +354,7 @@ class mockSimulation:
 
                 T_n = range(10,1010,10) # number of trajectories
                 T_len = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30] # lenght of trajectories
-                N = 70
+                N = 10
                 l = len(T_len)
                 n = len(T_n)
                 count = 1
