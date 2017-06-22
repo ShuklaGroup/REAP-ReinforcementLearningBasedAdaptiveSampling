@@ -294,7 +294,7 @@ class mockSimulation:
                 xi = x
                 yi = y
 
-                                # parameters in Mueller potential
+                # parameters in Mueller potential
 
                 aa = [-1] # inverse radius in x
                 bb = [0] # radius in xy
@@ -353,6 +353,39 @@ class mockSimulation:
                         
                 return trj_x, trj_y          
 
+        
+         def pltFinalPoints(self, trjs_theta):
+                import numpy as np
+                import matplotlib.pyplot as plt
+                x = np.array(trjs_theta[0])
+                y = np.array(trjs_theta[1])
+
+               # parameters in Mueller potential
+     
+                aa = [-1] # inverse radius in x
+                bb = [0] # radius in xy
+                cc = [-1] # inverse radius in y
+                AA = 3*[-200] # strength
+
+                XX = [0] # center_x
+                YY = [0] # center_y
+
+                zxx = np.mgrid[-2.5:2.51:0.01]
+                zyy = np.mgrid[-2.5:2.51:0.01]
+                xx, yy = np.meshgrid(zxx, zyy)
+
+
+                V1 = AA[0]*np.exp(aa[0] * np.square(xx-XX[0]) + bb[0] * (xx-XX[0]) * (yy-YY[0]) +cc[0]*np.square(yy-YY[0]))
+
+                fig = plt.figure()
+                ax = fig.add_subplot(111)
+                
+                ax.contourf(xx,yy,np.minimum(V1,200), 40)
+
+                plt.xlabel('x')
+                plt.ylabel('y')
+                plt.plot(x, y, 'o')
+                plt.savefig('fig_all.png')       
 # output size :
 # 2 * simu length * number of parallel sims
 
