@@ -56,6 +56,11 @@ class mockSimulation:
                       n_ec x n_frames
                 """
                 # map coordinate space to reaction coorinates space
+                
+                
+                
+                
+                """
                 import numpy as np
                 trj_Ps_theta = []
                 msm = self.msm
@@ -71,6 +76,7 @@ class mockSimulation:
                 for theta_index in range(len(trj_Ps_theta[0])):
                         trj_Ps_theta_2.append(trj_Ps_theta[:,theta_index])
                 return trj_Ps_theta_2
+                """
 
         def reward_state(self, S, theta_mean, theta_std, W_):
                 """
@@ -305,8 +311,9 @@ class mockSimulation:
                 global n_ec
                 import numpy as np
                 activeTime = -1
-                #init = 132 GPCRs B2AR
-                init = 120 # WW domain
+                
+                
+                init = 'ala2_1stFrame.pdb' #pdb name
                 inits = [init for i in range(N)]
                 n_ec = 10
                 #W_0 = [1/n_ec for i in range(n_ec)] # no direction
