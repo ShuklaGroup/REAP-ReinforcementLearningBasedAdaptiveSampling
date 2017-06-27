@@ -33,20 +33,46 @@ class mockSimulation:
                 return trj_Sp
 
 
-        def PreSamp_MC(self, trj, N = 20):
+        def PreSamp(self, trj, starting_n=1, myn_clusters = 40, N = 2): #?!!!!
                 """
-                Pre-Sampling for Monte Carlo simulations:
+                Pre-Sampling:
                         choose states with minimum counts or newly discovered states
                         
                 output:
-                        trj with shape of 
+                        trj with shape of [[Xs][Ys]]
                 """
                 import numpy as np
-                cl_trjs = trj             
+                comb_trj = trj
+
+                from sklearn.cluster import KMeans
+                comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
+                cluster = KMeans(n_clusters=myn_clusters)
+                cluster.fit(comb_trj_xy)
+                cl_trjs = cluster.labels_
+               
                 unique, counts = np.unique(cl_trjs, return_counts=True)
                 leastPop = counts.argsort()[:N]
                 init_cl = [unique[i] for i in leastPop]
-                return init_cl
+        
+                counter = 0
+                init_index = []
+                init_trj_xy = []
+                for i in range(len(cl_trjs)):
+                        if cl_trjs[i] in init_cl:
+                                #print(cl_trjs[i])
+                                counter = counter + 1
+                                init_index.append(i)
+                                init_trj_xy.append(comb_trj_xy[i])
+                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))]]     
+                trj_Sp = init_trj
+
+                while len(trj_Sp[0])<starting_n:
+                        print('trj_Sp<starting_n')
+                        print(len(trj_Sp[0]), starting_n)
+                        trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
+
+                return trj_Sp
+        
 
                 
         def map(self, trj_Ps): ######?!!!!!!!!!!!!!!!!!
@@ -259,70 +285,69 @@ class mockSimulation:
         def creatPotentioal(self):
                 return True
                 
-        def run(self, inits, nstepmax = 10): #### ?!!!!!!!!!!!!!!!!
-                """
-                Parameters
-                ----------
-                initi : 
-                        initial state (singe state)
-                msm :
-                        reference MSM
-                s :
-                        lenght (number of steps) of each simulation	
+        def run(self, production_steps = 200, start='ala2_1stFrame.pdb', production='ala2_production.pdb'): #### ?!!!!!!!!!!!!!!!!
+                from __future__ import print_function
+                from simtk.openmm import app
+                import simtk.openmm as mm
+                from simtk import unit
+                from sys import stdout
+                 
+                nonbondedCutoff = 1.0*unit.nanometers
+                timestep = 2.0*unit.femtoseconds
+                temperature = 300*unit.kelvin
+                save_frequency = 100 #Every 100 steps, save the trajectory
+
+                pdb = app.PDBFile(start)
+                forcefield = app.ForceField('amber99sb.xml', 'tip3p.xml')
+                ala2_model = app.Modeller(pdb.topology, pdb.positions)
+
+                #Hydrogens will be constrained after equilibrating
+                system = forcefield.createSystem(ala2_model.topology, nonbondedMethod=app.PME, 
+                    nonbondedCutoff=nonbondedCutoff, constraints=app.HBonds, rigidWater=True, 
+                    ewaldErrorTolerance=0.0005)
+
+                system.addForce(mm.MonteCarloBarostat(1*unit.bar, temperature, 100)) #Apply Monte Carlo Pressure changes in 100 timesteps
+                integrator = mm.LangevinIntegrator(temperature, 1.0/unit.picoseconds, 
+                    timestep)
+                integrator.setConstraintTolerance(0.00001)
+
+                platform = mm.Platform.getPlatformByName('CPU')
+                simulation = app.Simulation(ala2_model.topology, system, integrator, platform)
+                simulation.context.setPositions(ala2_model.positions)
+
+                simulation.context.setVelocitiesToTemperature(temperature)
+
+                simulation.reporters.append(app.PDBReporter(production, save_frequency))
+                simulation.reporters.append(app.StateDataReporter('stateReporter_constantPressure.txt', 1000, step=True, 
+                   totalEnergy=True, temperature=True, volume=True, progress=True, remainingTime=True, 
+                    speed=True, totalSteps=production_steps, separator='\t'))
+
+                print('Running Production...')
+                simulation.step(production_steps)
+                print('Done!')
                 
-                output :
-                        final trajectory
-                """
-                import numpy as np
-                msm = self.msm
-                N = len(inits)
-                trjs = np.empty([N, nstepmax])
-                for n in range(N):
-                        init = np.int(inits[n])
-                        trj = msm.sample_discrete(state=init, n_steps=nstepmax, random_state=None)
-                        trjs[n] = trj
-                return trjs
+                import mdtraj as md
+                trj = md.load(production)
+                return trj
                 
 
-        def isActive_singleRound(self, trjs):
-                time = -1
-                n_parTrjs = len(trjs)
-                for trj in trjs:
-                        for frame in range(len(trj)):
-                                if self.isFolded(trj[frame]):
-                                        time = n_parTrjs * frame
-                                        return time
-                return time
-
-########################################################################################################################
-# From calculated and saved files reads if the state is an active state or not
-########################################################################################################################	
-
-        def isFolded(self, state):
-                import numpy as np              
-                foldedState = [463]
-                isfolded = False
-                if state in foldedState:
-                        isfolded = True
-                return isfolded
-
-
-        def runSimulation(self, R=3,N=10,s=8, method='RL'):
+        def runSimulation(self, R=3,N=1,s=200, method='RL'):
                 global n_ec
                 import numpy as np
                 activeTime = -1
                 
                 
                 init = 'ala2_1stFrame.pdb' #pdb name
-                inits = [init for i in range(N)]
-                n_ec = 10
-                #W_0 = [1/n_ec for i in range(n_ec)] # no direction
-                W_0 = [[1/(2*n_ec), 1/(2*n_ec)] for i in range(n_ec)] # consider direction
+                inits = init
+                #inits = [init for i in range(N)]
+                n_ec = 2
+                W_0 = [1/n_ec for i in range(n_ec)] # no direction
+                #W_0 = [[1/(2*n_ec), 1/(2*n_ec)] for i in range(n_ec)] # consider direction
                 Ws = []
-                trj1 = self.run(inits, nstepmax = s)
-                comb_trj1 = np.concatenate(trj1)
+                trj1 = self.run(production_steps = s, start=inits, production='trj_R_1.pdb')
+                comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
-                trj1_Ps = self.PreSamp_MC(trj1, N = 3*N) # pre analysis , 1 x n_frames
+                trj1_Ps = self.PreSamp(trj1, N = 3*N) # pre analysis , 1 x n_frames
                 trj1_Ps_theta = self.map(trj1_Ps)
                 newPoints = self.findStarting(trj1_Ps_theta, trj1_Ps, W_0, starting_n = N , method = 'RL')
                 trjs_theta = trj1_Ps_theta
