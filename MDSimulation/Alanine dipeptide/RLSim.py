@@ -247,7 +247,7 @@ class mockSimulation:
                 return trj
                 
 
-        def runSimulation(self, R=3, N=1,s=8000, method='RL'):
+        def runSimulation(self, R=2, N=1,s=800, method='RL'):
                 global n_ec
                 import numpy as np
                 
@@ -257,7 +257,7 @@ class mockSimulation:
                 n_ec = 2
                 
                 count = 1
-                newPoints_name = 'start_r_'+str(count)
+                newPoints_name = 'start_r_'+str(count)+'.pdb'
                 
                 W_0 = [1/n_ec for i in range(n_ec)] # no direction
                 Ws = []
@@ -293,10 +293,11 @@ class mockSimulation:
                         newPoints = trjs[newPoints_index_orig[0]] 
                         
                         count = count + 1
-                        newPoints_name = 'start_r_'+str(count)
+                        newPoints_name = 'start_r_'+str(count)+'.pdb'
                         newPoints.save_pdb(newPoints_name)
   
                 np.save('w_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), Ws)
+                np.save('trjs_theta', trjs_theta)
                 return 
                         
 
