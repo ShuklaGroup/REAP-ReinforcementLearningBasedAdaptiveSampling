@@ -194,9 +194,10 @@ class mockSimulation:
                 
 
                 n_coord = 1                     
-                newPoints = [trj_Ps[int(i)] for i in newPoints_index]
+                #newPoints = [trj_Ps[int(i)] for i in newPoints_index]
                 newPoints_index_orig = [index_orig[int(i)] for i in newPoints_index]
-                return newPoints, newPoints_index_orig
+                return newPoints_index_orig
+                #return newPoints, newPoints_index_orig
         
         
                
@@ -264,7 +265,7 @@ class mockSimulation:
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta) # pre analysis (least count)
                 
                 #newPoints = self.findStarting(trj1_Ps_theta, trj1_Ps, W_0, starting_n = N , method = 'RL')
-                newPoints_theta, newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL')
+                newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL')
                 newPoints = [trj1[i] for i in newPoints_index_orig] # extract a frame ?!!!!
                 
                 trjs_theta = trj1_theta
@@ -279,16 +280,13 @@ class mockSimulation:
                         
                         trj1 = self.run(production_steps = s, start=newPoints, production='trj_R_'+str(count)+'.pdb') # return mdtraj object
 
-                        #trj1 = np.concatenate(trj1) # 1 x n_all_frames  # single trj
-        
                         com_trjs = np.concatenate((trjs, trj1)) # revise!!!! use mdtraj
-                        #trjs = np.array(com_trjs)
                         trjs = com_trjs
                         trjs_theta = np.array(self.map(trjs))
-                        #trjs_theta = np.array(self.map(trjs))
                         trjs_Ps_theta, index = self.PreSamp(trjs_theta)
                         
-                        newPoints, newPoints_index_orig = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
+                        newPoints_index_orig = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
+                        newPoints = [trj1[i] for i in newPoints_index_orig] # extract a frame ?!!!!
                         count = count + 1
                         
                 np.save('w_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), Ws)
