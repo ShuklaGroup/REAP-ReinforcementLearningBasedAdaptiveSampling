@@ -22,78 +22,69 @@ class mockSimulation:
                 return trj_Sp
 
 
-        def PreSamp(self, trj, starting_n=1, myn_clusters = 40, N = 1): #?!!!!
+        def PreSamp(self, trj, starting_n=1, myn_clusters = 40): #?!!!!
                 """
                 Pre-Sampling:
                         choose states with minimum counts or newly discovered states
                         
                 output:
                         trj with shape of [[Xs][Ys]]
+                        index of the trj
                 """
                 import numpy as np
                 comb_trj = trj
-
+                
+                # clustering
                 from sklearn.cluster import KMeans
                 comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
                 cluster = KMeans(n_clusters=myn_clusters)
                 cluster.fit(comb_trj_xy)
                 cl_trjs = cluster.labels_
-               
+                
+                # finding least count cluster
+                N = 1
                 unique, counts = np.unique(cl_trjs, return_counts=True)
                 leastPop = counts.argsort()[:N]
                 init_cl = [unique[i] for i in leastPop]
-        
+                
+                # 
                 counter = 0
                 init_index = []
                 init_trj_xy = []
                 for i in range(len(cl_trjs)):
                         if cl_trjs[i] in init_cl:
-                                #print(cl_trjs[i])
                                 counter = counter + 1
                                 init_index.append(i)
                                 init_trj_xy.append(comb_trj_xy[i])
-                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))]]     
+                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))]]
+                
                 trj_Sp = init_trj
 
+                # if number of states with least count is less than desired number of starting states
                 while len(trj_Sp[0])<starting_n:
                         print('trj_Sp<starting_n')
                         print(len(trj_Sp[0]), starting_n)
                         trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
 
-                return trj_Sp
+                return trj_Sp, init_index
         
 
                 
-        def map(self, trj_Ps): ######?!!!!!!!!!!!!!!!!!
+        def map(self, trj):
                 """
-
+                trj:
+                      mdtraj pbject
                 output:
                       n_ec x n_frames
                 """
                 # map coordinate space to reaction coorinates space
                 import mdtraj as md
-                trj = md.load()
-                
-                
-                
-                
-                """
-                import numpy as np
-                trj_Ps_theta = []
-                msm = self.msm
-                for frame in trj_Ps:
-                        theta = np.load('MSMStatesAllVals/Ave_AllECdist_cluster'+str(int(frame))+'.npy')[0][0] ## changed
-                        trj_Ps_theta.append(theta)
-                #trj_Sp_theta = trj_Sp
-
-                # change the format
-                trj_Ps_theta_2 = []
-                ##############
-                trj_Ps_theta = np.array(trj_Ps_theta) 
-                for theta_index in range(len(trj_Ps_theta[0])):
-                        trj_Ps_theta_2.append(trj_Ps_theta[:,theta_index])
-                return trj_Ps_theta_2
-                """
+                phi = md.compute_phi(trj)[1]
+                psi = md.compute_psi(trj)[1]
+                trj_theta = []
+                trj_theta.append(phi)
+                trj_theta.append(psi)
+                return trj_theta
  
         def reward_state(self, S, theta_mean, theta_std, W_):
                 # no direction
@@ -168,13 +159,15 @@ class mockSimulation:
                 W = x
                 return W
         
-        def findStarting(self, trj_Ps_theta, trj_Ps, W_1, starting_n=10 , method = 'RL'):
+        def findStarting(self, trj_Ps_theta, index_orig, W_1, starting_n=1 , method = 'RL'):
                 """
                 trj_Ps_theta: 
                          size n_theta x n_frames
                 trj_Ps:
                 """
                 # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
+                
+                # calculate stat for the pre-sampled trj
                 import numpy as np               
                 theta_mean = []
                 theta_std = []
@@ -196,8 +189,9 @@ class mockSimulation:
                 
 
                 n_coord = 1                     
-                newPoints = [trj_Ps[int(i)] for i in newPoints_index]                              
-                return newPoints
+                newPoints = [trj_Ps[int(i)] for i in newPoints_index]
+                newPoints_index_orig = [index_orig[int(i)] for i in newPoints_index]
+                return newPoints, newPoints_index_orig
         
         
                
@@ -258,14 +252,16 @@ class mockSimulation:
                 W_0 = [1/n_ec for i in range(n_ec)] # no direction
                 #W_0 = [[1/(2*n_ec), 1/(2*n_ec)] for i in range(n_ec)] # consider direction
                 Ws = []
-                trj1 = self.run(production_steps = s, start=inits, production='trj_R_1.pdb')
+                trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
-                trj1_theta = self.map(trj1_Ps)
-                trj1_Ps_theta = self.PreSamp(trj1_theta) # pre analysis , 1 x n_frames
+                trj1_theta = self.map(trj1)
+                trj1_Ps_theta, index = self.PreSamp(trj1_theta) # pre analysis (least count)
                 
                 #newPoints = self.findStarting(trj1_Ps_theta, trj1_Ps, W_0, starting_n = N , method = 'RL')
-                newPoints = self.findStarting(trj1_Ps_theta, W_0, starting_n = N , method = 'RL') # trj1_Ps?!
+                newPoints_theta, newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL')
+                newPoints = [trj1[i] for i in newPoints_index_orig] # extract a frame ?!!!!
+                
                 trjs_theta = trj1_theta
                 trjs_Ps_theta = trj1_Ps_theta
                 
@@ -276,16 +272,18 @@ class mockSimulation:
                         W_0 = W_1
                         Ws.append(W_0)
                         
-                        trj1 = self.run(newPoints, nstepmax = s) # N (number of parallel) x n_all_frames
-                        trj1 = np.concatenate(trj1) # 1 x n_all_frames
+                        trj1 = self.run(production_steps = s, start=newPoints, production='trj_R_'+str(count)+'.pdb') # return mdtraj object
+
+                        #trj1 = np.concatenate(trj1) # 1 x n_all_frames  # single trj
         
-                        com_trjs = np.concatenate((trjs, trj1))
-                        trjs = np.array(com_trjs)
+                        com_trjs = np.concatenate((trjs, trj1)) # revise!!!! use mdtraj
+                        #trjs = np.array(com_trjs)
+                        trjs = com_trjs
                         trjs_theta = np.array(self.map(trjs))
-                        trjs_theta = np.array(self.map(trjs))
-                        trjs_Ps = self.PreSamp(trjs_theta)
+                        #trjs_theta = np.array(self.map(trjs))
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta)
                         
-                        newPoints = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
+                        newPoints, newPoints_index_orig = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
                         count = count + 1
                         
                 np.save('w_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), Ws)
