@@ -147,7 +147,7 @@ class mockSimulation:
                 
                 global trj_Sp_theta_z 
                 trj_Sp_theta_z = trj_Sp_theta
-                alpha = 0.2
+                alpha = 0.02
                 delta = alpha
                 cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([np.sum(x)-1])},
@@ -247,7 +247,7 @@ class mockSimulation:
                 return trj
                 
 
-        def runSimulation(self, R=2, N=1,s=800, method='RL'):
+        def runSimulation(self, R=2, N=1,s=1100, method='RL'):
                 global n_ec
                 import numpy as np
                 
@@ -261,6 +261,8 @@ class mockSimulation:
                 
                 W_0 = [1/n_ec for i in range(n_ec)] # no direction
                 Ws = []
+                Ws.append(W_0)
+                
                 trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
