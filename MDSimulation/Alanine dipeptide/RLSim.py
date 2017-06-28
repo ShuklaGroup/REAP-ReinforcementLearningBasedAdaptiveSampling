@@ -71,6 +71,8 @@ class mockSimulation:
                       n_ec x n_frames
                 """
                 # map coordinate space to reaction coorinates space
+                import mdtraj as md
+                trj = md.load()
                 
                 
                 
