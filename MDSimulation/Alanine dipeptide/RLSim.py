@@ -33,7 +33,7 @@ class mockSimulation:
                 return trj_Sp
 
 
-        def PreSamp(self, trj, starting_n=1, myn_clusters = 40, N = 2): #?!!!!
+        def PreSamp(self, trj, starting_n=1, myn_clusters = 40, N = 1): #?!!!!
                 """
                 Pre-Sampling:
                         choose states with minimum counts or newly discovered states
@@ -334,8 +334,6 @@ class mockSimulation:
         def runSimulation(self, R=3,N=1,s=200, method='RL'):
                 global n_ec
                 import numpy as np
-                activeTime = -1
-                
                 
                 init = 'ala2_1stFrame.pdb' #pdb name
                 inits = init
@@ -347,10 +345,12 @@ class mockSimulation:
                 trj1 = self.run(production_steps = s, start=inits, production='trj_R_1.pdb')
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
-                trj1_Ps = self.PreSamp(trj1, N = 3*N) # pre analysis , 1 x n_frames
-                trj1_Ps_theta = self.map(trj1_Ps)
-                newPoints = self.findStarting(trj1_Ps_theta, trj1_Ps, W_0, starting_n = N , method = 'RL')
-                trjs_theta = trj1_Ps_theta
+                trj1_theta = self.map(trj1_Ps)
+                trj1_Ps_theta = self.PreSamp(trj1_theta) # pre analysis , 1 x n_frames
+                
+                #newPoints = self.findStarting(trj1_Ps_theta, trj1_Ps, W_0, starting_n = N , method = 'RL')
+                newPoints = self.findStarting(trj1_Ps_theta, W_0, starting_n = N , method = 'RL') # trj1_Ps?!
+                trjs_theta = trj1_theta
                 trjs_Ps_theta = trj1_Ps_theta
                 
                 count = 1
@@ -361,25 +361,19 @@ class mockSimulation:
                         Ws.append(W_0)
                         
                         trj1 = self.run(newPoints, nstepmax = s) # N (number of parallel) x n_all_frames
-                        isActive = self.isActive_singleRound(trj1)
                         trj1 = np.concatenate(trj1) # 1 x n_all_frames
-                        
-                        if int(isActive)!=-1:
-                                print('Active')
-                                activeTime = (round)*N*s+isActive
-                                break
-                                
+        
                         com_trjs = np.concatenate((trjs, trj1))
                         trjs = np.array(com_trjs)
                         trjs_theta = np.array(self.map(trjs))
-                        trjs_Ps = self.PreSamp_MC(trjs, N = 4*N)
-                        trjs_Ps_theta = np.array(self.map(trjs_Ps))
+                        trjs_theta = np.array(self.map(trjs))
+                        trjs_Ps = self.PreSamp(trjs_theta)
+                        
                         newPoints = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
                         count = count + 1
                         
-                np.save('foldTime_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), activeTime)
                 np.save('w_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), Ws)
-                return activeTime
+                return 
                         
 
         def multiSim_timeCal_script(self, method='RL'):
