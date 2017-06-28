@@ -79,11 +79,16 @@ class mockSimulation:
                 """
                 # map coordinate space to reaction coorinates space
                 import mdtraj as md
+                import numpy as np
+                
                 phi = md.compute_phi(trj)[1]
+                z_phi = np.rad2deg([phi[i][0] for i in range(len(phi))])
                 psi = md.compute_psi(trj)[1]
+                z_psi = np.rad2deg([psi[i][0] for i in range(len(psi))])
+                
                 trj_theta = []
-                trj_theta.append(phi)
-                trj_theta.append(psi)
+                trj_theta.append(z_phi)
+                trj_theta.append(z_psi)
                 return trj_theta
  
         def reward_state(self, S, theta_mean, theta_std, W_):
@@ -196,7 +201,7 @@ class mockSimulation:
         
                
         def run(self, production_steps = 200, start='ala2_1stFrame.pdb', production='ala2_production.pdb'): #### ?!!!!!!!!!!!!!!!!
-                from __future__ import print_function
+                #from __future__ import print_function
                 from simtk.openmm import app
                 import simtk.openmm as mm
                 from simtk import unit
