@@ -22,7 +22,7 @@ class mockSimulation:
                 return trj_Sp
 
 
-        def PreSamp(self, trj, starting_n=1, myn_clusters = 40): #?!!!!
+        def PreSamp(self, trj, starting_n=1, myn_clusters = 40): 
                 """
                 Pre-Sampling:
                         choose states with minimum counts or newly discovered states
@@ -247,7 +247,7 @@ class mockSimulation:
                 return trj
                 
 
-        def runSimulation(self, R=3,N=1,s=200, method='RL'):
+        def runSimulation(self, R=3, N=1,s=8000, method='RL'):
                 global n_ec
                 import numpy as np
                 
@@ -255,40 +255,46 @@ class mockSimulation:
                 inits = init
                 #inits = [init for i in range(N)]
                 n_ec = 2
+                
+                count = 1
+                newPoints_name = 'start_r_'+str(count)
+                
                 W_0 = [1/n_ec for i in range(n_ec)] # no direction
-                #W_0 = [[1/(2*n_ec), 1/(2*n_ec)] for i in range(n_ec)] # consider direction
                 Ws = []
                 trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
                 trj1_theta = self.map(trj1)
-                trj1_Ps_theta, index = self.PreSamp(trj1_theta) # pre analysis (least count)
+                trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
                 
-                #newPoints = self.findStarting(trj1_Ps_theta, trj1_Ps, W_0, starting_n = N , method = 'RL')
                 newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL')
-                newPoints = [trj1[i] for i in newPoints_index_orig] # extract a frame ?!!!!
+                newPoints = trj1[newPoints_index_orig[0]]
+                newPoints.save_pdb(newPoints_name)
                 
                 trjs_theta = trj1_theta
                 trjs_Ps_theta = trj1_Ps_theta
                 
-                count = 1
+                
                 for round in range(R):
                         self.updateStat(trjs_theta) # based on all trajectories
                         W_1 = self.updateW(trjs_Ps_theta, W_0)
                         W_0 = W_1
                         Ws.append(W_0)
                         
-                        trj1 = self.run(production_steps = s, start=newPoints, production='trj_R_'+str(count)+'.pdb') # return mdtraj object
+                        trj1 = self.run(production_steps = s, start=newPoints_name, production='trj_R_'+str(count)+'.pdb') # return mdtraj object
 
-                        com_trjs = np.concatenate((trjs, trj1)) # revise!!!! use mdtraj
+                        com_trjs = trjs.join(trj1) 
                         trjs = com_trjs
+                        
                         trjs_theta = np.array(self.map(trjs))
                         trjs_Ps_theta, index = self.PreSamp(trjs_theta)
                         
-                        newPoints_index_orig = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
-                        newPoints = [trj1[i] for i in newPoints_index_orig] # extract a frame ?!!!!
                         count = count + 1
-                        
+                        newPoints_name = 'start_r_'+str(count)
+                        newPoints_index_orig = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
+                        newPoints = trjs[newPoints_index_orig[0]] # extract a frame ?!!!!
+                        newPoints.save_pdb(newPoints_name)
+  
                 np.save('w_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), Ws)
                 return 
                         
