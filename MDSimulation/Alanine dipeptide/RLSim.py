@@ -289,10 +289,11 @@ class mockSimulation:
                         trjs_theta = np.array(self.map(trjs))
                         trjs_Ps_theta, index = self.PreSamp(trjs_theta)
                         
+                        newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
+                        newPoints = trjs[newPoints_index_orig[0]] 
+                        
                         count = count + 1
                         newPoints_name = 'start_r_'+str(count)
-                        newPoints_index_orig = self.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
-                        newPoints = trjs[newPoints_index_orig[0]] # extract a frame ?!!!!
                         newPoints.save_pdb(newPoints_name)
   
                 np.save('w_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), Ws)
