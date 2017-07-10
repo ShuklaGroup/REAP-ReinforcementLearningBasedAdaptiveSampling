@@ -1,5 +1,6 @@
 class mockSimulation:
         ## public
+        
         def __init__(self):
                 self.theta_mean = []
                 self.theta_std = []
