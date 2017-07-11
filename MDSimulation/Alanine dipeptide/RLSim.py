@@ -154,7 +154,9 @@ class mockSimulation:
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([np.min(x)])},
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([np.abs(np.sum(x-x0))+delta])})
+                          'fun' : lambda x: np.array([np.abs(x[0]-x0[0])-delta])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([np.abs(x[1]-x0[1])-delta])})
 
                 x0 = W_0
                 res = minimize(fun, x0, constraints=cons)
@@ -247,7 +249,7 @@ class mockSimulation:
                 return trj
                 
 
-        def runSimulation(self, R=2, N=1,s=1100, method='RL'):
+        def runSimulation(self, R=10, N=1,s=100000, method='RL'):
                 global n_ec
                 import numpy as np
                 
@@ -260,6 +262,7 @@ class mockSimulation:
                 newPoints_name = 'start_r_'+str(count)+'.pdb'
                 
                 W_0 = [1/n_ec for i in range(n_ec)] # no direction
+                #W_0 = [1, 0]# test
                 Ws = []
                 Ws.append(W_0)
                 
@@ -267,7 +270,7 @@ class mockSimulation:
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
                 trj1_theta = self.map(trj1)
-                trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
+                trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 100) # pre analysis (least count)
                 
                 newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL')
                 newPoints = trj1[newPoints_index_orig[0]]
@@ -279,8 +282,9 @@ class mockSimulation:
                 
                 for round in range(R):
                         self.updateStat(trjs_theta) # based on all trajectories
-                        W_1 = self.updateW(trjs_Ps_theta, W_0)
-                        W_0 = W_1
+                        #W_1 = self.updateW(trjs_Ps_theta, W_0)
+                        #W_0 = W_1
+                        W_1 = W_0
                         Ws.append(W_0)
                         
                         trj1 = self.run(production_steps = s, start=newPoints_name, production='trj_R_'+str(count)+'.pdb') # return mdtraj object
@@ -289,7 +293,7 @@ class mockSimulation:
                         trjs = com_trjs
                         
                         trjs_theta = np.array(self.map(trjs))
-                        trjs_Ps_theta, index = self.PreSamp(trjs_theta)
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
                         
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
                         newPoints = trjs[newPoints_index_orig[0]] 
