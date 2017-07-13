@@ -284,6 +284,16 @@ class mockSimulation:
                 newPoints = trj1[newPoints_index_orig[0]]
                 newPoints.save_pdb(newPoints_name)
                 
+                print(len(trj1), len(trj1_theta[0]), s)
+                plt.scatter(trj1_theta[0], trj1_theta[1])
+                plt.xlim([-180, 180])
+                plt.ylim([-180, 180])
+                newPoints_theta_x = trj1_theta[0][newPoints_index_orig[0]]
+                newPoints_theta_y = trj1_theta[1][newPoints_index_orig[0]]
+                plt.plot(newPoints_theta_x, newPoints_theta_y, 'o', color='red')
+                plt.savefig('fig_'+str(count))
+                plt.close()                
+                
                 trjs_theta = trj1_theta
                 trjs_Ps_theta = trj1_Ps_theta
                 
@@ -309,7 +319,17 @@ class mockSimulation:
                         count = count + 1
                         newPoints_name = 'start_r_'+str(count)+'.pdb'
                         newPoints.save_pdb(newPoints_name)
-  
+                        
+                        print(len(trjs), len(trjs_theta[0]), s)
+                        plt.scatter(trjs_theta[0], trjs_theta[1])
+                        plt.xlim([-180, 180])
+                        plt.ylim([-180, 180])
+                        newPoints_theta_x = trjs_theta[0][newPoints_index_orig[0]]
+                        newPoints_theta_y = trjs_theta[1][newPoints_index_orig[0]]
+                        plt.plot(newPoints_theta_x, newPoints_theta_y, 'o', color='red')
+                        plt.savefig('fig_'+str(count))
+                        plt.close()
+                        
                 np.save('w_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), Ws)
                 np.save('trjs_theta', trjs_theta)
                 return 
