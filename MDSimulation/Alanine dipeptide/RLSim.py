@@ -36,9 +36,17 @@ class mockSimulation:
                 
                 # clustering
                 from sklearn.cluster import KMeans
+                
+                
+                trj_phi_sin = np.sin(np.array(comb_trj[0])*(np.pi / 180))
+                trj_phi_cos = np.cos(np.array(comb_trj[0])*(np.pi / 180))
+                trj_psi_sin = np.sin(np.array(comb_trj[1])*(np.pi / 180))
+                trj_psi_cos = np.cos(np.array(comb_trj[1])*(np.pi / 180))               
+                
                 comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
+                comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i]] for i in range(len(trj_phi_sin))])
                 cluster = KMeans(n_clusters=myn_clusters)
-                cluster.fit(comb_trj_xy)
+                cluster.fit(comb_trj_sincos)
                 cl_trjs = cluster.labels_
                 
                 # finding least count cluster
@@ -307,39 +315,8 @@ class mockSimulation:
                 return 
                         
 
-        def multiSim_timeCal_script(self, method='RL'):
 
-                T_n = range(10,1010,10) # number of trajectories
-                T_len = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30] # lenght of trajectories
-                N = 10
-                l = len(T_len)
-                n = len(T_n)
-                count = 1
-                for i in range(l):
-                        for j in range(n):
-                                T_len1 = T_len[i]
-                                T_n1 = T_n[j]
-                                r=T_n1/N
-                                N=10
-                                s=T_len1
-                                myfile = open('run_'+'r'+str(int(r))+'N'+str(N)+'s'+str(s)+'.py','w')
-                                myfile.write('import pickle \n')
-                                myfile.write('import RLSim as rl \n')
-                                myfile.write('import numpy as np \n')
-                                myfile.write('msm =  pickle.load(open(\'MSM.pkl\',\'rb\'), encoding=\'latin1\') \n')
-                                myfile.write('my_sim = rl.mockSimulation() \n')
-                                myfile.write('my_sim.msm = msm \n')
-                                myfile.write('my_sim.runSimulation(s='+str(int(s))+', R='+ str(int(r)) +', N='+ str(N)+') \n')
-                                myRun = open('Run_'+str(count),'w')
-                                myRun.write('ipython run_'+'r'+str(int(r))+'N'+str(N)+'s'+str(int(s))+'.py')
-                                myRun.close()
-                                count = count + 1
-                                myfile.close()
-                return
-
-
-
-       
+     
 ####################################
 
         def updateW_withDir(self, trj_Sp_theta, W_0):
