@@ -36,15 +36,15 @@ class mockSimulation:
                 
                 # clustering
                 from sklearn.cluster import KMeans
-                
-                
+                comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
+
                 trj_phi_sin = np.sin(np.array(comb_trj[0])*(np.pi / 180))
                 trj_phi_cos = np.cos(np.array(comb_trj[0])*(np.pi / 180))
                 trj_psi_sin = np.sin(np.array(comb_trj[1])*(np.pi / 180))
-                trj_psi_cos = np.cos(np.array(comb_trj[1])*(np.pi / 180))               
-                
-                comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
+                trj_psi_cos = np.cos(np.array(comb_trj[1])*(np.pi / 180))   
+
                 comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i]] for i in range(len(trj_phi_sin))])
+
                 cluster = KMeans(n_clusters=myn_clusters)
                 cluster.fit(comb_trj_sincos)
                 cl_trjs = cluster.labels_
@@ -221,7 +221,8 @@ class mockSimulation:
                 nonbondedCutoff = 1.0*unit.nanometers
                 timestep = 2.0*unit.femtoseconds
                 temperature = 300*unit.kelvin
-                save_frequency = 100 #Every 100 steps, save the trajectory
+                #save_frequency = 100 #Every 100 steps, save the trajectory
+                save_frequency = 10 #Every 1 steps, save the trajectory
 
                 pdb = app.PDBFile(start)
                 forcefield = app.ForceField('amber99sb.xml', 'tip3p.xml')
@@ -257,11 +258,20 @@ class mockSimulation:
                 return trj
                 
 
-        def runSimulation(self, R=10, N=1,s=100000, method='RL'):
+        def runSimulation(self, R=5000, N=1,s=1000, method='RL'):
                 global n_ec
                 import numpy as np
-                
+                import matplotlib.pyplot as plt
+                import matplotlib
+                matplotlib.use('Agg')
+                matplotlib.pyplot.switch_backend('agg')
+                # step = 2 fs
+                # each round is 2 fs * 1000 = 2 ps
+
+
+
                 init = 'ala2_1stFrame.pdb' #pdb name
+                #init = 'ala2_start_r_1001.pdb'
                 inits = init
                 #inits = [init for i in range(N)]
                 n_ec = 2
@@ -280,20 +290,22 @@ class mockSimulation:
                 trj1_theta = self.map(trj1)
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 100) # pre analysis (least count)
                 
+
                 newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL')
                 newPoints = trj1[newPoints_index_orig[0]]
                 newPoints.save_pdb(newPoints_name)
                 
                 print(len(trj1), len(trj1_theta[0]), s)
                 plt.scatter(trj1_theta[0], trj1_theta[1])
-                plt.xlim([-180, 180])
-                plt.ylim([-180, 180])
+                plt.xlim([-200, 200])
+                plt.ylim([-200, 200])
                 newPoints_theta_x = trj1_theta[0][newPoints_index_orig[0]]
                 newPoints_theta_y = trj1_theta[1][newPoints_index_orig[0]]
                 plt.plot(newPoints_theta_x, newPoints_theta_y, 'o', color='red')
                 plt.savefig('fig_'+str(count))
-                plt.close()                
-                
+                plt.close()
+
+
                 trjs_theta = trj1_theta
                 trjs_Ps_theta = trj1_Ps_theta
                 
@@ -304,7 +316,7 @@ class mockSimulation:
                         #W_0 = W_1
                         W_1 = W_0
                         Ws.append(W_0)
-                        
+                        s = 1000
                         trj1 = self.run(production_steps = s, start=newPoints_name, production='trj_R_'+str(count)+'.pdb') # return mdtraj object
 
                         com_trjs = trjs.join(trj1) 
@@ -319,24 +331,27 @@ class mockSimulation:
                         count = count + 1
                         newPoints_name = 'start_r_'+str(count)+'.pdb'
                         newPoints.save_pdb(newPoints_name)
-                        
+
+
                         print(len(trjs), len(trjs_theta[0]), s)
                         plt.scatter(trjs_theta[0], trjs_theta[1])
-                        plt.xlim([-180, 180])
-                        plt.ylim([-180, 180])
+                        plt.xlim([-200, 200])
+                        plt.ylim([-200, 200])
                         newPoints_theta_x = trjs_theta[0][newPoints_index_orig[0]]
                         newPoints_theta_y = trjs_theta[1][newPoints_index_orig[0]]
                         plt.plot(newPoints_theta_x, newPoints_theta_y, 'o', color='red')
                         plt.savefig('fig_'+str(count))
                         plt.close()
-                        
+  
                 np.save('w_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), Ws)
                 np.save('trjs_theta', trjs_theta)
                 return 
                         
 
 
-     
+
+
+       
 ####################################
 
         def updateW_withDir(self, trj_Sp_theta, W_0):
