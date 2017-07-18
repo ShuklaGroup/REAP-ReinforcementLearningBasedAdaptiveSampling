@@ -3,7 +3,6 @@ import numpy as np
 X_0 = [1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1]
 Y_0 = [0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01]
 
-
 X_0 = [1.1,1.1,1.1]
 Y_0 = [0.01,0.01,.01]
 
@@ -16,18 +15,18 @@ Ws = [] # series of weights
 
 
 # first round
-trj1 = my_sim.run([X_0, Y_0], nstepmax = 10)
+trj1 = my_sim.run_noPlt([X_0, Y_0], nstepmax = 10)
 trj1 = my_sim.PreAll(trj1)
 
 trjs = trj1
-trj1_Sp = my_sim.PreSamp(trj1, starting_n = N) # pre analysis
+trj1_Sp = my_sim.PreSamp(trj1, starting_n = N, myn_clusters = 20) # pre analysis
 trj1_Sp_theta = my_sim.map(trj1_Sp)
 newPoints = my_sim.findStarting(trj1_Sp_theta, trj1_Sp, W_0, starting_n = N , method = 'RL')
 
 trjs_theta = trj1_Sp_theta
 
 trjs_Sp_theta = trj1_Sp_theta
-for round in range(300):
+for round in range(700):
 	# updates the std and mean 
 	#my_sim.updateStat(trjs_Sp_theta) # based on min count trajectories
 	my_sim.updateStat(trjs_theta) # based on all trajectories
@@ -37,10 +36,11 @@ for round in range(300):
 	Ws.append(W_0)
 	print('Weight', W_0)
 	
-	trj1 = my_sim.run(newPoints, nstepmax = 10)
+	trj1 = my_sim.run_noPlt(newPoints, nstepmax = 5)
 	trj1 = my_sim.PreAll(trj1) # 2 x all points of this round
 
 	#trjs = np.array([np.array(np.concatenate((trj1[0],trjs[0]))), np.array(np.concatenate((trj1[1],trjs[1])))])  # 2 x all points
+
 	com_trjs = []
 
 	for theta in range(len(trj1)):
@@ -57,5 +57,5 @@ for round in range(300):
 	
 print(Ws)
 np.save('w', Ws)
-
+np.save('trjs_theta', trjs_theta)
 
