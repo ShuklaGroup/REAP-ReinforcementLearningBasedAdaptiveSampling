@@ -28,9 +28,7 @@ trjs_theta = trj1_Sp_theta
 trjs_Sp_theta = trj1_Sp_theta
 for round in range(700):
 	# updates the std and mean 
-	#my_sim.updateStat(trjs_Sp_theta) # based on min count trajectories
 	my_sim.updateStat(trjs_theta) # based on all trajectories
-	#W_1 = my_sim.updateW(trj1_Sp_theta, W_0) # rewigth weigths using last round
 	W_1 = my_sim.updateW(trjs_Sp_theta, W_0) # important
 	W_0 = W_1
 	Ws.append(W_0)
@@ -39,7 +37,6 @@ for round in range(700):
 	trj1 = my_sim.run_noPlt(newPoints, nstepmax = 5)
 	trj1 = my_sim.PreAll(trj1) # 2 x all points of this round
 
-	#trjs = np.array([np.array(np.concatenate((trj1[0],trjs[0]))), np.array(np.concatenate((trj1[1],trjs[1])))])  # 2 x all points
 
 	com_trjs = []
 
@@ -52,7 +49,6 @@ for round in range(700):
 	trjs_Sp = my_sim.PreSamp(trjs, starting_n = N)
 	trjs_Sp_theta = np.array(my_sim.map(trjs_Sp))
   
-
 	newPoints = my_sim.findStarting(trjs_Sp_theta, trjs_Sp, W_1, starting_n = N , method = 'RL')
 	
 print(Ws)
