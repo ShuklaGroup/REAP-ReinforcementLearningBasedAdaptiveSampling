@@ -3,6 +3,10 @@ import numpy as np
 X_0 = [1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1]
 Y_0 = [0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01,0.01,0.01,.01]
 
+
+X_0 = [1.1,1.1,1.1]
+Y_0 = [0.01,0.01,.01]
+
 N = len(X_0) # number of parallel runs 
 
 # run first round of simulation
@@ -23,7 +27,7 @@ newPoints = my_sim.findStarting(trj1_Sp_theta, trj1_Sp, W_0, starting_n = N , me
 trjs_theta = trj1_Sp_theta
 
 trjs_Sp_theta = trj1_Sp_theta
-for round in range(30):
+for round in range(300):
 	# updates the std and mean 
 	#my_sim.updateStat(trjs_Sp_theta) # based on min count trajectories
 	my_sim.updateStat(trjs_theta) # based on all trajectories
