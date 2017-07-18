@@ -163,7 +163,7 @@ class mockSimulation:
                 
                 global trj_Sp_theta_z 
                 trj_Sp_theta_z = trj_Sp_theta
-                alpha = 0.2
+                alpha = 0.02
                 delta = alpha
                 cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([x[0]+x[1]+x[2]+x[3]-1])},
@@ -279,6 +279,7 @@ class mockSimulation:
                 # time-step (limited by the ODE step on line 83 & 84 but independent of n1)
                 #h = 1e-4
                 h = 5e-5
+                h = 1e-5
                 # end points of the initial string
                 # notice that they do NOT have to be at minima of V -- the method finds
                 # those automatically
