@@ -1,6 +1,5 @@
 class mockSimulation:
         ## public
-        
         def __init__(self):
                 self.theta_mean = []
                 self.theta_std = []
@@ -156,16 +155,16 @@ class mockSimulation:
                 
                 global trj_Sp_theta_z 
                 trj_Sp_theta_z = trj_Sp_theta
-                alpha = 0.02
+                alpha = 0.005
                 delta = alpha
                 cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([np.sum(x)-1])},
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([np.min(x)])},
+                          'fun' : lambda x: np.array([np.min(x)])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([np.abs(x[0]-x0[0])-delta])},
+                          'fun' : lambda x: np.array([-np.abs(x[0]-x0[0])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([np.abs(x[1]-x0[1])-delta])})
+                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}) # greater than zero
 
                 x0 = W_0
                 res = minimize(fun, x0, constraints=cons)
@@ -266,6 +265,10 @@ class mockSimulation:
                 import matplotlib
                 matplotlib.use('Agg')
                 matplotlib.pyplot.switch_backend('agg')
+
+                plt.rcParams.update({'font.size':20})
+                plt.rc('xtick', labelsize=20)
+                plt.rc('ytick', labelsize=20)
                 # step = 2 fs
                 # each round is 2 fs * 1000 = 2 ps
 
@@ -297,12 +300,14 @@ class mockSimulation:
                 newPoints.save_pdb(newPoints_name)
                 
                 print(len(trj1), len(trj1_theta[0]), s)
-                plt.scatter(trj1_theta[0], trj1_theta[1])
-                plt.xlim([-200, 200])
-                plt.ylim([-200, 200])
+                plt.scatter(trj1_theta[0], trj1_theta[1], color='dodgerblue', s=5, alpha=0.2)
+                plt.xlim([-180, 180])
+                plt.ylim([-180, 180])
                 newPoints_theta_x = trj1_theta[0][newPoints_index_orig[0]]
                 newPoints_theta_y = trj1_theta[1][newPoints_index_orig[0]]
-                plt.plot(newPoints_theta_x, newPoints_theta_y, 'o', color='red')
+                plt.scatter(newPoints_theta_x, newPoints_theta_y, color='red', s=50)
+                plt.xlabel(r'$\phi$')
+                plt.ylabel(r'$\psi$')
                 plt.savefig('fig_'+str(count))
                 plt.close()
 
@@ -313,8 +318,8 @@ class mockSimulation:
                 
                 for round in range(R):
                         self.updateStat(trjs_theta) # based on all trajectories
-                        #W_1 = self.updateW(trjs_Ps_theta, W_0)
-                        #W_0 = W_1
+                        W_1 = self.updateW(trjs_Ps_theta, W_0)
+                        W_0 = W_1
                         W_1 = W_0
                         Ws.append(W_0)
                         s = 1000
@@ -335,12 +340,16 @@ class mockSimulation:
 
 
                         print(len(trjs), len(trjs_theta[0]), s)
-                        plt.scatter(trjs_theta[0], trjs_theta[1])
-                        plt.xlim([-200, 200])
-                        plt.ylim([-200, 200])
+                        plt.scatter(trjs_theta[0], trjs_theta[1], color='dodgerblue', s=5, alpha=0.2)
+                        plt.xlim([-180, 180])
+                        plt.ylim([-180, 180])
                         newPoints_theta_x = trjs_theta[0][newPoints_index_orig[0]]
                         newPoints_theta_y = trjs_theta[1][newPoints_index_orig[0]]
-                        plt.plot(newPoints_theta_x, newPoints_theta_y, 'o', color='red')
+                        plt.scatter(newPoints_theta_x, newPoints_theta_y, color='red', s=50)
+                        plt.xlabel(r'$\phi$')
+                        plt.ylabel(r'$\psi$')
+
+
                         plt.savefig('fig_'+str(count))
                         plt.close()
   
@@ -378,7 +387,7 @@ class mockSimulation:
                 global n_ec
                 
                 trj_Sp_theta_z = trj_Sp_theta
-                alpha = 0.2
+                alpha = 0.05
                 delta = alpha
                 cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([np.sum(x)-1])},
