@@ -1,4 +1,4 @@
-## Run 1000 rounds of simulations using RL 
+## Run simulations using RL 
 
 > import RLSim as rl
 
