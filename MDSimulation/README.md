@@ -1,5 +1,12 @@
+## Run 1000 rounds of simulations using RL 
 
+> import RLSim as rl
 
+> z = rl.mockSimulation()
+
+> z.runSimulation(R=1000, N=1,s=1000, method='RL')
+
+Run single trajectory for 1000 round, each 1000 step (=2 fs*1000 = 2 ps).
 
 ## Animate the images
 
