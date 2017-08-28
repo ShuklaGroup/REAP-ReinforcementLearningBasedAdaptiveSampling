@@ -33,7 +33,7 @@ class mockSimulation:
                 return trj_Sp
 
 
-        def PreSamp(self, trj, starting_n=10, myn_clusters = 40, N = 2):
+        def PreSamp(self, trj, starting_n=10, myn_clusters = 40, N = 10):
                 """
                 Pre-Sampling:
                         choose states with minimum counts or newly discovered states
@@ -158,7 +158,7 @@ class mockSimulation:
                 global trj_Sp_theta_z 
                 trj_Sp_theta_z = trj_Sp_theta
                 alpha = 0.01
-                alpha = 0.1
+                alpha = 0.02
                 delta = alpha
                 cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([x[0]+x[1]+x[2]+x[3]-1])},
@@ -225,7 +225,6 @@ class mockSimulation:
                 ranks = {}
                 for state_index in range(len(trj_Sp_theta[0])):
                         #print(len(trj_Sp_theta[0]))
-                        trj_Sp_theta = np.array(trj_Sp_theta)
                         state_theta = trj_Sp_theta[:,state_index]
                         
                         r = self.reward_state( state_theta, theta_mean, theta_std, W_1)
@@ -247,6 +246,9 @@ class mockSimulation:
         def creatPotentioal(self):
                 return True
                 
+# output size :
+# 2 * simu length * number of parallel sims
+
 
         def run(self, inits, round, oldTrjs, nstepmax = 10):
                 import numpy as np
@@ -267,6 +269,7 @@ class mockSimulation:
 
                 # temperature ###?!!!
                 mu = 3
+                mu = 4
                 # parameter used as stopping criterion
                 tol1 = 1e-7
 
@@ -315,17 +318,17 @@ class mockSimulation:
                 xi = x
                 yi = y
 
-                                # parameters in Mueller potential
+                # parameters in Mueller potential
 
-                aa = [-1.5, -10, -1.5] # inverse radius in x
-                bb = [0, 0, 0] # radius in xy
-                cc = [-20, -0.95, -20] # inverse radius in y
-                AA = [-80, -100, -80] # strength
+                aa = [-5, -5, -10, -10, -10, -5, -5] # inverse radius in x
+                bb = [0, 0, 0, 0, 0 , 0, 0] # radius in xy
+                cc = [-10, -10, -3, -3, -3, -10, -10] # inverse radius in y
+                AA = 2*np.array([-60, -60, -65, -65, -65, -60, -60]) # strength
                 #AA = [-200, -120, -200, -80, -80] # strength
 
 
-                XX = [0, 0, 0]  # center_x
-                YY = [0.6, 2, 3.4] # center_y
+                XX = [-0.4, 0.4, 0, 0, 0, -0.4, 0.4]  # center_x
+                YY = [0.6, 0.6, 1.2, 2, 2.8, 3.4, 3.4] # center_y
 
                 zxx = np.mgrid[-2:2.01:0.01]
                 zyy = np.mgrid[0:4.01:0.01]
@@ -333,14 +336,11 @@ class mockSimulation:
 
 
                 V1 = AA[0]*np.exp(aa[0] * np.square(xx-XX[0]) + bb[0] * (xx-XX[0]) * (yy-YY[0]) +cc[0]*np.square(yy-YY[0]))
-                for j in range(1,3):
+                for j in range(1,7):
                         V1 =  V1 + AA[j]*np.exp(aa[j]*np.square(xx-XX[j]) + bb[j]*(xx-XX[j])*(yy-YY[j]) + cc[j]*np.square(yy-YY[j]))
 
                 fig = plt.figure()
                 ax = fig.add_subplot(111)
-                
-                #plt.axvline(x=self.theta_mean[0])
-                #plt.axhline(y=self.theta_mean[1])
 
                 plt.xlabel('x')
                 plt.ylabel('y')
@@ -358,7 +358,7 @@ class mockSimulation:
                         ee = AA[0]*np.exp(aa[0]*np.square(x-XX[0])+bb[0]*(x-XX[0])*(y-YY[0])+cc[0]*np.square(y-YY[0]))
                         dVx = (2*aa[0]*(x-XX[0])+bb[0]*(y-YY[0]))*ee
                         dVy = (bb[0]*(x-XX[0])+2*cc[0]*(y-YY[0]))*ee
-                        for j in range(1,3):
+                        for j in range(1,7):
                                 ee = AA[j]*np.exp(aa[j]*np.square(x-XX[j])+bb[j]*(x-XX[j])*(y-YY[j])+cc[j]*np.square(y-YY[j]))
                                 dVx = dVx + (2*aa[j]*(x-XX[j])+bb[j]*(y-YY[j]))*ee
                                 dVy = dVy + (bb[j]*(x-XX[j])+2*cc[j]*(y-YY[j]))*ee
@@ -368,31 +368,10 @@ class mockSimulation:
                         y = y - h*dVy + np.sqrt(2*h*mu)*np.random.randn(1,n1) 
                         trj_x.append(x) 
                         trj_y.append(y)
-                        #for j in range(len(trj_x)):
-                        #        ax.plot(trj_x[j], trj_y[j], 'o', color='w')
-                        
-                        #plt.xlabel('x')
-                        #plt.ylabel('y')   
-
-                        #ax.plot(oldTrjs[0], oldTrjs[1], 'o', color='w')     
-
-                        #ax.plot(x,y, 'o', color='r')
-                        #print(x)
-                        #plt.savefig('fig_r'+str(round)+'frame'+str(index)+'_withTrj.png')
                         index = index + 1
 
-                        #fig.canvas.draw()
-                        
 
-                #ax.plot(oldTrjs[0], oldTrjs[1], 'o', color='blue')
-                #ax.plot(x, y, 'o', color='blue')
-                #plt.savefig('fig_r'+str(round)+'frame'+str(index)+'_withTrj.png')
-                return trj_x, trj_y          
-
-# output size :
-# 2 * simu length * number of parallel sims
-
-
+                return trj_x, trj_y 
         def pltPoints(self, trjs_theta, trjs_Sp_theta, newPoints, round, weights = 'none'):
                 import numpy as np
                 import time 
@@ -410,7 +389,7 @@ class mockSimulation:
                 flag1 = 1
 
                 # temperature ###?!!!
-                mu = 4
+                mu = 3
                 # parameter used as stopping criterion
                 tol1 = 1e-7
 
@@ -425,9 +404,13 @@ class mockSimulation:
                 # those automatically
 
                 # initialization
+
                 plt.rcParams.update({'font.size':18})
                 plt.rc('xtick', labelsize=18)
                 plt.rc('ytick', labelsize=18)
+
+
+
                 cdict3 = {'red':  ((0.0, 238/255, 238/255),  # orange
                     (0.4, 1.5*238/255, 1.5*238/255),
                     (0.85, 19/255, 19/255), # blue
@@ -446,14 +429,15 @@ class mockSimulation:
                 plt.rcParams['image.cmap'] = 'BlueRed3'
 
 
-                aa = [-1.5, -10, -1.5] # inverse radius in x
-                bb = [0, 0, 0] # radius in xy
-                cc = [-20, -0.95, -20] # inverse radius in y
-                AA = [-80, -100, -80] # strength
+                aa = [-5, -5, -10, -10, -10, -5, -5] # inverse radius in x
+                bb = [0, 0, 0, 0, 0 , 0, 0] # radius in xy
+                cc = [-10, -10, -3, -3, -3, -10, -10] # inverse radius in y
+                AA = 2*np.array([-60, -60, -65, -65, -65, -60, -60]) # strength
                 #AA = [-200, -120, -200, -80, -80] # strength
 
-                XX = [0, 0, 0]  # center_x
-                YY = [0.6, 2, 3.4] # center_y
+
+                XX = [-0.4, 0.4, 0, 0, 0, -0.4, 0.4]  # center_x
+                YY = [0.6, 0.6, 1.2, 2, 2.8, 3.4, 3.4] # center_y
 
                 zxx = np.mgrid[-2:2.01:0.01]
                 zyy = np.mgrid[0:4.01:0.01]
@@ -461,27 +445,43 @@ class mockSimulation:
 
 
                 V1 = AA[0]*np.exp(aa[0] * np.square(xx-XX[0]) + bb[0] * (xx-XX[0]) * (yy-YY[0]) +cc[0]*np.square(yy-YY[0]))
-                for j in range(1,3):
+                for j in range(1,7):
                         V1 =  V1 + AA[j]*np.exp(aa[j]*np.square(xx-XX[j]) + bb[j]*(xx-XX[j])*(yy-YY[j]) + cc[j]*np.square(yy-YY[j]))
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(221)
-                ax1.contourf(xx,yy,np.minimum(V1,400), 40, vmin=-80)
+                #ax1.contourf(xx,yy,np.minimum(V1,400), 40, vmin=-80, cmap=plt.cm.bone)
+                #ax1.contourf(xx,yy,V1, 40, cmap=plt.cm.jet)
+                ax1.contourf(xx,yy,V1, 40)
                 ax1.set_xlabel('x')
                 ax1.set_ylabel('y')
 
-                ax1.plot(trjs_theta[0], trjs_theta[1], 'o', color='w')
-                ax1.plot(trjs_Sp_theta[0], trjs_Sp_theta[1], 'o', color='blue')
-                ax1.plot(newPoints[0], newPoints[1], 'o', color='red')
+                ax1.plot(trjs_theta[0], trjs_theta[1], 'o', color='white', alpha=0.2, mec="black")
+                ax1.plot(trjs_Sp_theta[0], trjs_Sp_theta[1], 'o', color='aquamarine', alpha=0.5, mec="black")
+                ax1.plot(newPoints[0], newPoints[1], 'o', color='darkmagenta', alpha=0.9, mec="black")
+                
+                ax1.set_xticks([-2, 0 ,2])
+                ax1.set_yticks([0, 2 ,4])
 
                 ax2 = fig.add_subplot(222)
                 weights = np.array(weights)
-                W_y = weights[:,1,0] + weights[:,1,1]
-                W_x = weights[:,0,0] + weights[:,0,1]
-                ax2.plot(np.arange(len(W_x)), W_x, 'r', lw=2, label='X weight')
-                ax2.plot(np.arange(len(W_y)), W_y, 'black', lw=2, label='Y weight')
-                ax2.set_ylim([0,1])
+                W_y1 = weights[:,1,0] 
+                W_y2 = weights[:,1,1]
+                W_y = W_y1 + W_y2
+                
+                W_x1 = weights[:,0,0] 
+                W_x2 = weights[:,0,1]
+                W_x = W_x1 + W_x2
+                ax2.plot(np.arange(len(W_x)), W_x, 'orange', lw=2, label='X weight')
+                ax2.plot(np.arange(len(W_y)), W_y, 'blue', lw=2, label='Y weight')
+                ax2.legend(loc=0, prop={'size': 10})
+                #ax2.plot(np.arange(len(W_y1)), W_y1, 'r', lw=2, label='X weight')
+                #ax2.plot(np.arange(len(W_y2)), W_y2, 'black', lw=2, label='Y weight')
+                
                 ax2.set_xlim([0,100])
+                ax2.set_ylim([0,1])
+                ax2.set_xticks([0, 20 ,40, 60, 80, 100])
+                ax2.set_yticks([0, 0.5, 1])
 
                 #ax.plot(x, y, 'o', color='blue')
                 plt.savefig('fig_r'+str(round)+'_withTrj.png')
