@@ -158,7 +158,7 @@ class mockSimulation:
                 global trj_Sp_theta_z 
                 trj_Sp_theta_z = trj_Sp_theta
                 alpha = 0.01
-                alpha = 0.02
+                alpha = 0.1
                 delta = alpha
                 cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([x[0]+x[1]+x[2]+x[3]-1])},
@@ -225,6 +225,7 @@ class mockSimulation:
                 ranks = {}
                 for state_index in range(len(trj_Sp_theta[0])):
                         #print(len(trj_Sp_theta[0]))
+                        trj_Sp_theta = np.array(trj_Sp_theta)
                         state_theta = trj_Sp_theta[:,state_index]
                         
                         r = self.reward_state( state_theta, theta_mean, theta_std, W_1)
@@ -246,99 +247,6 @@ class mockSimulation:
         def creatPotentioal(self):
                 return True
                 
-        def run_noPlt(self, inits, nstepmax = 10):
-                import numpy as np
-                import time 
-                from scipy.interpolate import interp1d
-                inits_x = inits[0]
-                inits_y = inits[1]                    
-                #plt.ion()
-                # max number of iterations
-                
-                # frequency of plotting
-                #nstepplot = 1e1
-                # plot string every nstepplot if flag1 = 1 
-                #flag1 = 1
-
-                # temperature ###?!!!
-                mu = 8
-
-                # parameter used as stopping criterion
-                tol1 = 1e-7
-
-                # number of images during prerelaxation
-                n2 = 1e1;
-                # number of images along the string (try from  n1 = 3 up to n1 = 1e4)
-                n1 = 25
-                n1 = len(inits_x)
-                # time-step (limited by the ODE step on line 83 & 84 but independent of n1)
-                h = 1e-4
-                #h = 5e-5
-                #h = 1e-5
-                # end points of the initial string
-                # notice that they do NOT have to be at minima of V -- the method finds
-                # those automatically
-
-                # initialization
-                
-                x = np.array(inits_x)
-                y = np.array(inits_y)
-                dx = x-np.roll(x, 1)
-                dy = y-np.roll(y, 1)
-                dx[0] = 0
-                dy[0] = 0
-                xi = x
-                yi = y
-
-                                # parameters in Mueller potential
-
-                aa = [-1.5, -10, -1.5] # inverse radius in x
-                bb = [0, 0, 0]  # radius in xy
-                cc = [-20, -1, -20] # inverse radius in y
-                AA = [-80, -80, -80] # strength
-                #AA = [-200, -120, -200, -80, -80] # strength
-
-
-                XX = [0, 0, 0] # center_x
-                YY = [0.5, 2, 3.5] # center_y
-
-                zxx = np.mgrid[-2:2.01:0.01]
-                zyy = np.mgrid[0:4.01:0.01]
-                xx, yy = np.meshgrid(zxx, zyy)
-
-
-                V1 = AA[0]*np.exp(aa[0] * np.square(xx-XX[0]) + bb[0] * (xx-XX[0]) * (yy-YY[0]) +cc[0]*np.square(yy-YY[0]))
-                for j in range(1,3):
-                        V1 =  V1 + AA[j]*np.exp(aa[j]*np.square(xx-XX[j]) + bb[j]*(xx-XX[j])*(yy-YY[j]) + cc[j]*np.square(yy-YY[j]))
-
-
-##### Main loop
-
-                trj_x = []
-                trj_y = []
-                for nstep in range(int(nstepmax)):
-                        
-                        # calculation of the x and y-components of the force, dVx and dVy respectively
-                        ee = AA[0]*np.exp(aa[0]*np.square(x-XX[0])+bb[0]*(x-XX[0])*(y-YY[0])+cc[0]*np.square(y-YY[0]))
-
-
-                        dVx = (aa[0]*(x-XX[0])+bb[0]*(y-YY[0]))*ee
-                        dVy = (bb[0]*(x-XX[0])+cc[0]*(y-YY[0]))*ee
-                        for j in range(1,5):
-                                ee = AA[j]*np.exp(aa[j]*np.square(x-XX[j])+bb[j]*(x-XX[j])*(y-YY[j])+cc[j]*np.square(y-YY[j]))
-                                dVx = dVx + (aa[j]*(x-XX[j])+bb[j]*(y-YY[j]))*ee
-                                dVy = dVy + (bb[j]*(x-XX[j])+cc[j]*(y-YY[j]))*ee
-
-                        x0 = x
-                        y0 = y
-
-                        x = x - h*dVx + np.sqrt(h*mu)*np.random.randn(1,n1)
-                        y = y - h*dVy + np.sqrt(h*mu)*np.random.randn(1,n1)
-                        trj_x.append(x) 
-                        trj_y.append(y)
-
-                        
-                return trj_x, trj_y    
 
         def run(self, inits, round, oldTrjs, nstepmax = 10):
                 import numpy as np
@@ -358,7 +266,7 @@ class mockSimulation:
                 flag1 = 1
 
                 # temperature ###?!!!
-                mu = 8
+                mu = 3
                 # parameter used as stopping criterion
                 tol1 = 1e-7
 
@@ -411,13 +319,13 @@ class mockSimulation:
 
                 aa = [-1.5, -10, -1.5] # inverse radius in x
                 bb = [0, 0, 0] # radius in xy
-                cc = [-20, -1, -20] # inverse radius in y
-                AA = [-80, -80, -80] # strength
+                cc = [-20, -0.95, -20] # inverse radius in y
+                AA = [-80, -100, -80] # strength
                 #AA = [-200, -120, -200, -80, -80] # strength
 
 
                 XX = [0, 0, 0]  # center_x
-                YY = [0.5, 2, 3.5] # center_y
+                YY = [0.6, 2, 3.4] # center_y
 
                 zxx = np.mgrid[-2:2.01:0.01]
                 zyy = np.mgrid[0:4.01:0.01]
@@ -446,7 +354,7 @@ class mockSimulation:
                 for nstep in range(int(nstepmax)):
                         
                         # calculation of the x and y-components of the force, dVx and dVy respectively
-                        ax.contourf(xx,yy,np.minimum(V1,200), 40, vmin=-80)
+                        ax.contourf(xx,yy,np.minimum(V1,400), 40, vmin=-80)
                         ee = AA[0]*np.exp(aa[0]*np.square(x-XX[0])+bb[0]*(x-XX[0])*(y-YY[0])+cc[0]*np.square(y-YY[0]))
                         dVx = (2*aa[0]*(x-XX[0])+bb[0]*(y-YY[0]))*ee
                         dVy = (bb[0]*(x-XX[0])+2*cc[0]*(y-YY[0]))*ee
@@ -460,68 +368,119 @@ class mockSimulation:
                         y = y - h*dVy + np.sqrt(2*h*mu)*np.random.randn(1,n1) 
                         trj_x.append(x) 
                         trj_y.append(y)
-                        for j in range(len(trj_x)):
-                                ax.plot(trj_x[j], trj_y[j], 'o', color='w')
+                        #for j in range(len(trj_x)):
+                        #        ax.plot(trj_x[j], trj_y[j], 'o', color='w')
                         
-                        plt.xlabel('x')
-                        plt.ylabel('y')   
+                        #plt.xlabel('x')
+                        #plt.ylabel('y')   
 
-                        ax.plot(oldTrjs[0], oldTrjs[1], 'o', color='w')     
+                        #ax.plot(oldTrjs[0], oldTrjs[1], 'o', color='w')     
 
-                        ax.plot(x,y, 'o', color='r')
+                        #ax.plot(x,y, 'o', color='r')
                         #print(x)
-                        plt.savefig('fig_r'+str(round)+'frame'+str(index)+'_withTrj.png')
+                        #plt.savefig('fig_r'+str(round)+'frame'+str(index)+'_withTrj.png')
                         index = index + 1
 
                         #fig.canvas.draw()
                         
 
-                ax.plot(oldTrjs[0], oldTrjs[1], 'o', color='blue')
-                ax.plot(x, y, 'o', color='blue')
-                plt.savefig('fig_r'+str(round)+'frame'+str(index)+'_withTrj.png')
+                #ax.plot(oldTrjs[0], oldTrjs[1], 'o', color='blue')
+                #ax.plot(x, y, 'o', color='blue')
+                #plt.savefig('fig_r'+str(round)+'frame'+str(index)+'_withTrj.png')
                 return trj_x, trj_y          
 
 # output size :
 # 2 * simu length * number of parallel sims
 
 
-        def pltFinalPoints(self, trjs_theta):
+        def pltPoints(self, trjs_theta, trjs_Sp_theta, newPoints, round, weights = 'none'):
                 import numpy as np
+                import time 
+                from scipy.interpolate import interp1d
                 import matplotlib.pyplot as plt
-                plt.rcParams.update({'font.size':20})
-                plt.rc('xtick', labelsize=20)
-                plt.rc('ytick', labelsize=20)
-                x = np.array(trjs_theta[0])
-                y = np.array(trjs_theta[1])
+                from pylab import cm
 
-                                # parameters in Mueller potential
+                   
+                plt.ion()
+                # max number of iterations
+                
+                # frequency of plotting
+                nstepplot = 1e1
+                # plot string every nstepplot if flag1 = 1 
+                flag1 = 1
 
-                aa = [-2, -20, -20, -20, -20] # inverse radius in x
-                bb = [0, 0, 0, 0, 0] # radius in xy
-                cc = [-20, -20, -2, -20, -20] # inverse radius in y
-                AA = 3*[-200, -120, -200, -80, -80] # strength
+                # temperature ###?!!!
+                mu = 4
+                # parameter used as stopping criterion
+                tol1 = 1e-7
 
-                XX = [1, 0, 0, 0, 0.4] # center_x
-                YY = [0, 0, 1, 0.4, 0] # center_y
+                # number of images during prerelaxation
+                n2 = 1e1;
 
-                zxx = np.mgrid[-1:2.51:0.01]
-                zyy = np.mgrid[-1:2.51:0.01]
+                # time-step (limited by the ODE step on line 83 & 84 but independent of n1)
+
+                h = 1e-4
+                # end points of the initial string
+                # notice that they do NOT have to be at minima of V -- the method finds
+                # those automatically
+
+                # initialization
+                plt.rcParams.update({'font.size':18})
+                plt.rc('xtick', labelsize=18)
+                plt.rc('ytick', labelsize=18)
+                cdict3 = {'red':  ((0.0, 238/255, 238/255),  # orange
+                    (0.4, 1.5*238/255, 1.5*238/255),
+                    (0.85, 19/255, 19/255), # blue
+                    (1.0, 1, 1)), # orange
+                    'green': ((0.0, 83/255, 83/255), # orange
+                        (0.4, 1.5*83/255, 1.5*83/255),
+                        (0.85, 31/255, 31/255),
+                        (1.0, 1, 1)), # orange
+                    'blue':  ((0.0, 57/255, 57/255), # orange
+                    (0.4, 1.5*57/255, 1.5*57/255), # orange
+                    (0.85, 81/255, 81/255), # blue
+                    (1.0, 1, 1)) # orange
+        }
+
+                plt.register_cmap(name='BlueRed3', data=cdict3)
+                plt.rcParams['image.cmap'] = 'BlueRed3'
+
+
+                aa = [-1.5, -10, -1.5] # inverse radius in x
+                bb = [0, 0, 0] # radius in xy
+                cc = [-20, -0.95, -20] # inverse radius in y
+                AA = [-80, -100, -80] # strength
+                #AA = [-200, -120, -200, -80, -80] # strength
+
+                XX = [0, 0, 0]  # center_x
+                YY = [0.6, 2, 3.4] # center_y
+
+                zxx = np.mgrid[-2:2.01:0.01]
+                zyy = np.mgrid[0:4.01:0.01]
                 xx, yy = np.meshgrid(zxx, zyy)
 
 
                 V1 = AA[0]*np.exp(aa[0] * np.square(xx-XX[0]) + bb[0] * (xx-XX[0]) * (yy-YY[0]) +cc[0]*np.square(yy-YY[0]))
-                for j in range(1,5):
+                for j in range(1,3):
                         V1 =  V1 + AA[j]*np.exp(aa[j]*np.square(xx-XX[j]) + bb[j]*(xx-XX[j])*(yy-YY[j]) + cc[j]*np.square(yy-YY[j]))
 
                 fig = plt.figure()
-                ax = fig.add_subplot(111)
-                
-                ax.contourf(xx,yy,np.minimum(V1,200), 40)
+                ax1 = fig.add_subplot(221)
+                ax1.contourf(xx,yy,np.minimum(V1,400), 40, vmin=-80)
+                ax1.set_xlabel('x')
+                ax1.set_ylabel('y')
 
-                plt.xlabel('x')
-                plt.ylabel('y')
-                plt.plot(x, y, 'o', color='white', alpha=0.2, mec="black")
-                plt.savefig('fig_all.png', dpi =500)
+                ax1.plot(trjs_theta[0], trjs_theta[1], 'o', color='w')
+                ax1.plot(trjs_Sp_theta[0], trjs_Sp_theta[1], 'o', color='blue')
+                ax1.plot(newPoints[0], newPoints[1], 'o', color='red')
+
+                ax2 = fig.add_subplot(222)
+                ax2.plot(np.arange(len(weights[:,0,0])), weights, 'r', lw=2, label='X weight')
+                ax2.plot(np.arange(len(weights[:,0,1])), weights, 'black', lw=2, label='Y weight')
+
+                #ax.plot(x, y, 'o', color='blue')
+                plt.savefig('fig_r'+str(round)+'_withTrj.png')
+       
 
 
 
