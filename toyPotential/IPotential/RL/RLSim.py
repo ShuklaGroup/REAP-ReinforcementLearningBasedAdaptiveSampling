@@ -475,12 +475,13 @@ class mockSimulation:
                 ax1.plot(newPoints[0], newPoints[1], 'o', color='red')
 
                 ax2 = fig.add_subplot(222)
-                ax2.plot(np.arange(len(weights[:,0,0])), weights, 'r', lw=2, label='X weight')
-                ax2.plot(np.arange(len(weights[:,0,1])), weights, 'black', lw=2, label='Y weight')
+                weights = np.array(weights)
+                W_y = weights[:,1,0] + weights[:,1,1]
+                W_x = weights[:,0,0] + weights[:,0,1]
+                ax2.plot(np.arange(len(W_x)), W_x, 'r', lw=2, label='X weight')
+                ax2.plot(np.arange(len(W_y)), W_y, 'black', lw=2, label='Y weight')
+                ax2.set_ylim([0,1])
+                ax2.set_xlim([0,100])
 
                 #ax.plot(x, y, 'o', color='blue')
                 plt.savefig('fig_r'+str(round)+'_withTrj.png')
-       
-
-
-
