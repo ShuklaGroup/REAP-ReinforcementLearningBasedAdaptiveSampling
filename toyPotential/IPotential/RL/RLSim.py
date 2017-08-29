@@ -484,4 +484,4 @@ class mockSimulation:
                 ax2.set_yticks([0, 0.5, 1])
 
                 #ax.plot(x, y, 'o', color='blue')
-                plt.savefig('fig_r'+str(round)+'_withTrj.png')
+                plt.savefig('fig_r'+str(round)+'_withTrj.png', dpi=500)
