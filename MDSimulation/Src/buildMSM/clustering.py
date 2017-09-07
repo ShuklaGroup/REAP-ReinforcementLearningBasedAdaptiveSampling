@@ -9,7 +9,7 @@ from msmbuilder.msm import MarkovStateModel
 # setting the parameters
 n_components= 8
 lag_time= 10 
-n_clusters= 100
+n_clusters= 2000
 sys = 'Src-'
 n_timescales = 10
 lagTime = 50 # 5ns
@@ -28,11 +28,11 @@ tica_traj = tica.transform(dataset)
 pickle.dump(tica, open(sys+'_tICs_'+str(n_components)+'.pkl','wb'))
 
 # clustering
-states = msmbuilder.cluster.KMeans(n_clusters= n_clusters)
+states = msmbuilder.cluster.KMeans(n_clusters = n_clusters)
 states.fit(tica_traj)
-io.dump(states,sys+'_tICs_'+str(n_components)+'nCluster_'+str(n_clusters)+'.pkl')
+io.dump(states, sys+'_tICs_'+str(n_components)+'nCluster_'+str(n_clusters)+'.pkl')
 
 # making MSM
 msm = MarkovStateModel(lag_time=lagTime, n_timescales=n_timescales)
 msm.fit_transform(cl.labels_)
-io.dump(msm,'MSM'+str(i)+sys)
+io.dump(msm, 'MSM'+sys)
