@@ -3,23 +3,17 @@ import glob
 import numpy as np
 import mdtraj as md
 
-topFile = '2HYY_bi.prmtop'
-top = md.load_prmtop(topFile)
+topFile = 'csrc_inactive.pdb'
+top = md.load(topFile).topology
 
 # high RMSF res
-highRMSFRes = np.load('highRMSFRes-2HYY.npy')
-select='('
-for res in highRMSFRes:
-    select=select+' resid '+str(res)+' or '
-    
-select = select[:-3]+')'
+select = 'resid 5 to 86 or resid 144 to 170'
 protein_highRMSF_atomIndex = top.select(select)
 	
 #############
 for file in glob.glob('*/*.mdcrd'):
 	print(file)
-	t = md.load(file ,top=topFile)
-	
+	t = md.load(file)
 
 	# High RMSF Dihedral Angles
 	t2 = t.atom_slice(protein_highRMSF_atomIndex)
@@ -41,5 +35,5 @@ for file in glob.glob('*/*.mdcrd'):
 		phi_psi[i,2*n_phi:2*n_phi+n_psi] = psi_sin[i]
 		phi_psi[i,2*n_phi+n_psi:2*n_phi+2*n_psi] = psi_cos[i]
 	
-	np.save(file.replace('.mdcrd','_highRMSF_phi_psi.npy'), phi_psi)
+	np.save(file.replace('.lh5','_highRMSF_phi_psi.npy'), phi_psi)
 	
