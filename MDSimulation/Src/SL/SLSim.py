@@ -6,7 +6,9 @@ class mockSimulation:
                 self.r = 1#number of rounds
                 self.s = 1# length of simulations
                 self.N = 1# number of parallel simulations
-                self.msm = None
+                self.tp = None
+		self.x = None
+		self.y = None
                 
         def run_multipleSim(self):
                 return True
@@ -19,25 +21,17 @@ class mockSimulation:
                 """
                 Pre-Sampling:
                         choose states with minimum counts or newly discovered states
-                        
                 output:
                         trj with shape of [[Xs][Ys]]
                 """
                 import numpy as np
                 comb_trj = np.concatenate(trj)
-
-                #for theta in range(len(trj)):
-                #        comb_trj.append(np.concatenate(np.concatenate(trj[theta])))
-                #trj_Sp = np.array(comb_trj) # pick all
-                
                 return trj_Sp
-
 
         def PreSamp_MC(self, trj, N = 20):
                 """
                 Pre-Sampling for Monte Carlo simulations:
                         choose states with minimum counts or newly discovered states
-                        
                 output:
                         trj with shape of 
                 """
@@ -58,10 +52,11 @@ class mockSimulation:
                 # map coordinate space to reaction coorinates space
                 import numpy as np
                 trj_Ps_theta = []
-                msm = self.msm
+                x = self.x
+		y = self.y
                 for frame in trj_Ps:
-                        theta = np.loadtxt('MSMStatesAllVals_1000/cluster'+str(msm.mapping_[int(frame)])+'-1')
-                        trj_Ps_theta.append(theta)
+                        theta = [x[frame], y[frame]]
+			trj_Ps_theta.append(theta)
 
                 # change the format
                 trj_Ps_theta_2 = []
