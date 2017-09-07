@@ -62,7 +62,6 @@ class mockSimulation:
                 for frame in trj_Ps:
                         theta = np.loadtxt('MSMStatesAllVals_1000/cluster'+str(msm.mapping_[int(frame)])+'-1')
                         trj_Ps_theta.append(theta)
-                #trj_Sp_theta = trj_Sp
 
                 # change the format
                 trj_Ps_theta_2 = []
@@ -96,7 +95,6 @@ class mockSimulation:
                 return r_s
 
         def reward_state_withoutStd(self, S, theta_mean, theta_std, W_):
-                
                 r_s = 0
                 for k in range(len(W_)):
                         
@@ -263,12 +261,16 @@ class mockSimulation:
                         final trajectory
                 """
                 import numpy as np
-                msm = self.msm
+		import msmbuilder as msmb
+		
+                #msm = self.msm
+		tp = self.tp
                 N = len(inits)
                 trjs = np.empty([N, nstepmax])
                 for n in range(N):
                         init = np.int(inits[n])
-                        trj = msm.sample_discrete(state=init, n_steps=nstepmax, random_state=None)
+			trj = msmb.msm_analysis.sample(tp, init, nstepmax)
+                        #trj = msm.sample_discrete(state=init, n_steps=nstepmax, random_state=None)
                         trjs[n] = trj
                 return trjs
                 
@@ -293,7 +295,7 @@ class mockSimulation:
                 return isActive
 
 
-        def runSimulation(self, R=3,N=10,s=8, method='RL'):
+        def runSimulation(self, R=3, N=10, s=8, method='RL'):
                 import numpy as np
                 global n_ec
                 activeTime = -1
@@ -341,37 +343,6 @@ class mockSimulation:
                 return activeTime
                         
 
-        def multiSim_timeCal_script(self, method='RL'):
-
-                # T_len = [1,2,3,4,5,6,7,8,9] # lenght of trajectories
-                T_n = range(10,1010,10) # number of trajectories
-                T_len = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000]
-                N=10
-                l = len(T_len)
-                n = len(T_n)
-                count = 1
-                for i in range(l):
-                        for j in range(n):
-                                T_len1 = T_len[i]
-                                T_n1 = T_n[j]
-                                r=T_n1/N
-                                N=10
-                                s=T_len1
-                                myfile = open('run_'+'r'+str(r)+'N'+str(N)+'s'+str(s)+'.py','w')
-                                myfile.write('import pickle \n')
-                                myfile.write('import RLSim as rl \n')
-                                myfile.write('import numpy as np \n')
-                                myfile.write('msm =  pickle.load(open(\'MSM150.pkl\',\'rb\')) \n')
-                                myfile.write('my_sim = rl.mockSimulation() \n')
-                                myfile.write('my_sim.msm = msm \n')
-                                myfile.write('my_sim.runSimulation(s='+str(s)+', R='+ str(int(r)) +', N='+ str(N)+') \n')
-                                myfile.close()
-                                myRun = open('Run_'+str(count),'w')
-                                myRun.write('ipython run_'+'r'+str(r)+'N'+str(N)+'s'+str(s)+'.py')
-                                myRun.close()
-                                count = count + 1
-                return
-
         def collect_times(self):
                 import numpy as np
                 #T_len = [1,2,3,4,5,6,7,8,9] # lenght of trajectories
@@ -395,37 +366,3 @@ class mockSimulation:
                 return time
 
 	
-
-def pltTimes(times, filename='pcolormesh_timeReachingActive.png'):
-	
-	import matplotlib.pyplot as plt
-	from matplotlib.colors import LogNorm
-	font = {'family':'Times New Roman', 'size': 22}
-	plt.rc('font', **font)
-
-	T_len = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000]
-	T_n = range(10,1000,10)
-	
-	fig, ax = plt.subplots(1)
-
-	p = ax.pcolormesh(times, norm=LogNorm(vmin=1000, vmax=5000000))
-	xticks = range(len(T_n))
-	yticks = range(len(T_len))
-	
-	T_n1 = [1, 20,40,60,80,100] # Number of rounds
-	ax.set_xticklabels(T_n1)
-	T_len1 = [' ', 5,10,50,100,500,1000, 5000]
-	T_len1 = [' ', 5,100,50,' ' ,500, 5000]
-	
-	ax.set_yticklabels(T_len1)
-	
-	cbar = fig.colorbar(p, label='ms')
-	cbar.ax.set_yticklabels([0.05,0.5,5,50])
-	ax.set(xlabel='# Rounds of Simulation', ylabel=r'Trajectory Length/$\tau$')
-	ax.set_xlim([0,99])
-	ax.set_ylim([0,32])
-	
-	fig.set_size_inches(9, 7)
-
-	fig.savefig(filename, dpi=300)
-	fig.show()
