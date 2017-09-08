@@ -20,7 +20,12 @@ for file in glob.glob('*/*.lh5'):
 	t = md.load(file)
 	# distances
 	dist1 = md.compute_distances(t,pairs)
-	
 	np.save(file.replace('.lh5','_KE-RE.npy'), dist1)
     
     
+####
+re = [delta[i][1] for i in range(2000)]
+ke = [delta[i][0] for i in range(2000)]
+np.save('Gens_KE.npy', ke)
+np.save('Gens_RE.npy', re)
+
