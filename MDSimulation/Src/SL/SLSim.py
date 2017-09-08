@@ -1,3 +1,5 @@
+# ipython2 SLmain.py
+
 class mockSimulation:
         ## public
         def __init__(self):
@@ -7,6 +9,7 @@ class mockSimulation:
                 self.s = 1# length of simulations
                 self.N = 1# number of parallel simulations
                 self.tp = None
+                self.mapping = None
 		self.x = None
 		self.y = None
                 
@@ -38,13 +41,14 @@ class mockSimulation:
                 # map coordinate space to reaction coorinates space
                 import numpy as np
                 trj_x = []
-		trj_y = []
+                trj_y = []
                 x = self.x
-		y = self.y
-                for frame in trj_Ps:
-			frame = int(frame)
-			trj_x.append(x[frame])
-			trj_y.append(y[frame])
+                y = self.y
+                map = self.mapping
+                for MacroFrame in trj_Ps:
+                    microFrame = map[int(MacroFrame)]
+                    trj_x.append(x[microFrame])
+                    trj_y.append(y[microFrame])
 
                 return trj_x, trj_y
 
@@ -79,23 +83,23 @@ class mockSimulation:
                 
 
         def pltPoints(self, x, y):
-		import matplotlib.pyplot as plt
-		import numpy as np
-		
-		figName = 'fig.png'
-		plt.rcParams.update({'font.size':30})
-		plt.rc('xtick', labelsize=30)
-		plt.rc('ytick', labelsize=30)
+            import matplotlib.pyplot as plt
+            import numpy as np
 
-		fig = plt.figure()
-		ax = fig.add_subplot(111)
-		ax.scatter(x, y, color='darkorange', s=5, alpha=0.2)
-		plt.xlabel(r'$A-loop RMSD$')
-		plt.ylabel(r'$K-E - R-E$')
-		fig.savefig('fig.png', dpi=1000, bbox_inches='tight')
+            figName = 'fig.png'
 
-                return 
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
+            
+            
+            #ax.scatter(x , y, color='darkorange', s=10, alpha=0.2)
+            ax.scatter(x + np.random.normal(0, 0.06/4, len(x)), y+np.random.normal(0, 0.06, len(y)), color='darkorange', s=10, alpha=0.2)
+            plt.xlabel(r'$RMSD of A-loop (nm)$')
+            plt.ylabel(r'$d_E310-R409 - d_K295 - E310$')
+            #plt.ylabel(r'$d_E_310_-_R_409  - d_K_295_-_E_310 (nm)$')
+            plt.ylim([-2, 2])
+            plt.xlim([0, 1])
+#            plt.show()
+            fig.savefig('fig.png', dpi=1000, bbox_inches='tight')
 
-
-
-	
+            return 
