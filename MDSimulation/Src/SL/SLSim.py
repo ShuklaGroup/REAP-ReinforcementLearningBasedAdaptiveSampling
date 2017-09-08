@@ -26,21 +26,7 @@ class mockSimulation:
                 """
                 import numpy as np
                 comb_trj = np.concatenate(trj)
-                return trj_Sp
-
-        def PreSamp_MC(self, trj, N = 20):
-                """
-                Pre-Sampling for Monte Carlo simulations:
-                        choose states with minimum counts or newly discovered states
-                output:
-                        trj with shape of 
-                """
-                import numpy as np
-                cl_trjs = trj             
-                unique, counts = np.unique(cl_trjs, return_counts=True)
-                leastPop = counts.argsort()[:N]
-                init_cl = [unique[i] for i in leastPop]
-                return init_cl
+                return trj
 
                 
         def map(self, trj_Ps):
@@ -51,20 +37,16 @@ class mockSimulation:
                 """
                 # map coordinate space to reaction coorinates space
                 import numpy as np
-                trj_Ps_theta = []
+                trj_x = []
+		trj_y = []
                 x = self.x
 		y = self.y
                 for frame in trj_Ps:
-                        theta = [x[frame], y[frame]]
-			trj_Ps_theta.append(theta)
+			frame = int(frame)
+			trj_x.append(x[frame])
+			trj_y.append(y[frame])
 
-                # change the format
-                trj_Ps_theta_2 = []
-                ##############
-                trj_Ps_theta = np.array(trj_Ps_theta) 
-                for theta_index in range(len(trj_Ps_theta[0])):
-                        trj_Ps_theta_2.append(trj_Ps_theta[:,theta_index])
-                return trj_Ps_theta_2
+                return trj_x, trj_y
 
         
         def run(self, inits, nstepmax = 10):
@@ -96,15 +78,23 @@ class mockSimulation:
                 return trjs
                 
 
-        def isActive_singleRound(self, trjs):
-                time = -1
-                n_parTrjs = len(trjs)
-                for trj in trjs:
-                        for frame in range(len(trj)):
-                                if self.isActive(trj[frame]):
-                                        time = n_parTrjs * frame
-                                        return time
-                return time
+        def pltPoints(self, x, y):
+		import matplotlib.pyplot as plt
+		import numpy as np
+		
+		figName = 'fig.png'
+		plt.rcParams.update({'font.size':30})
+		plt.rc('xtick', labelsize=30)
+		plt.rc('ytick', labelsize=30)
+
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		ax.scatter(x, y, color='darkorange', s=5, alpha=0.2)
+		plt.xlabel(r'$A-loop RMSD$')
+		plt.ylabel(r'$K-E - R-E$')
+		fig.savefig('fig.png', dpi=1000, bbox_inches='tight')
+
+                return 
 
 
 
