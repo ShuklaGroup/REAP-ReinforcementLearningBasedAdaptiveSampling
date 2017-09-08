@@ -1,79 +1,66 @@
-# B2AR
-import pickle
+# python 2.7 MSMbuilder 2.8
+
+from scipy import io as sio
 import RLSim as rl
-import numpy as np
+import numpy as np 
 
-msm =  pickle.load(open('MSM150.pkl','rb'))
-init = 132
-N = 10 # number of parallel runs 
-inits = [init for i in range(N)]
-my_sim = rl.mockSimulation()
-my_sim.msm = msm
-n_ec = 10
-W_0 = [1/n_ec for i in range(n_ec)]
+# inital state
+S_0 = [0] # inactive
 
+N = len(S_0) # number of parallel runs 
+nstepmax = 80
+print('Simulation length: ', nstepmax*0.005)
+# W_0 = [[1/4, 1/4], [1/4, 1/4]] # initial geuss of weights for + - in x and y directions
+W_0 = [0.5, 0.5]
 Ws = [] # series of weights
+Ws.append(W_0)
+print('Weight', W_0)
+# run simulation
+my_sim = rl.mockSimulation()
+my_sim.tp = sio.mmread('tProb.mtx')
+my_sim.x = np.load('Gens_aloopRMSD.npy')
+my_sim.y = np.load('Gens_y_deltaDist.npy')
+my_sim.mapping = np.load('map_Macro2micro.npy')
 
 
-# first round
-trj1 = my_sim.run(inits, nstepmax = 10)
-comb_trj1 = np.concatenate(trj1)
-#trj1 = my_sim.PreAll(trj1)
+#### first round
+trj1 = my_sim.run(S_0, nstepmax = nstepmax) # 1 x 1 x n_frames
+trj1 = my_sim.PreAll(trj1) # 1 x 1 x n_frames
+trjs = trj1[0] # 1 x n_frames
+trj1_Sp = my_sim.PreSamp_MC(trjs, N = 20) # pre analysis # 1 x n_samples
+trj1_Sp_theta = np.array(my_sim.map(trj1_Sp)) # [trjx, trjy]
+newPoints = my_sim.findStarting(trj1_Sp_theta, trj1_Sp, W_0, starting_n = N , method = 'RL') # needs 2 x something
+trjs_theta = trj1_Sp_theta
+trjs_Sp_theta = trj1_Sp_theta
 
-# comb_trj1 = first trajectory in the format of 1x(N*step) and cluster labels
-trjs = comb_trj1
 
-# trj1_Ps= presampled (least count,...) from first trajectory in the format of cluster labels
-trj1_Ps = my_sim.PreSamp_MC(trj1, N = 3*N) # pre analysis , 1 x n_frames
+for round in range(500):
+	# updates the std and mean 
+	my_sim.updateStat(trjs_theta) # based on all trajectories
 
-# trj1_Ps_theta = presampled (least count,..) from first trajectory in the format of n_ec x n_frames and theta (evolutionary couplings,..)
-trj1_Ps_theta = my_sim.map(trj1_Ps)
-# 
-newPoints = my_sim.findStarting(trj1_Ps_theta, trj1_Ps, W_0, starting_n = N , method = 'RL')
-trjs_theta = trj1_Ps_theta
-trjs_Ps_theta = trj1_Ps_theta
-count = 1 
-
-for round in range(20):
-        # updates the std and mean 
-        my_sim.updateStat(trjs_theta) # based on all trajectories
-        W_1 = my_sim.updateW(trjs_Ps_theta, W_0)
-        W_0 = W_1
-        Ws.append(W_0)
-        print('Weight', W_0)
-        
-        trj1 = my_sim.run(newPoints, nstepmax = 10) # N (number of parallel) x n_all_frames
-        trj1 = np.concatenate(trj1) # 1 x n_all_frames
+	W_1 = my_sim.updateW(trjs_Sp_theta, W_0) # important
+	W_0 = W_1
+	Ws.append(W_0)
+	print('Weight', W_0)
 	
+	oldTrjs = trjs
+	trj1 = my_sim.run(newPoints, nstepmax = 20)
+	trj1 = my_sim.PreAll(trj1)[0] # 2 x all points of this round
+	com_trjs = np.concatenate((trjs, trj1))
 	
-        
-        # combine trj1 with old trajectories
-        com_trjs = np.concatenate((trjs, trj1))
-        
-        trjs = np.array(com_trjs)
-        trjs_theta = np.array(my_sim.map(trjs))
-        
-        trjs_Ps = my_sim.PreSamp_MC(trjs, N = 4*N)
-        trjs_Ps_theta = np.array(my_sim.map(trjs_Ps))
-        
-        newPoints = my_sim.findStarting(trjs_Ps_theta, trjs_Ps, W_1, starting_n = N , method = 'RL')
-
-        count = count + 1 
-
-#       print(np.any(trjs_theta[1]>1.4))
-#       if np.any(trjs_theta[1]>1.4):
-#               import matplotlib.pyplot as plt
-#               plt.plot(trjs_theta[0], trjs_theta[1], 'o')
-#               plt.savefig('fig.png')
-#               np.save('count', count)
-#               break
-        
-        
-import matplotlib.pyplot as plt
-plt.plot(trjs_theta[0], trjs_theta[1], 'o')
-plt.savefig('fig_all.png')
-np.save('count_all', count)
+	trjs = np.array(com_trjs)
+	trjs_theta = np.array(my_sim.map(trjs))
+	
+	trjs_Sp = my_sim.PreSamp_MC(trjs, N = 20)
+	trjs_Sp_theta = np.array(my_sim.map(trjs_Sp))
+	newPoints = my_sim.findStarting(trjs_Sp_theta, trjs_Sp, W_1, starting_n = N , method = 'RL')
 
 
+#my_sim.pltPoints(trjs_theta, trjs_Sp_theta, newPoints, round, weights=Ws)
+
+my_sim.pltPoints(trjs_theta[0], trjs_theta[1])
 print(Ws)
-np.save('w', Ws)
+np.save('w_2', Ws)
+np.save('trjs_theta_2', trjs_theta)
+
+
