@@ -1,5 +1,4 @@
 # ipython2 SLmain.py
-
 class mockSimulation:
         ## public
         def __init__(self):
