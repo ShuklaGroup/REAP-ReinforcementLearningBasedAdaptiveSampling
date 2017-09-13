@@ -1,10 +1,8 @@
-
 from __future__ import print_function
 from simtk.openmm import app
 import simtk.openmm as mm
 from simtk import unit
 from sys import stdout
-
 
 nonbondedCutoff = 1.0*unit.nanometers
 timestep = 2.0*unit.femtoseconds
