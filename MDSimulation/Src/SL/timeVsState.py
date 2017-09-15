@@ -14,7 +14,3 @@ for i in range(len(z)):
     
 np.save('n_discoveredS_time.npy', data)    
 
-import matplotlib.pyplot as plt
-plt.plot(data)
-plt.show()
-
