@@ -1,11 +1,18 @@
+#######
 import numpy as np
 
+xedges = np.linspace(-180, 180, num=101)
+yedges = np.linspace(-180, 180, num=101)
+stride = 100 # 2 pico second
 
-xedges = np.linspace(-180, 180, num=181)
-yedges = np.linspace(-180, 180, num=181)
+"""
+phi_all = np.load('phi.npy')[::stride]
+psi_all = np.load('psi.npy')[::stride]
+"""
 
-phi_all = np.load('phi.npy')
-psi_all = np.load('psi.npy')
+w = np.load('trjs_theta.npy')[::stride]
+phi_all = w[0]
+psi_all = w[1]
 
 phi = []
 psi = []
