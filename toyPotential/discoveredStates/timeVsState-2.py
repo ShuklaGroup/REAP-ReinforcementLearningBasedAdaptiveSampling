@@ -3,7 +3,7 @@ import numpy as np
 fulldata = np.zeros((1000, 100))
 
 for j in range(100):
-    data = np.load('n_discoveredS_time'+str(i)+'.npy')
+    data = np.load('n_discoveredS_time'+str(j)+'.npy')
     for i in range(1000):
         fulldata[i][j] = data[j]
 
