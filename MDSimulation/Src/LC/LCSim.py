@@ -119,7 +119,20 @@ class mockSimulation:
 
             return 
        
-        def findStarting(self, trj_Ps_theta, trj_Ps, W_1, starting_n=10 , method = 'RL'):
+        def findStarting(self, trj_Ps_theta, trj_Ps, W_1, starting_n=10 , method = 'LC'):
+                """
+                trj_Ps_theta: 
+                         size n_theta x n_frames
+                trj_Ps:
+                """
+		# As you have already done least count in finding Sp, then just pick to Sps as least counts
+                import numpy as np               
+                n_coord = 1                     
+		newPoints_index = range(starting_n) 
+                newPoints = [trj_Ps[int(i)] for i in newPoints_index]
+                return newPoints
+
+        def findStarting_RL(self, trj_Ps_theta, trj_Ps, W_1, starting_n=10 , method = 'RL'):
                 """
                 trj_Ps_theta: 
                          size n_theta x n_frames
@@ -152,7 +165,6 @@ class mockSimulation:
                 #for coord in range(n_coord):
                 #          newPoints.append([trj_Ps[coord][int(i)] for i in newPoints_index])                                   
                 return newPoints
-
 
 
 
