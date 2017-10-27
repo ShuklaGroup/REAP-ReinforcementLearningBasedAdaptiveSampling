@@ -87,7 +87,7 @@ class mockSimulation:
 
              
         def findStarting(self, trj_Sp_theta, trj_Sp, starting_n=10 , method = 'LC'):
-                # get new starting points (in theta domain) using new reward function based on updated weigths (W_1)
+                # As you have already done least count in finding Sp, then just pick to Sps as least counts
                 import numpy as np
                 
                 n_coord = 2
