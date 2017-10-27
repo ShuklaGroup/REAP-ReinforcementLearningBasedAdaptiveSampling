@@ -36,22 +36,54 @@ class mockSimulation:
                 """
 
                 output:
-                      n_ec x n_frames
+                      n_op x n_frames # po: order parameter
                 """
                 # map coordinate space to reaction coorinates space
                 import numpy as np
-                trj_x = []
-                trj_y = []
-                x = self.x
-                y = self.y
+                #trj_x = []
+                #trj_y = []
+                #x = self.x
+                #y = self.y
                 map = self.mapping
+		trj_Ps_theta = []   # n_frames x n_theta
                 for MacroFrame in trj_Ps:
                     microFrame = map[int(MacroFrame)]
-                    trj_x.append(x[microFrame])
-                    trj_y.append(y[microFrame])
+                    theta = np.load('cluster'+str(int(microFrame))+'.npy')[0][0] ## changed
+                    trj_Ps_theta.append(theta)
+		
+                    #trj_x.append(x[microFrame])
+                    #trj_y.append(y[microFrame])
+		
+		# change the format
+                trj_Ps_theta_2 = []  # n_theta x n_frames
+                trj_Ps_theta = np.array(trj_Ps_theta) 
+                for theta_index in range(len(trj_Ps_theta[0])):
+                        trj_Ps_theta_2.append(trj_Ps_theta[:,theta_index])
+			
+                return trj_Ps_theta_2
+"""
+# from Monte Carlo
+        def map(self, trj_Ps):
+                """
+                output:
+                      n_op x n_frames
+                """
+                # map coordinate space to reaction coorinates space
+                import numpy as np
+                trj_Ps_theta = []
+                msm = self.msm
+                for frame in trj_Ps:
+                        theta = np.load('luster'+str(int(frame))+'.npy')[0][0] ## changed
+                        trj_Ps_theta.append(theta)
 
-                return [trj_x, trj_y]
-
+                # change the format
+                trj_Ps_theta_2 = []
+                trj_Ps_theta = np.array(trj_Ps_theta) 
+                for theta_index in range(len(trj_Ps_theta[0])):
+                        trj_Ps_theta_2.append(trj_Ps_theta[:,theta_index])
+                return trj_Ps_theta_2
+"""	
+	
         def PreSamp_MC(self, trj, N = 20):
                 """
                 Pre-Sampling for Monte Carlo simulations:
