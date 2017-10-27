@@ -118,108 +118,7 @@ class mockSimulation:
             fig.savefig('fig.png', dpi=1000, bbox_inches='tight')
 
             return 
-
-        def reward_state(self, S, theta_mean, theta_std, W_):
-                
-                r_s = 0
-                for k in range(len(W_)):
-                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
-                        """
-                        if (S[k] - theta_mean[k]) < 0: 
-                                r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k])
-                        else:
-                                r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k])
-                        """
-                return r_s
-
-        def reward_state_withoutStd(self, S, theta_mean, theta_std, W_):
-                
-                r_s = 0
-                for k in range(len(W_)):
-                        
-                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])) # no direction
-                        """
-                        if (S[k] - theta_mean[k]) < 0: 
-                                r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k]))
-                        else:
-                                r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k]))
-                        """
-                return r_s
-
-
-        def updateStat(self, trj_Sp_theta):      
-                import numpy as np
-                theta_mean = []
-                theta_std = []
-                for theta in range(len(trj_Sp_theta)):
-                        theta_mean.append(np.mean(trj_Sp_theta[theta]))
-                        theta_std.append(np.std(trj_Sp_theta[theta]))
-                self.theta_std = theta_std
-                self.theta_mean = theta_mean
-        
-
-        def reward_trj(self, trj_Sp_theta, W_):
-                """
-                
-                """
-                import numpy as np
-                #theta_mean = []
-                #theta_std = []
-                #for theta in range(len(W_)):
-                #        theta_mean.append(np.mean(trj_Sp_theta[theta]))
-                #        theta_std.append(np.std(trj_Sp_theta[theta]))
-                
-
-                r = []
-                # for over all dicovered states
-                trj_Sp_theta = np.array(trj_Sp_theta)
-                for state_index in range(len(trj_Sp_theta[0])):
-                        #print('trj_Sp_theta', trj_Sp_theta)
-                        state_theta = trj_Sp_theta[:, state_index]
-                        r_s = self.reward_state(state_theta, self.theta_mean, self.theta_std, W_)
-                        
-                        r.append(r_s)
-                        
-                R = np.sum(np.array(r))
-                return R
-                
-        
-        
-        def updateW(self, trj_Sp_theta, W_0):
-                """
-                update weigths 
-                prior_weigths = W_0
-                """
-                def fun(x):
-                        global trj_Sp_theta_z
-                        #W_0 = [[x[0], x[1]],[x[2], x[3]]]
-                        W_0 = x
-                        r_0 = self.reward_trj(trj_Sp_theta, W_0)
-                        return -1*r_0                        
-                import numpy as np
-                from scipy.optimize import minimize
-                
-                global trj_Sp_theta_z 
-                trj_Sp_theta_z = trj_Sp_theta
-                delta = 0.01
-                cons = ({'type': 'eq',
-                          'fun' : lambda x: np.array([np.sum(x)-1])},
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([np.min(x)])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[0]-x0[0])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}) # greater than zero
-
-                #x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]    
-                x0 = W_0
-                res = minimize(fun, x0, constraints=cons)
-                #res = minimize(fun, x0)
-                x = res.x
-                #W = [[x[0], x[1]],[x[2], x[3]]]
-                W = x
-                return W
-                
+       
         def findStarting(self, trj_Ps_theta, trj_Ps, W_1, starting_n=10 , method = 'RL'):
                 """
                 trj_Ps_theta: 
@@ -253,10 +152,7 @@ class mockSimulation:
                 #for coord in range(n_coord):
                 #          newPoints.append([trj_Ps[coord][int(i)] for i in newPoints_index])                                   
                 return newPoints
-        
- 
 
-	
 
 
 
