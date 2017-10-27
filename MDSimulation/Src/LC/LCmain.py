@@ -15,7 +15,7 @@ print('Simulation length: ', nstepmax*0.005)
 my_sim = lc.mockSimulation()
 my_sim.tp = sio.mmread('tProb.mtx')
 my_sim.x = np.load('Gens_aloopRMSD.npy')
-my_sim.y = np.load('Gens_y_deltaDist.npy')
+my_sim.y = np.load('Gens_y_KE.npy')
 my_sim.mapping = np.load('map_Macro2micro.npy')
 
 #### first round
@@ -45,4 +45,3 @@ for round in range(500):
 
 my_sim.pltPoints(trjs_theta[0], trjs_theta[1])
 np.save('trjs_theta_LC', trjs_theta)
-
