@@ -1,7 +1,7 @@
 # python 2.7 MSMbuilder 2.8
 
 from scipy import io as sio
-import RLSim as rl
+import LCSim as lc
 import numpy as np 
 
 # inital state
@@ -12,7 +12,7 @@ nstepmax = 80
 print('Simulation length: ', nstepmax*0.005)
 
 # Simulation setup
-my_sim = rl.mockSimulation()
+my_sim = lc.mockSimulation()
 my_sim.tp = sio.mmread('tProb.mtx')
 my_sim.x = np.load('Gens_aloopRMSD.npy')
 my_sim.y = np.load('Gens_y_deltaDist.npy')
