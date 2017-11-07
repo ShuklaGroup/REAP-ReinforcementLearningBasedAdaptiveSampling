@@ -202,7 +202,6 @@ class mockSimulation:
                 """
                 def fun(x):
                         global trj_Sp_theta_z
-                        #W_0 = [[x[0], x[1]],[x[2], x[3]]]
                         W_0 = x
                         r_0 = self.reward_trj(trj_Sp_theta, W_0)
                         return -1*r_0                        
@@ -220,13 +219,14 @@ class mockSimulation:
                           'fun' : lambda x: np.array([-np.abs(x[0]-x0[0])+delta])}, # greater than zero
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}) # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[2])+delta])}) # greater than zero		
+			 {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[3])+delta])}) # greater than zero
 
-                #x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]    
                 x0 = W_0
                 res = minimize(fun, x0, constraints=cons)
-                #res = minimize(fun, x0)
                 x = res.x
-                #W = [[x[0], x[1]],[x[2], x[3]]]
                 W = x
                 return W
                 
