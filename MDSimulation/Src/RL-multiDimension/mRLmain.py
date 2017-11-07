@@ -23,8 +23,8 @@ my_sim = rl.mockSimulation()
 my_sim.tp = sio.mmread('tProb.mtx')
 my_sim.x1 = np.load('Gens_aloopRMSD.npy')
 my_sim.x2 = np.load('Gens_y_deltaDist.npy')
-!!my_sim.x3 = np.load('')
-!!my_sim.x4 = np.load('')
+my_sim.x3 = np.load('Gens_x3.npy')
+my_sim.x4 = np.load('Gens_x4.npy')
 
 my_sim.mapping = np.load('map_Macro2micro.npy')
 
