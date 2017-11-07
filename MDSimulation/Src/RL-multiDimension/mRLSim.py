@@ -12,8 +12,8 @@ class mockSimulation:
                 self.mapping = None
                 self.x1 = None
                 self.x2 = None
-		self.x3 = None
-		self.x4 = None
+                self.x3 = None
+                self.x4 = None
                 
         def run_multipleSim(self):
                 return True
@@ -44,24 +44,34 @@ class mockSimulation:
                 import numpy as np
                 trj_x1 = []
                 trj_x2 = []
-		trj_x3 = []
-		trj_x4 = []
+                trj_x3 = []
+                trj_x4 = []
                 x1 = self.x1
                 x2 = self.x2
-		x3 = self.x3
-		x4 = self.x4
+                x3 = self.x3
+                x4 = self.x4
                 mapZ = self.mapping
-		trj_Ps_theta = []   # n_frames x n_theta
+                trj_Ps_theta = []   # n_frames x n_theta
                 for MacroFrame in trj_Ps:
                     microFrame = mapZ[int(MacroFrame)]
-                    trj_x1.append(x1[microFrame])
-                    trj_x2.append(x2[microFrame])
-                    trj_x3.append(x3[microFrame])
-                    trj_x4.append(x4[microFrame])
-		
+                    if microFrame==0:
+                        x000 = np.load('state0-200.npy')
+                        x00 = np.random.choice(range(len(x000)), 1)
+                        x0 = x000[x00][0]
+                        trj_x1.append(x0[0])
+                        trj_x2.append(x0[1])
+                        trj_x3.append(x3[microFrame])
+                        trj_x4.append(x4[microFrame])
+                    else:
+                        trj_x1.append(x1[microFrame])
+                        trj_x2.append(x2[microFrame])
+                        trj_x3.append(x3[microFrame])
+                        trj_x4.append(x4[microFrame])
+
+        
                 return [trj_x1, trj_x2, trj_x3, trj_x4]
 
-	
+    
         def PreSamp_MC(self, trj, N = 20):
                 """
                 Pre-Sampling for Monte Carlo simulations:
@@ -87,14 +97,14 @@ class mockSimulation:
                 msm :
                         reference MSM
                 s :
-                        lenght (number of steps) of each simulation	
+                        lenght (number of steps) of each simulation 
                 
                 output :
                         final trajectory
                 """
                 import numpy as np
                 import msmbuilder as msmb
-		
+        
                 #msm = self.msm
                 tp = self.tp
                 N = len(inits)
@@ -111,18 +121,25 @@ class mockSimulation:
             import matplotlib.pyplot as plt
             import numpy as np
 
+            plt.rcParams.update({'font.size':20})
+            plt.rc('xtick', labelsize=20)
+            plt.rc('ytick', labelsize=20)
+
             figName = 'fig.png'
 
             fig = plt.figure()
             ax = fig.add_subplot(111)
             
             
-            #ax.scatter(x , y, color='darkorange', s=10, alpha=0.2)
-            ax.scatter(x + np.random.normal(0, 0.06/4, len(x)), y+np.random.normal(0, 0.06, len(y)), color='darkorange', s=10, alpha=0.2)
+            ax.scatter(x , y, color='darkorange', s=10, alpha=0.4)
+            #ax.scatter(x + np.random.normal(0, 0.06/4, len(x)), y+np.random.normal(0, 0.06, len(y)), color='darkorange', s=10, alpha=0.5)
             plt.xlabel('RMSD of A-loop (nm)')
-            plt.ylabel(r'$d_E 310-R409 - d_K295 - E310$')
-            #plt.ylabel(r'$d_E_310_-_R_409  - d_K_295_-_E_310 (nm)$')
-            plt.ylim([-2, 2])
+            plt.ylabel('K-E distances (nm)')
+            #plt.ylabel('K295-E310 distances (nm)')
+            plt.yticks([0, 1, 2])
+            plt.xticks([0, 0.5, 1])
+            #plt.ylabel(r'$d_{E310-R409}-d_{K295-E310}$')
+            plt.ylim([0, 2])
             plt.xlim([0, 1])
 #            plt.show()
             fig.savefig('fig.png', dpi=1000, bbox_inches='tight')
@@ -218,10 +235,10 @@ class mockSimulation:
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([-np.abs(x[0]-x0[0])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}) # greater than zero
+                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[2])+delta])}) # greater than zero		
-			 {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[2])+delta])}, # greater than zero     
+                         {'type': 'ineq',
                           'fun' : lambda x: np.array([-np.abs(x[1]-x0[3])+delta])}) # greater than zero
 
                 x0 = W_0
@@ -266,4 +283,4 @@ class mockSimulation:
         
  
 
-	
+    
