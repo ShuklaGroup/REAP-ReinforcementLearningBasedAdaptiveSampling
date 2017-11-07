@@ -1,7 +1,7 @@
 # python 2.7 MSMbuilder 2.8
 
 from scipy import io as sio
-import RLSim as rl
+import mRLSim as rl
 import numpy as np 
 
 # inital state
@@ -22,7 +22,7 @@ print('Weight', W_0)
 my_sim = rl.mockSimulation()
 my_sim.tp = sio.mmread('tProb.mtx')
 my_sim.x1 = np.load('Gens_aloopRMSD.npy')
-my_sim.x2 = np.load('Gens_y_deltaDist.npy')
+my_sim.x2 = np.load('Gens_y_KE.npy')
 my_sim.x3 = np.load('Gens_x3.npy')
 my_sim.x4 = np.load('Gens_x4.npy')
 
@@ -73,4 +73,3 @@ np.save('trjs_theta_2', trjs_theta)
 ## Should change with differet OP 
 # map
 # updateW
-
