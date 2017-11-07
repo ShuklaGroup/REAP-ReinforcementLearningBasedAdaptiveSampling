@@ -10,8 +10,10 @@ class mockSimulation:
                 self.N = 1# number of parallel simulations
                 self.tp = None
                 self.mapping = None
-                self.x = None
-                self.y = None
+                self.x1 = None
+                self.x2 = None
+		self.x3 = None
+		self.x4 = None
                 
         def run_multipleSim(self):
                 return True
@@ -36,53 +38,29 @@ class mockSimulation:
                 """
 
                 output:
-                      n_op x n_frames # po: order parameter
+                      n_op x n_frames # op: order parameter
                 """
                 # map coordinate space to reaction coorinates space
                 import numpy as np
-                #trj_x = []
-                #trj_y = []
-                #x = self.x
-                #y = self.y
-                map = self.mapping
+                trj_x1 = []
+                trj_x2 = []
+		trj_x3 = []
+		trj_x4 = []
+                x1 = self.x1
+                x2 = self.x2
+		x3 = self.x3
+		x4 = self.x4
+                mapZ = self.mapping
 		trj_Ps_theta = []   # n_frames x n_theta
                 for MacroFrame in trj_Ps:
-                    microFrame = map[int(MacroFrame)]
-                    theta = np.load('cluster'+str(int(microFrame))+'.npy')[0][0] ## changed
-                    trj_Ps_theta.append(theta)
+                    microFrame = mapZ[int(MacroFrame)]
+                    trj_x1.append(x1[microFrame])
+                    trj_x2.append(x2[microFrame])
+                    trj_x3.append(x3[microFrame])
+                    trj_x4.append(x4[microFrame])
 		
-                    #trj_x.append(x[microFrame])
-                    #trj_y.append(y[microFrame])
-		
-		# change the format
-                trj_Ps_theta_2 = []  # n_theta x n_frames
-                trj_Ps_theta = np.array(trj_Ps_theta) 
-                for theta_index in range(len(trj_Ps_theta[0])):
-                        trj_Ps_theta_2.append(trj_Ps_theta[:,theta_index])
-			
-                return trj_Ps_theta_2
-"""
-# from Monte Carlo
-        def map(self, trj_Ps):
-                """
-                output:
-                      n_op x n_frames
-                """
-                # map coordinate space to reaction coorinates space
-                import numpy as np
-                trj_Ps_theta = []
-                msm = self.msm
-                for frame in trj_Ps:
-                        theta = np.load('luster'+str(int(frame))+'.npy')[0][0] ## changed
-                        trj_Ps_theta.append(theta)
+                return [trj_x1, trj_x2, trj_x3, trj_x4]
 
-                # change the format
-                trj_Ps_theta_2 = []
-                trj_Ps_theta = np.array(trj_Ps_theta) 
-                for theta_index in range(len(trj_Ps_theta[0])):
-                        trj_Ps_theta_2.append(trj_Ps_theta[:,theta_index])
-                return trj_Ps_theta_2
-"""	
 	
         def PreSamp_MC(self, trj, N = 20):
                 """
