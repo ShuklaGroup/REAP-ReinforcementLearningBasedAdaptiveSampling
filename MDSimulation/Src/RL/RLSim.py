@@ -45,12 +45,26 @@ class mockSimulation:
                 x = self.x
                 y = self.y
                 map = self.mapping
+
                 for MacroFrame in trj_Ps:
                     microFrame = map[int(MacroFrame)]
+                    """
                     trj_x.append(x[microFrame])
                     trj_y.append(y[microFrame])
+                    """
+                    if microFrame==0:
+                        x000 = np.load('../state0-200.npy')
+                        x00 = np.random.choice(range(len(x000)), 1)
+                        x0 = x000[x00][0]
+                        #print(x0)
+                        trj_x.append(x0[0])
+                        trj_y.append(x0[1])
+                    else:
+                        trj_x.append(x[microFrame])
+                        trj_y.append(y[microFrame])
+                
 
-                return [trj_x, trj_y]
+                return trj_x, trj_y
 
         def PreSamp_MC(self, trj, N = 20):
                 """
@@ -101,18 +115,25 @@ class mockSimulation:
             import matplotlib.pyplot as plt
             import numpy as np
 
+            plt.rcParams.update({'font.size':20})
+            plt.rc('xtick', labelsize=20)
+            plt.rc('ytick', labelsize=20)
+
             figName = 'fig.png'
 
             fig = plt.figure()
             ax = fig.add_subplot(111)
             
             
-            #ax.scatter(x , y, color='darkorange', s=10, alpha=0.2)
-            ax.scatter(x + np.random.normal(0, 0.06/4, len(x)), y+np.random.normal(0, 0.06, len(y)), color='darkorange', s=10, alpha=0.2)
+            ax.scatter(x , y, color='darkorange', s=10, alpha=0.4)
+            #ax.scatter(x + np.random.normal(0, 0.06/4, len(x)), y+np.random.normal(0, 0.06, len(y)), color='darkorange', s=10, alpha=0.5)
             plt.xlabel('RMSD of A-loop (nm)')
-            plt.ylabel(r'$d_E 310-R409 - d_K295 - E310$')
-            #plt.ylabel(r'$d_E_310_-_R_409  - d_K_295_-_E_310 (nm)$')
-            plt.ylim([-2, 2])
+            plt.ylabel('K-E distances (nm)')
+            #plt.ylabel('K295-E310 distances (nm)')
+            plt.yticks([0, 1, 2])
+            plt.xticks([0, 0.5, 1])
+            #plt.ylabel(r'$d_{E310-R409}-d_{K295-E310}$')
+            plt.ylim([0, 2])
             plt.xlim([0, 1])
 #            plt.show()
             fig.savefig('fig.png', dpi=1000, bbox_inches='tight')
@@ -123,27 +144,16 @@ class mockSimulation:
                 
                 r_s = 0
                 for k in range(len(W_)):
-                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
-                        """
-                        if (S[k] - theta_mean[k]) < 0: 
-                                r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k])
-                        else:
-                                r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k])
-                        """
-                return r_s
+                    if theta_std[k]==0:
+                        print(theta_std[k])
+                        theta_std[k]=1
 
-        def reward_state_withoutStd(self, S, theta_mean, theta_std, W_):
-                
-                r_s = 0
-                for k in range(len(W_)):
-                        
-                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])) # no direction
-                        """
-                        if (S[k] - theta_mean[k]) < 0: 
-                                r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k]))
-                        else:
-                                r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k]))
-                        """
+                    #r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
+                    if (S[k] - theta_mean[k]) < 0:  # direstional
+                        r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k]) # W_[k][0] is weight for W_ negetive direction
+                    else:
+                        r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k]) # W_[k][1] is weight for W_ positive direction
+                    
                 return r_s
 
 
@@ -192,8 +202,8 @@ class mockSimulation:
                 """
                 def fun(x):
                         global trj_Sp_theta_z
-                        #W_0 = [[x[0], x[1]],[x[2], x[3]]]
-                        W_0 = x
+                        W_0 = [[x[0], x[1]],[x[2], x[3]]]
+                        #W_0 = x
                         r_0 = self.reward_trj(trj_Sp_theta, W_0)
                         return -1*r_0                        
                 import numpy as np
@@ -201,7 +211,7 @@ class mockSimulation:
                 
                 global trj_Sp_theta_z 
                 trj_Sp_theta_z = trj_Sp_theta
-                delta = 0.01
+                delta = 0.1
                 cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([np.sum(x)-1])},
                          {'type': 'ineq',
@@ -209,15 +219,18 @@ class mockSimulation:
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([-np.abs(x[0]-x0[0])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}) # greater than zero
+                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}, # greater than zero
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[2]-x0[2])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[3]-x0[3])+delta])}) # greater than zero
 
-                #x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]    
-                x0 = W_0
+                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]   # with dir 
+                #x0 = W_0 # no dir
                 res = minimize(fun, x0, constraints=cons)
-                #res = minimize(fun, x0)
                 x = res.x
-                #W = [[x[0], x[1]],[x[2], x[3]]]
-                W = x
+                W = [[x[0], x[1]],[x[2], x[3]]] # with dir
+                #W = x
                 return W
                 
         def findStarting(self, trj_Ps_theta, trj_Ps, W_1, starting_n=10 , method = 'RL'):
@@ -231,15 +244,15 @@ class mockSimulation:
                 theta_mean = []
                 theta_std = []
                 for theta in range(len(W_1)):
-                        theta_mean.append(np.mean(trj_Ps_theta[theta]))
-                        theta_std.append(np.std(trj_Ps_theta[theta]))
+                    theta_mean.append(np.mean(trj_Ps_theta[theta]))
+                    theta_std.append(np.std(trj_Ps_theta[theta]))
                         
                 ranks = {}
                 trj_Ps_theta = np.array(trj_Ps_theta)
                 for state_index in range(len(trj_Ps_theta[0])):
                         state_theta = trj_Ps_theta[:,state_index]
                         
-                        r = self.reward_state( state_theta, theta_mean, theta_std, W_1)
+                        r = self.reward_state(state_theta, theta_mean, theta_std, W_1)
                         
                         ranks[state_index] = r
 
