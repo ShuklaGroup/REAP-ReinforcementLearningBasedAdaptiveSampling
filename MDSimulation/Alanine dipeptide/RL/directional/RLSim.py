@@ -167,6 +167,7 @@ class mockSimulation:
                 global trj_Sp_theta_z 
                 trj_Sp_theta_z = trj_Sp_theta
                 alpha = 0.005
+                alpha = 0.01
                 delta = alpha
                 cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([np.sum(x)-1])},
@@ -345,7 +346,8 @@ class mockSimulation:
                         trjs = com_trjs
                         
                         trjs_theta = np.array(self.map(trjs))
-                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 20)
+                        #trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
                         
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
                         newPoints = trjs[newPoints_index_orig[0]] 
@@ -378,65 +380,5 @@ class mockSimulation:
 
 
        
-####################################
-
-        def updateW_withDir(self, trj_Sp_theta, W_0):
-                """
-                update weigths 
-                prior_weigths = W_0
-                with considering direction
-                """
-                def fun(x):
-                        global trj_Sp_theta_z
-                        global n_ec
-                        import numpy as np
-                        x = np.array(x)
-                        W_0 = x.reshape(n_ec, 2)
-                        # W_0 = x
-                        r_0 = self.reward_trj(trj_Sp_theta, W_0)
-                        return -1*r_0     
-                
-                import numpy as np
-                from scipy.optimize import minimize
-                
-                global trj_Sp_theta_z 
-                global n_ec
-                
-                trj_Sp_theta_z = trj_Sp_theta
-                alpha = 0.05
-                delta = alpha
-                cons = ({'type': 'eq',
-                          'fun' : lambda x: np.array([np.sum(x)-1])},
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([np.min(x)])},
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([np.abs(np.sum(x-x0))+delta])})
-
-                #x0 = W_0
-                x0 = np.concatenate(W_0)
-                res = minimize(fun, x0, constraints=cons)
-
-                x = res.x
-                x = x/(np.sum(x))
-                W = x.reshape(n_ec, 2)
-                
-                #W = x
-                return W
-        
-        
-        def reward_state_withDir(self, S, theta_mean, theta_std, W_):
-                """
-                with direction
-                """
-                r_s = 0
-                for k in range(len(W_)):
-                        """
-                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
-                        """
-                        if (S[k] - theta_mean[k]) < 0: 
-                                r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k])
-                        else:
-                                r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k])
-                        
-                return r_s        
+     
         
