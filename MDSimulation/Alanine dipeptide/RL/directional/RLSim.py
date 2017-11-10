@@ -103,11 +103,20 @@ class mockSimulation:
         def reward_state(self, S, theta_mean, theta_std, W_):
                 # no direction
                 r_s = 0
+#                for k in range(len(W_)):
+#                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
+#                return r_s
                 for k in range(len(W_)):
-                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
+                    if theta_std[k]==0:
+                        print(theta_std[k])
+                        theta_std[k]=1
+                    if (S[k] - theta_mean[k]) < 0:  # direstional
+                        r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k]) # W_[k][0] is weight for W_ negetive direction
+                    else:
+                        r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k]) # W_[k][1] is weight for W_ positive direction
+
                 return r_s
         
-
 
         def updateStat(self, trj_Sp_theta):      
                 import numpy as np
@@ -147,9 +156,10 @@ class mockSimulation:
                 """
                 def fun(x):
                         global trj_Sp_theta_z
+                        W_0 = [[x[0], x[1]],[x[2], x[3]]]
 
-                        W_0 = x
-                        r_0 = self.reward_trj(trj_Sp_theta, W_0)
+                        #W_0 = x
+                        r_0 = self.reward_trj(trj_Sp_theta, W_0) 
                         return -1*r_0                        
                 import numpy as np
                 from scipy.optimize import minimize
@@ -165,14 +175,18 @@ class mockSimulation:
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([-np.abs(x[0]-x0[0])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}) # greater than zero
+                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[2]-x0[2])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[3]-x0[3])+delta])}) # greater than zero
 
-                x0 = W_0
+                #x0 = W_0
+                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]   # with dir
                 res = minimize(fun, x0, constraints=cons)
-
                 x = res.x
-
-                W = x
+                W = [[x[0], x[1]],[x[2], x[3]]] # with dir
+                #W = x
                 return W
         
         def findStarting(self, trj_Ps_theta, index_orig, W_1, starting_n=1 , method = 'RL'):
@@ -284,7 +298,8 @@ class mockSimulation:
                 count = 1
                 newPoints_name = 'start_r_'+str(count)+'.pdb'
                 
-                W_0 = [1/n_ec for i in range(n_ec)] # no direction
+                #W_0 = [1/n_ec for i in range(n_ec)] # no direction
+                W_0 = [[0.25, 0.25], [0.25, 0.25]]
                 #W_0 = [1, 0]# test
                 Ws = []
                 Ws.append(W_0)
@@ -296,7 +311,7 @@ class mockSimulation:
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 100) # pre analysis (least count)
                 
 
-                newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL')
+                newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL') #need change
                 newPoints = trj1[newPoints_index_orig[0]]
                 newPoints.save_pdb(newPoints_name)
                 
@@ -319,7 +334,7 @@ class mockSimulation:
                 
                 for round in range(R):
                         self.updateStat(trjs_theta) # based on all trajectories
-                        W_1 = self.updateW(trjs_Ps_theta, W_0)
+                        W_1 = self.updateW(trjs_Ps_theta, W_0) #need change
                         W_0 = W_1
                         W_1 = W_0
                         Ws.append(W_0)
