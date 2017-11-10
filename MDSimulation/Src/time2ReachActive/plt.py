@@ -20,17 +20,23 @@ SL = 0.005*SL
 
 sns.set_style("whitegrid")
 
+RLcolor="midnightblue"
+LCcolor="green"
+SLcolor="orangered"
 
-ax1= sns.boxplot(data=[RL, LC, SL], palette='spectral',width=.28)
-#ax1 = sns.swarmplot(data=[LC,RL], size=6, edgecolor="black", linewidth=.9)
+#ax1= sns.boxplot(data=[RL, LC, SL], palette=[RLcolor, LCcolor, SLcolor], width=.28)
+ax1= sns.boxplot(data=[RL, LC], palette=[RLcolor, LCcolor], width=.28)
+plt.setp(ax1.artists, alpha=0.4)
+
 
 #plt.xticks(rotation=-20)
-ax1.set(xticklabels=['REAP', 'Least Count', 'Single Long'])
+ax1.set(xticklabels=['REAP', 'Least Count'])
+#, 'Single Long'])
 
 #plt.xlabel('Portion of landscape discovered')
 ax1.set_ylabel('Time to reach to active ('+ r'$\mu$'+'s)', fontdict={'fontsize' : 20})
 #ax1.set_yticks([0, 20, 40])
 
-plt.savefig('fig4')
+plt.savefig('fig3')
 plt.show()
 
