@@ -45,7 +45,7 @@ class mockSimulation:
                 #trj_psi_cos = np.cos(np.array(comb_trj[1])*(np.pi / 180))   
 
                 #comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i]] for i in range(len(trj_phi_sin))])
-                comb_trj_xy = np.array([[trj[0][i], trj[1][i]], trj[2][i], trj[1][i]] for i in range(len(trj[0]))])
+                comb_trj_xy = np.array([[trj[0][i], trj[1][i],trj[2][i], trj[3][i]] for i in range(len(trj[0]))])
                 comb_trj_sincos = np.array([[trj[0][i], trj[1][i], trj[2][i], trj[3][i]] for i in range(len(trj[0]))])
                 #comb_trj_sincos = trj
                 #comb_trj_xy = trj # simulations with sine and cosine
@@ -327,7 +327,7 @@ class mockSimulation:
                 trjs = comb_trj1
                 trj1_theta = self.map(trj1) # changed for sine/cosine
                 print(len(trj1_theta), len(trj1_theta[0]))
-                trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 3) # pre analysis (least count)
+                trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
                 print(len(trj1_Ps_theta), len(trj1_Ps_theta[0]))
 
                 newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL') #need change
@@ -364,7 +364,7 @@ class mockSimulation:
                         trjs = com_trjs
                         
                         trjs_theta = np.array(self.map(trjs))
-                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 4)
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 10)
                         #trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
                         
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
