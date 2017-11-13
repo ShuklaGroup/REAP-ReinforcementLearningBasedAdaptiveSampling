@@ -81,7 +81,33 @@ class mockSimulation:
 
                 return trj_Sp, init_index
         
-
+        def map_angles(self, trj):
+                """
+                trj:
+                      mdtraj pbject
+                output:
+                      n_ec x n_frames
+                """
+                # map coordinate space to reaction coorinates space
+                import mdtraj as md
+                import numpy as np
+                
+                phi = md.compute_phi(trj)[1]
+                z_phi = np.rad2deg([phi[i][0] for i in range(len(phi))])
+                #z_phi = np.array([phi[i][0] for i in range(len(phi))])
+                psi = md.compute_psi(trj)[1]
+                #z_psi = np.array([psi[i][0] for i in range(len(psi))])
+                z_psi = np.rad2deg([psi[i][0] for i in range(len(psi))])
+                
+                trj_theta2 = []
+                trj_theta2.append(z_phi)
+                trj_theta2.append(z_psi)
+                #trj_theta.append(np.sin(z_phi)) # sin's input is in Radian
+                #trj_theta.append(np.cos(z_phi))
+                #trj_theta.append(np.sin(z_psi))
+                #trj_theta.append(np.cos(z_psi))
+                return trj_theta2
+        
                 
         def map(self, trj):
                 """
@@ -321,7 +347,7 @@ class mockSimulation:
                 print(W_0)
 
                 Ws = []
-                Ws.append('', W_0)
+                Ws.append(W_0)
                
                 trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
                 comb_trj1 = trj1 # single trajectory
@@ -329,7 +355,7 @@ class mockSimulation:
                 trj1_theta = self.map(trj1) # changed for sine/cosine
                 trj1_theta2 = self.map_angles(trj1) # changed for angles to display
                 print('trj1_theta', len(trj1_theta), len(trj1_theta[0]))
-                trj1_Ps_theta, trj1_Ps_theta2, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
+                trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
                 print('trj1_Ps_theta', len(trj1_Ps_theta), len(trj1_Ps_theta[0]))
 
                 newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL') #need change
@@ -366,7 +392,7 @@ class mockSimulation:
                         
                         trjs_theta = np.array(self.map(trjs))
                         trjs_theta2 = np.array(self.map_angles(trjs)) # changed for angles to display
-                        trjs_Ps_theta, trjs_Ps_theta2, index = self.PreSamp(trjs_theta, myn_clusters = 10)
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 10)
                         #trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
                         
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
@@ -393,10 +419,3 @@ class mockSimulation:
                 np.save('trjs_theta', trjs_theta)
                 return 
                         
-
-
-
-
-       
-     
-        
