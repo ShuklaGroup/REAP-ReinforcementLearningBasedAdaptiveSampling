@@ -91,13 +91,17 @@ class mockSimulation:
                 import numpy as np
                 
                 phi = md.compute_phi(trj)[1]
-                z_phi = np.rad2deg([phi[i][0] for i in range(len(phi))])
+                #z_phi = np.rad2deg([phi[i][0] for i in range(len(phi))])
+                z_phi = np.array([phi[i][0] for i in range(len(phi))])
                 psi = md.compute_psi(trj)[1]
-                z_psi = np.rad2deg([psi[i][0] for i in range(len(psi))])
+                z_psi = np.array([psi[i][0] for i in range(len(psi))])
+                #z_psi = np.rad2deg([psi[i][0] for i in range(len(psi))])
                 
                 trj_theta = []
-                trj_theta.append(z_phi)
-                trj_theta.append(z_psi)
+                trj_theta.append(np.sin(z_phi)) # sin's input is in Radian
+                trj_theta.append(np.cos(z_phi))
+                trj_theta.append(np.sin(z_psi))
+                trj_theta.append(np.cos(z_psi))
                 return trj_theta
  
         def reward_state(self, S, theta_mean, theta_std, W_):
@@ -156,7 +160,7 @@ class mockSimulation:
                 """
                 def fun(x):
                         global trj_Sp_theta_z
-                        W_0 = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]]]
+                        W_0 = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]]
                         #W_0 = [[x[0], x[1]],[x[2], x[3]]]
 
                         #W_0 = x
@@ -185,13 +189,17 @@ class mockSimulation:
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([-np.abs(x[4]-x0[4])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[5]-x0[5])+delta])}) # greater than zero
+                          'fun' : lambda x: np.array([-np.abs(x[5]-x0[5])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[6]-x0[6])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[7]-x0[7])+delta])}) # greater than zero
                 #x0 = W_0
                 #x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]   # with dir
-                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1], W_0[2][0], W_0[2][1]]   # with dir sine cosine
+                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1], W_0[2][0], W_0[2][1], W_0[3][0], W_0[3][1]]   # with dir sine cosine
                 res = minimize(fun, x0, constraints=cons)
                 x = res.x
-                W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]]] # with dir
+                W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]] # with dir
                 #W = [[x[0], x[1]],[x[2], x[3]]] # with dir
                 #W = x
                 return W
@@ -294,8 +302,6 @@ class mockSimulation:
                 # step = 2 fs
                 # each round is 2 fs * 1000 = 2 ps
 
-
-
                 init = 'ala2_1stFrame.pdb' #pdb name
                 #init = 'ala2_start_r_1001.pdb'
                 inits = init
@@ -315,7 +321,7 @@ class mockSimulation:
                 trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
-                trj1_theta = self.map(trj1)
+                trj1_theta = self.map(trj1) # changed for sine/cosine
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 100) # pre analysis (least count)
                 
 
