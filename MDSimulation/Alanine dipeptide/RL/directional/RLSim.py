@@ -322,8 +322,9 @@ class mockSimulation:
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
                 trj1_theta = self.map(trj1) # changed for sine/cosine
+                print(len(trj1_theta), len(trj1_theta[0]))
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 100) # pre analysis (least count)
-                
+                print(len(trj1_Ps_theta), len(trj1_Ps_theta[0]))
 
                 newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL') #need change
                 newPoints = trj1[newPoints_index_orig[0]]
