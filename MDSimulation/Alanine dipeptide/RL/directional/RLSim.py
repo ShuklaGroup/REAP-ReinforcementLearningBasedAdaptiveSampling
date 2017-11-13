@@ -37,14 +37,16 @@ class mockSimulation:
                 
                 # clustering
                 from sklearn.cluster import KMeans
-                comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
+                #comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))]) ### Needs to be changed for diffretn directions
 
-                trj_phi_sin = np.sin(np.array(comb_trj[0])*(np.pi / 180))
-                trj_phi_cos = np.cos(np.array(comb_trj[0])*(np.pi / 180))
-                trj_psi_sin = np.sin(np.array(comb_trj[1])*(np.pi / 180))
-                trj_psi_cos = np.cos(np.array(comb_trj[1])*(np.pi / 180))   
+                #trj_phi_sin = np.sin(np.array(comb_trj[0])*(np.pi / 180))
+                #trj_phi_cos = np.cos(np.array(comb_trj[0])*(np.pi / 180))
+                #trj_psi_sin = np.sin(np.array(comb_trj[1])*(np.pi / 180))
+                #trj_psi_cos = np.cos(np.array(comb_trj[1])*(np.pi / 180))   
 
-                comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i]] for i in range(len(trj_phi_sin))])
+                #comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i]] for i in range(len(trj_phi_sin))])
+                comb_trj_sincos = trj
+                comb_trj_xy = trj # simulations with sine and cosine
 
                 cluster = KMeans(n_clusters=myn_clusters)
                 cluster.fit(comb_trj_sincos)
@@ -65,7 +67,7 @@ class mockSimulation:
                                 counter = counter + 1
                                 init_index.append(i)
                                 init_trj_xy.append(comb_trj_xy[i])
-                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))]]
+                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))], [init_trj_xy[i][2] for i in range(len(init_trj_xy))], [init_trj_xy[i][3] for i in range(len(init_trj_xy))]]
                 
                 trj_Sp = init_trj
 
@@ -73,7 +75,7 @@ class mockSimulation:
                 while len(trj_Sp[0])<starting_n:
                         print('trj_Sp<starting_n')
                         print(len(trj_Sp[0]), starting_n)
-                        trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
+                        trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]]), np.concatenate([trj_Sp[2], trj_Sp[2]]),np.concatenate([trj_Sp[3], trj_Sp[3]])])
 
                 return trj_Sp, init_index
         
