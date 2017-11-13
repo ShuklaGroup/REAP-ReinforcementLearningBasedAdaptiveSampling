@@ -318,23 +318,25 @@ class mockSimulation:
                 #W_0 = [1/n_ec for i in range(n_ec)] # no direction
                 #W_0 = [[0.25, 0.25], [0.25, 0.25]]
                 W_0 = [[1/(2*n_ec), 1/(2*n_ec)] for i in range(n_ec)] # directional
+                print(W_0)
 
                 Ws = []
-                Ws.append(W_0)
+                Ws.append('', W_0)
                
                 trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
                 trj1_theta = self.map(trj1) # changed for sine/cosine
-                print(len(trj1_theta), len(trj1_theta[0]))
+                print('trj1_theta', len(trj1_theta), len(trj1_theta[0]))
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
-                print(len(trj1_Ps_theta), len(trj1_Ps_theta[0]))
+                print('trj1_Ps_theta', len(trj1_Ps_theta), len(trj1_Ps_theta[0]))
 
                 newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL') #need change
                 newPoints = trj1[newPoints_index_orig[0]]
                 newPoints.save_pdb(newPoints_name)
                 
-                print(len(trj1), len(trj1_theta[0]), s)
+                
+                print('trj1_theta[0]',trj1_theta[0])
                 plt.scatter(trj1_theta[0], trj1_theta[1], color='dodgerblue', s=5, alpha=0.2)
                 plt.xlim([-180, 180])
                 plt.ylim([-180, 180])
@@ -346,11 +348,9 @@ class mockSimulation:
                 plt.savefig('fig_'+str(count))
                 plt.close()
 
-
                 trjs_theta = trj1_theta
                 trjs_Ps_theta = trj1_Ps_theta
-                
-                
+
                 for round in range(R):
                         self.updateStat(trjs_theta) # based on all trajectories
                         W_1 = self.updateW(trjs_Ps_theta, W_0) #need change
