@@ -362,7 +362,7 @@ class mockSimulation:
                         trjs = com_trjs
                         
                         trjs_theta = np.array(self.map(trjs))
-                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 10)
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 4)
                         #trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
                         
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
