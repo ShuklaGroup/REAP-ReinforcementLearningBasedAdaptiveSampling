@@ -45,8 +45,10 @@ class mockSimulation:
                 #trj_psi_cos = np.cos(np.array(comb_trj[1])*(np.pi / 180))   
 
                 #comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i]] for i in range(len(trj_phi_sin))])
-                comb_trj_sincos = trj
-                comb_trj_xy = trj # simulations with sine and cosine
+                comb_trj_xy = np.array([[trj[0][i], trj[1][i]], trj[2][i], trj[1][i]] for i in range(len(trj[0]))])
+                comb_trj_sincos = np.array([[trj[0][i], trj[1][i], trj[2][i], trj[3][i]] for i in range(len(trj[0]))])
+                #comb_trj_sincos = trj
+                #comb_trj_xy = trj # simulations with sine and cosine
 
                 cluster = KMeans(n_clusters=myn_clusters)
                 cluster.fit(comb_trj_sincos)
