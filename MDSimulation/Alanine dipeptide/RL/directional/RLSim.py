@@ -156,7 +156,8 @@ class mockSimulation:
                 """
                 def fun(x):
                         global trj_Sp_theta_z
-                        W_0 = [[x[0], x[1]],[x[2], x[3]]]
+                        W_0 = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]]]
+                        #W_0 = [[x[0], x[1]],[x[2], x[3]]]
 
                         #W_0 = x
                         r_0 = self.reward_trj(trj_Sp_theta, W_0) 
@@ -167,7 +168,7 @@ class mockSimulation:
                 global trj_Sp_theta_z 
                 trj_Sp_theta_z = trj_Sp_theta
                 alpha = 0.005
-                alpha = 0.01
+                alpha = 0.02
                 delta = alpha
                 cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([np.sum(x)-1])},
@@ -180,13 +181,18 @@ class mockSimulation:
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([-np.abs(x[2]-x0[2])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[3]-x0[3])+delta])}) # greater than zero
-
+                          'fun' : lambda x: np.array([-np.abs(x[3]-x0[3])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[4]-x0[4])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[5]-x0[5])+delta])}) # greater than zero
                 #x0 = W_0
-                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]   # with dir
+                #x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]   # with dir
+                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1], W_0[2][0], W_0[2][1]]   # with dir sine cosine
                 res = minimize(fun, x0, constraints=cons)
                 x = res.x
-                W = [[x[0], x[1]],[x[2], x[3]]] # with dir
+                W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]]] # with dir
+                #W = [[x[0], x[1]],[x[2], x[3]]] # with dir
                 #W = x
                 return W
         
@@ -294,14 +300,15 @@ class mockSimulation:
                 #init = 'ala2_start_r_1001.pdb'
                 inits = init
                 #inits = [init for i in range(N)]
-                n_ec = 2
+                n_ec = 2*2 # sine and cosine
                 
                 count = 1
                 newPoints_name = 'start_r_'+str(count)+'.pdb'
                 
                 #W_0 = [1/n_ec for i in range(n_ec)] # no direction
-                W_0 = [[0.25, 0.25], [0.25, 0.25]]
-                #W_0 = [1, 0]# test
+                #W_0 = [[0.25, 0.25], [0.25, 0.25]]
+                W_0 = [[1/(2*n_ec), 1/(2*n_ec)] for i in range(n_ec)] # directional
+
                 Ws = []
                 Ws.append(W_0)
                 
@@ -346,7 +353,7 @@ class mockSimulation:
                         trjs = com_trjs
                         
                         trjs_theta = np.array(self.map(trjs))
-                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 20)
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 10)
                         #trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
                         
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
