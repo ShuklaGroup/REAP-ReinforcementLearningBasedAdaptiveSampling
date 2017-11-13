@@ -319,7 +319,7 @@ class mockSimulation:
 
                 Ws = []
                 Ws.append(W_0)
-                
+               
                 trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
