@@ -388,7 +388,7 @@ class mockSimulation:
                         trjs = com_trjs
                         trjs_theta = np.array(self.map(trjs))
                         trjs_theta2 = np.array(self.map_angles(trjs)) # changed for angles to display
-                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 60)
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
                         #trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
                         newPoints = trjs[newPoints_index_orig[0]] 
