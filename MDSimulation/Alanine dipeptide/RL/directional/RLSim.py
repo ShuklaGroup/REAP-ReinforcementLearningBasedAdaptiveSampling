@@ -374,10 +374,8 @@ class mockSimulation:
                 plt.ylabel(r'$\psi$')
                 plt.savefig('fig_'+str(count))
                 plt.close()
-
                 trjs_theta = trj1_theta
                 trjs_Ps_theta = trj1_Ps_theta
-
                 for round in range(R):
                         self.updateStat(trjs_theta) # based on all trajectories
                         W_1 = self.updateW(trjs_Ps_theta, W_0) #need change
@@ -386,15 +384,12 @@ class mockSimulation:
                         Ws.append(W_0)
                         s = 1000
                         trj1 = self.run(production_steps = s, start=newPoints_name, production='trj_R_'+str(count)+'.pdb') # return mdtraj object
-
                         com_trjs = trjs.join(trj1) 
                         trjs = com_trjs
-                        
                         trjs_theta = np.array(self.map(trjs))
                         trjs_theta2 = np.array(self.map_angles(trjs)) # changed for angles to display
-                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 10)
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 60)
                         #trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
-                        
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
                         newPoints = trjs[newPoints_index_orig[0]] 
                         
@@ -411,7 +406,6 @@ class mockSimulation:
                         plt.scatter(newPoints_theta2_x, newPoints_theta2_y, color='red', s=50)
                         plt.xlabel(r'$\phi$')
                         plt.ylabel(r'$\psi$')
-
                         plt.savefig('fig_'+str(count))
                         plt.close()
   
