@@ -37,18 +37,21 @@ class mockSimulation:
                 
                 # clustering
                 from sklearn.cluster import KMeans
-                #comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))]) ### Needs to be changed for diffretn directions
+                comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))]) ### Needs to be changed for diffretn directions
 
-                #trj_phi_sin = np.sin(np.array(comb_trj[0])*(np.pi / 180))
-                #trj_phi_cos = np.cos(np.array(comb_trj[0])*(np.pi / 180))
-                #trj_psi_sin = np.sin(np.array(comb_trj[1])*(np.pi / 180))
-                #trj_psi_cos = np.cos(np.array(comb_trj[1])*(np.pi / 180))   
+                """
+                trj_phi_sin = np.sin(np.array(comb_trj[0])*(np.pi / 180))
+                trj_phi_cos = np.cos(np.array(comb_trj[0])*(np.pi / 180))
+                trj_psi_sin = np.sin(np.array(comb_trj[1])*(np.pi / 180))
+                trj_psi_cos = np.cos(np.array(comb_trj[1])*(np.pi / 180))  
+                """
+                trj_phi_sin = np.sin(np.array(comb_trj[0]))
+                trj_phi_cos = np.cos(np.array(comb_trj[0]))
+                trj_psi_sin = np.sin(np.array(comb_trj[1]))
+                trj_psi_cos = np.cos(np.array(comb_trj[1]))                  
 
-                #comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i]] for i in range(len(trj_phi_sin))])
-                comb_trj_xy = np.array([[trj[0][i], trj[1][i],trj[2][i], trj[3][i]] for i in range(len(trj[0]))])
-                comb_trj_sincos = np.array([[trj[0][i], trj[1][i], trj[2][i], trj[3][i]] for i in range(len(trj[0]))])
-                #comb_trj_sincos = trj
-                #comb_trj_xy = trj # simulations with sine and cosine
+                comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i]] for i in range(len(trj_phi_sin))])
+
 
                 cluster = KMeans(n_clusters=myn_clusters)
                 cluster.fit(comb_trj_sincos)
@@ -69,6 +72,7 @@ class mockSimulation:
                                 counter = counter + 1
                                 init_index.append(i)
                                 init_trj_xy.append(comb_trj_xy[i])
+                #init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))], [init_trj_xy[i][2] for i in range(len(init_trj_xy))], [init_trj_xy[i][3] for i in range(len(init_trj_xy))]]
                 init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))], [init_trj_xy[i][2] for i in range(len(init_trj_xy))], [init_trj_xy[i][3] for i in range(len(init_trj_xy))]]
                 
                 trj_Sp = init_trj
@@ -77,8 +81,8 @@ class mockSimulation:
                 while len(trj_Sp[0])<starting_n:
                         print('trj_Sp<starting_n')
                         print(len(trj_Sp[0]), starting_n)
-                        trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]]), np.concatenate([trj_Sp[2], trj_Sp[2]]),np.concatenate([trj_Sp[3], trj_Sp[3]])])
-
+                        trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
+                        #trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]]), np.concatenate([trj_Sp[2], trj_Sp[2]]),np.concatenate([trj_Sp[3], trj_Sp[3]])])
                 return trj_Sp, init_index
         
         def map_angles(self, trj):
@@ -93,11 +97,11 @@ class mockSimulation:
                 import numpy as np
                 
                 phi = md.compute_phi(trj)[1]
-                z_phi = np.rad2deg([phi[i][0] for i in range(len(phi))])
-                #z_phi = np.array([phi[i][0] for i in range(len(phi))])
+                #z_phi = np.rad2deg([phi[i][0] for i in range(len(phi))])
+                z_phi = np.array([phi[i][0] for i in range(len(phi))]) # in rad
                 psi = md.compute_psi(trj)[1]
-                #z_psi = np.array([psi[i][0] for i in range(len(psi))])
-                z_psi = np.rad2deg([psi[i][0] for i in range(len(psi))])
+                z_psi = np.array([psi[i][0] for i in range(len(psi))]) # in rad
+                #z_psi = np.rad2deg([psi[i][0] for i in range(len(psi))])
                 
                 trj_theta2 = []
                 trj_theta2.append(z_phi)
@@ -186,9 +190,8 @@ class mockSimulation:
                 """
                 def fun(x):
                         global trj_Sp_theta_z
-                        W_0 = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]]
-                        #W_0 = [[x[0], x[1]],[x[2], x[3]]]
-
+                        #W_0 = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]] # sin cos
+                        W_0 = [[x[0], x[1]],[x[2], x[3]]] # with dir
                         #W_0 = x
                         r_0 = self.reward_trj(trj_Sp_theta, W_0) 
                         return -1*r_0                        
@@ -211,22 +214,15 @@ class mockSimulation:
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([-np.abs(x[2]-x0[2])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[3]-x0[3])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[4]-x0[4])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[5]-x0[5])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[6]-x0[6])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[7]-x0[7])+delta])}) # greater than zero
+                          'fun' : lambda x: np.array([-np.abs(x[3]-x0[3])+delta])}) # greater than zero
+
                 #x0 = W_0
-                #x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]   # with dir
-                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1], W_0[2][0], W_0[2][1], W_0[3][0], W_0[3][1]]   # with dir sine cosine
+                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]   # with dir
+                #x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1], W_0[2][0], W_0[2][1], W_0[3][0], W_0[3][1]]   # with dir sine cosine
                 res = minimize(fun, x0, constraints=cons)
                 x = res.x
-                W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]] # with dir
-                #W = [[x[0], x[1]],[x[2], x[3]]] # with dir
+                #W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]] # with dir
+                W = [[x[0], x[1]],[x[2], x[3]]] # with dir
                 #W = x
                 return W
         
@@ -336,7 +332,7 @@ class mockSimulation:
                 #init = 'ala2_start_r_1001.pdb'
                 inits = init
                 #inits = [init for i in range(N)]
-                n_ec = 2*2 # sine and cosine
+                n_ec = 2 # angles
                 
                 count = 1
                 newPoints_name = 'start_r_'+str(count)+'.pdb'
@@ -352,8 +348,8 @@ class mockSimulation:
                 trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
-                trj1_theta = self.map(trj1) # changed for sine/cosine
-                trj1_theta2 = self.map_angles(trj1) # changed for angles to display
+                #trj1_theta = self.map(trj1) # changed for sine/cosine
+                trj1_theta = self.map_angles(trj1) # changed for angles to display
                 print('trj1_theta', len(trj1_theta), len(trj1_theta[0]))
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
                 print('trj1_Ps_theta', len(trj1_Ps_theta), len(trj1_Ps_theta[0]))
@@ -364,12 +360,12 @@ class mockSimulation:
                 
                 
                 print('trj1_theta[0]',trj1_theta[0])
-                plt.scatter(trj1_theta2[0], trj1_theta2[1], color='dodgerblue', s=5, alpha=0.2)
+                plt.scatter(trj1_theta[0], trj1_theta[1], color='dodgerblue', s=5, alpha=0.2)
                 plt.xlim([-180, 180])
                 plt.ylim([-180, 180])
-                newPoints_theta2_x = trj1_theta2[0][newPoints_index_orig[0]]
-                newPoints_theta2_y = trj1_theta2[1][newPoints_index_orig[0]]
-                plt.scatter(newPoints_theta2_x, newPoints_theta2_y, color='red', s=50)
+                newPoints_theta_x = trj1_theta[0][newPoints_index_orig[0]]
+                newPoints_theta_y = trj1_theta[1][newPoints_index_orig[0]]
+                plt.scatter(newPoints_theta_x, newPoints_theta_y, color='red', s=50)
                 plt.xlabel(r'$\phi$')
                 plt.ylabel(r'$\psi$')
                 plt.savefig('fig_'+str(count))
@@ -386,8 +382,8 @@ class mockSimulation:
                         trj1 = self.run(production_steps = s, start=newPoints_name, production='trj_R_'+str(count)+'.pdb') # return mdtraj object
                         com_trjs = trjs.join(trj1) 
                         trjs = com_trjs
-                        trjs_theta = np.array(self.map(trjs))
-                        trjs_theta2 = np.array(self.map_angles(trjs)) # changed for angles to display
+                        #trjs_theta = np.array(self.map(trjs))
+                        trjs_theta = np.array(self.map_angles(trjs)) 
                         trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
                         #trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
@@ -398,12 +394,12 @@ class mockSimulation:
                         newPoints.save_pdb(newPoints_name)
 
                         print(len(trjs), len(trjs_theta[0]), s)
-                        plt.scatter(trjs_theta2[0], trjs_theta2[1], color='dodgerblue', s=5, alpha=0.2)
-                        plt.xlim([-180, 180])
-                        plt.ylim([-180, 180])
-                        newPoints_theta2_x = trjs_theta2[0][newPoints_index_orig[0]]
-                        newPoints_theta2_y = trjs_theta2[1][newPoints_index_orig[0]]
-                        plt.scatter(newPoints_theta2_x, newPoints_theta2_y, color='red', s=50)
+                        plt.scatter(trjs_theta[0], trjs_theta[1], color='dodgerblue', s=5, alpha=0.2)
+                        plt.xlim([-np.pi, np.pi])
+                        plt.ylim([-np.pi, np.pi])
+                        newPoints_theta_x = trjs_theta[0][newPoints_index_orig[0]]
+                        newPoints_theta_y = trjs_theta[1][newPoints_index_orig[0]]
+                        plt.scatter(newPoints_theta_x, newPoints_theta_y, color='red', s=50)
                         plt.xlabel(r'$\phi$')
                         plt.ylabel(r'$\psi$')
                         plt.savefig('fig_'+str(count))
