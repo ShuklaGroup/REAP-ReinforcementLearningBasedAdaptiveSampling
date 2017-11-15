@@ -90,9 +90,11 @@ class mockSimulation:
                 import numpy as np
                 
                 phi = md.compute_phi(trj)[1]
-                z_phi = np.rad2deg([phi[i][0] for i in range(len(phi))])
+                z_phi = np.array([phi[i][0] for i in range(len(phi))]) # in Rad
+                #z_phi = np.rad2deg([phi[i][0] for i in range(len(phi))]) # in degree
                 psi = md.compute_psi(trj)[1]
-                z_psi = np.rad2deg([psi[i][0] for i in range(len(psi))])
+                z_psi = np.array([psi[i][0] for i in range(len(psi))]) # in Rad
+                #z_psi = np.rad2deg([psi[i][0] for i in range(len(psi))])
                 
                 trj_theta = []
                 trj_theta.append(z_phi)
@@ -137,42 +139,6 @@ class mockSimulation:
                 R = np.sum(np.array(r))
                 return R
                 
-
-        def updateW(self, trj_Sp_theta, W_0):
-                """
-                update weigths 
-                prior_weigths = W_0
-                no direction
-                """
-                def fun(x):
-                        global trj_Sp_theta_z
-
-                        W_0 = x
-                        r_0 = self.reward_trj(trj_Sp_theta, W_0)
-                        return -1*r_0                        
-                import numpy as np
-                from scipy.optimize import minimize
-                
-                global trj_Sp_theta_z 
-                trj_Sp_theta_z = trj_Sp_theta
-                alpha = 0.002
-                delta = alpha
-                cons = ({'type': 'eq',
-                          'fun' : lambda x: np.array([np.sum(x)-1])},
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([np.min(x)])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[0]-x0[0])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}) # greater than zero
-
-                x0 = W_0
-                res = minimize(fun, x0, constraints=cons)
-
-                x = res.x
-
-                W = x
-                return W
 
         def findStarting(self, trj_Ps_theta, index_orig, starting_n=1 , method = 'LC'):
                 """
@@ -219,15 +185,12 @@ class mockSimulation:
                 newPoints_index0 = sorted(ranks.items(), key=lambda x: x[1], reverse=True)[0:starting_n] 
                 newPoints_index = np.array(newPoints_index0)[:,0]   
                 
-
                 n_coord = 1                     
                 #newPoints = [trj_Ps[int(i)] for i in newPoints_index]
                 newPoints_index_orig = [index_orig[int(i)] for i in newPoints_index]
                 return newPoints_index_orig
                 #return newPoints, newPoints_index_orig
         
-        
-               
         def run(self, production_steps = 200, start='ala2_1stFrame.pdb', production='ala2_production.pdb'): #### ?!!!!!!!!!!!!!!!!
                 #from __future__ import print_function
                 from simtk.openmm import app
@@ -274,8 +237,7 @@ class mockSimulation:
                 trj = md.load(production)
                 return trj
                 
-
-        def runSimulation(self, R=5000, N=1,s=1000, method='RL'):
+        def runSimulation(self, R=1000, N=1,s=1000, method='RL'):
                 global n_ec
                 import numpy as np
                 import matplotlib.pyplot as plt
@@ -285,8 +247,6 @@ class mockSimulation:
                 # step = 2 fs
                 # each round is 2 fs * 1000 = 2 ps
 
-
-
                 init = 'ala2_1stFrame.pdb' #pdb name
                 #init = 'ala2_start_r_1001.pdb'
                 inits = init
@@ -295,7 +255,6 @@ class mockSimulation:
                 
                 count = 1
                 newPoints_name = 'start_r_'+str(count)+'.pdb'
-
                 
                 trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
                 comb_trj1 = trj1 # single trajectory
@@ -303,7 +262,6 @@ class mockSimulation:
                 trj1_theta = self.map(trj1)
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 100) # pre analysis (least count)
                 
-
                 #newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL')
                 newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, starting_n = N , method = 'LC')
 
@@ -312,18 +270,16 @@ class mockSimulation:
                 
                 print(len(trj1), len(trj1_theta[0]), s)
                 plt.scatter(trj1_theta[0], trj1_theta[1])
-                plt.xlim([-180, 180])
-                plt.ylim([-180, 180])
+                plt.xlim([-np.pi, np.pi])
+                plt.ylim([-np.pi, np.pi])
                 newPoints_theta_x = trj1_theta[0][newPoints_index_orig[0]]
                 newPoints_theta_y = trj1_theta[1][newPoints_index_orig[0]]
                 plt.plot(newPoints_theta_x, newPoints_theta_y, 'o', color='red')
                 plt.savefig('fig_'+str(count))
                 plt.close()
 
-
                 trjs_theta = trj1_theta
                 trjs_Ps_theta = trj1_Ps_theta
-                
                 
                 for round in range(R):
                         s = 1000
@@ -342,85 +298,17 @@ class mockSimulation:
                         count = count + 1
                         newPoints_name = 'start_r_'+str(count)+'.pdb'
                         newPoints.save_pdb(newPoints_name)
-
-
-                        print(len(trjs), len(trjs_theta[0]), s)
-                        plt.scatter(trjs_theta[0], trjs_theta[1])
-                        plt.xlim([-180, 180])
-                        plt.ylim([-180, 180])
-                        newPoints_theta_x = trjs_theta[0][newPoints_index_orig[0]]
-                        newPoints_theta_y = trjs_theta[1][newPoints_index_orig[0]]
-                        plt.plot(newPoints_theta_x, newPoints_theta_y, 'o', color='red')
-                        plt.savefig('fig_'+str(count))
-                        plt.close()
+                        if round==R-1:
+                                print(len(trjs), len(trjs_theta[0]), s)
+                                plt.scatter(trjs_theta[0], trjs_theta[1])
+                                plt.xlim([-np.pi, np.pi])
+                                plt.ylim([-np.pi, np.pi])
+                                newPoints_theta_x = trjs_theta[0][newPoints_index_orig[0]]
+                                newPoints_theta_y = trjs_theta[1][newPoints_index_orig[0]]
+                                plt.plot(newPoints_theta_x, newPoints_theta_y, 'o', color='red')
+                                plt.savefig('fig_'+str(count))
+                                plt.close()
   
                 np.save('trjs_theta', trjs_theta)
                 return 
                         
-
-
-
-
-       
-####################################
-
-        def updateW_withDir(self, trj_Sp_theta, W_0):
-                """
-                update weigths 
-                prior_weigths = W_0
-                with considering direction
-                """
-                def fun(x):
-                        global trj_Sp_theta_z
-                        global n_ec
-                        import numpy as np
-                        x = np.array(x)
-                        W_0 = x.reshape(n_ec, 2)
-                        # W_0 = x
-                        r_0 = self.reward_trj(trj_Sp_theta, W_0)
-                        return -1*r_0     
-                
-                import numpy as np
-                from scipy.optimize import minimize
-                
-                global trj_Sp_theta_z 
-                global n_ec
-                
-                trj_Sp_theta_z = trj_Sp_theta
-                alpha = 0.05
-                delta = alpha
-                cons = ({'type': 'eq',
-                          'fun' : lambda x: np.array([np.sum(x)-1])},
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([np.min(x)])},
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([np.abs(np.sum(x-x0))+delta])})
-
-                #x0 = W_0
-                x0 = np.concatenate(W_0)
-                res = minimize(fun, x0, constraints=cons)
-
-                x = res.x
-                x = x/(np.sum(x))
-                W = x.reshape(n_ec, 2)
-                
-                #W = x
-                return W
-        
-        
-        def reward_state_withDir(self, S, theta_mean, theta_std, W_):
-                """
-                with direction
-                """
-                r_s = 0
-                for k in range(len(W_)):
-                        """
-                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
-                        """
-                        if (S[k] - theta_mean[k]) < 0: 
-                                r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k])
-                        else:
-                                r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k])
-                        
-                return r_s        
-        
