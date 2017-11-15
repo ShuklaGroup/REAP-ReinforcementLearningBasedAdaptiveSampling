@@ -73,7 +73,7 @@ class mockSimulation:
                                 init_index.append(i)
                                 init_trj_xy.append(comb_trj_xy[i])
                 #init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))], [init_trj_xy[i][2] for i in range(len(init_trj_xy))], [init_trj_xy[i][3] for i in range(len(init_trj_xy))]]
-                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))], [init_trj_xy[i][2] for i in range(len(init_trj_xy))], [init_trj_xy[i][3] for i in range(len(init_trj_xy))]]
+                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))]]
                 
                 trj_Sp = init_trj
 
@@ -152,13 +152,17 @@ class mockSimulation:
                 return r_s
         
 
-        def updateStat(self, trj_Sp_theta):      
-                import numpy as np
+        def updateStat(self, trj_Sp_theta):
+                """
+                circular statistics
+                """
+                #import numpy as np
+                import scipy
                 theta_mean = []
                 theta_std = []
                 for theta in range(len(trj_Sp_theta)):
-                        theta_mean.append(np.mean(trj_Sp_theta[theta]))
-                        theta_std.append(np.std(trj_Sp_theta[theta]))
+                        theta_mean.append(scipy.stats.circmean(trj_Sp_theta[theta]))
+                        theta_std.append(scipy.stats.circstd(trj_Sp_theta[theta]))
                 self.theta_std = theta_std
                 self.theta_mean = theta_mean
         
