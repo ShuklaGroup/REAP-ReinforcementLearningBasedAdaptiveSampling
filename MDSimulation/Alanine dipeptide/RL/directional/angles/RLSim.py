@@ -38,13 +38,6 @@ class mockSimulation:
                 # clustering
                 from sklearn.cluster import KMeans
                 comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))]) ### Needs to be changed for diffretn directions
-
-                """
-                trj_phi_sin = np.sin(np.array(comb_trj[0])*(np.pi / 180))
-                trj_phi_cos = np.cos(np.array(comb_trj[0])*(np.pi / 180))
-                trj_psi_sin = np.sin(np.array(comb_trj[1])*(np.pi / 180))
-                trj_psi_cos = np.cos(np.array(comb_trj[1])*(np.pi / 180))  
-                """
                 trj_phi_sin = np.sin(np.array(comb_trj[0]))
                 trj_phi_cos = np.cos(np.array(comb_trj[0]))
                 trj_psi_sin = np.sin(np.array(comb_trj[1]))
@@ -72,7 +65,6 @@ class mockSimulation:
                                 counter = counter + 1
                                 init_index.append(i)
                                 init_trj_xy.append(comb_trj_xy[i])
-                #init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))], [init_trj_xy[i][2] for i in range(len(init_trj_xy))], [init_trj_xy[i][3] for i in range(len(init_trj_xy))]]
                 init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))]]
                 
                 trj_Sp = init_trj
@@ -82,7 +74,6 @@ class mockSimulation:
                         print('trj_Sp<starting_n')
                         print(len(trj_Sp[0]), starting_n)
                         trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
-                        #trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]]), np.concatenate([trj_Sp[2], trj_Sp[2]]),np.concatenate([trj_Sp[3], trj_Sp[3]])])
                 return trj_Sp, init_index
         
         def map_angles(self, trj):
@@ -97,19 +88,12 @@ class mockSimulation:
                 import numpy as np
                 
                 phi = md.compute_phi(trj)[1]
-                #z_phi = np.rad2deg([phi[i][0] for i in range(len(phi))])
                 z_phi = np.array([phi[i][0] for i in range(len(phi))]) # in rad
                 psi = md.compute_psi(trj)[1]
                 z_psi = np.array([psi[i][0] for i in range(len(psi))]) # in rad
-                #z_psi = np.rad2deg([psi[i][0] for i in range(len(psi))])
-                
                 trj_theta2 = []
                 trj_theta2.append(z_phi)
                 trj_theta2.append(z_psi)
-                #trj_theta.append(np.sin(z_phi)) # sin's input is in Radian
-                #trj_theta.append(np.cos(z_phi))
-                #trj_theta.append(np.sin(z_psi))
-                #trj_theta.append(np.cos(z_psi))
                 return trj_theta2
         
                 
@@ -125,11 +109,9 @@ class mockSimulation:
                 import numpy as np
                 
                 phi = md.compute_phi(trj)[1]
-                #z_phi = np.rad2deg([phi[i][0] for i in range(len(phi))])
                 z_phi = np.array([phi[i][0] for i in range(len(phi))])
                 psi = md.compute_psi(trj)[1]
                 z_psi = np.array([psi[i][0] for i in range(len(psi))])
-                #z_psi = np.rad2deg([psi[i][0] for i in range(len(psi))])
                 
                 trj_theta = []
                 trj_theta.append(np.sin(z_phi)) # sin's input is in Radian
@@ -222,12 +204,9 @@ class mockSimulation:
 
                 #x0 = W_0
                 x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]   # with dir
-                #x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1], W_0[2][0], W_0[2][1], W_0[3][0], W_0[3][1]]   # with dir sine cosine
                 res = minimize(fun, x0, constraints=cons)
                 x = res.x
-                #W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]] # with dir
                 W = [[x[0], x[1]],[x[2], x[3]]] # with dir
-                #W = x
                 return W
         
         def findStarting(self, trj_Ps_theta, index_orig, W_1, starting_n=1 , method = 'RL'):
@@ -260,13 +239,9 @@ class mockSimulation:
                 
 
                 n_coord = 1                     
-                #newPoints = [trj_Ps[int(i)] for i in newPoints_index]
                 newPoints_index_orig = [index_orig[int(i)] for i in newPoints_index]
-                return newPoints_index_orig
-                #return newPoints, newPoints_index_orig
+                return newPoints_index_orig       
         
-        
-               
         def run(self, production_steps = 200, start='ala2_1stFrame.pdb', production='ala2_production.pdb'): #### ?!!!!!!!!!!!!!!!!
                 #from __future__ import print_function
                 from simtk.openmm import app
@@ -333,11 +308,8 @@ class mockSimulation:
                 # each round is 2 fs * 1000 = 2 ps
 
                 init = 'ala2_1stFrame.pdb' #pdb name
-                #init = 'ala2_start_r_1001.pdb'
                 inits = init
-                #inits = [init for i in range(N)]
                 n_ec = 2 # angles
-                
                 count = 1
                 newPoints_name = 'start_r_'+str(count)+'.pdb'
                 
@@ -352,7 +324,6 @@ class mockSimulation:
                 trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
-                #trj1_theta = self.map(trj1) # changed for sine/cosine
                 trj1_theta = self.map_angles(trj1) # changed for angles to display
                 print('trj1_theta', len(trj1_theta), len(trj1_theta[0]))
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
