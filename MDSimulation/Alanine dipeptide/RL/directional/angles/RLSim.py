@@ -205,7 +205,7 @@ class mockSimulation:
                 global trj_Sp_theta_z 
                 trj_Sp_theta_z = trj_Sp_theta
                 alpha = 0.005
-                alpha = 0.02
+                alpha = 0.1
                 delta = alpha
                 cons = ({'type': 'eq',
                           'fun' : lambda x: np.array([np.sum(x)-1])},
@@ -356,6 +356,7 @@ class mockSimulation:
                 trj1_theta = self.map_angles(trj1) # changed for angles to display
                 print('trj1_theta', len(trj1_theta), len(trj1_theta[0]))
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
+                trj1_Ps_w_theta, index_w = self.PreSamp(trj1_theta, myn_clusters = 100) # for updating the weights
                 print('trj1_Ps_theta', len(trj1_Ps_theta), len(trj1_Ps_theta[0]))
 
                 newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL') #need change
@@ -376,9 +377,11 @@ class mockSimulation:
                 plt.close()
                 trjs_theta = trj1_theta
                 trjs_Ps_theta = trj1_Ps_theta
+                trjs_Ps_w_theta = trj1_Ps_w_theta 
                 for round in range(R):
                         self.updateStat(trjs_theta) # based on all trajectories
-                        W_1 = self.updateW(trjs_Ps_theta, W_0) #need change
+                        #W_1 = self.updateW(trjs_Ps_theta, W_0) 
+                        W_1 = self.updateW(trjs_Ps_w_theta, W_0) 
                         W_0 = W_1
                         W_1 = W_0
                         Ws.append(W_0)
@@ -386,10 +389,9 @@ class mockSimulation:
                         trj1 = self.run(production_steps = s, start=newPoints_name, production='trj_R_'+str(count)+'.pdb') # return mdtraj object
                         com_trjs = trjs.join(trj1) 
                         trjs = com_trjs
-                        #trjs_theta = np.array(self.map(trjs))
                         trjs_theta = np.array(self.map_angles(trjs)) 
-                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
-                        #trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 10)
+                        trjs_Ps_w_theta, index = self.PreSamp(trjs_theta, myn_clusters = 200)
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
                         newPoints = trjs[newPoints_index_orig[0]] 
                         
