@@ -326,7 +326,7 @@ class mockSimulation:
                 trjs = comb_trj1
                 trj1_theta = self.map_angles(trj1) # changed for angles to display
                 print('trj1_theta', len(trj1_theta), len(trj1_theta[0]))
-                trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
+                trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 1) # pre analysis (least count)
                 trj1_Ps_w_theta, index_w = self.PreSamp(trj1_theta, myn_clusters = 100) # for updating the weights
                 print('trj1_Ps_theta', len(trj1_Ps_theta), len(trj1_Ps_theta[0]))
 
@@ -361,7 +361,7 @@ class mockSimulation:
                         com_trjs = trjs.join(trj1) 
                         trjs = com_trjs
                         trjs_theta = np.array(self.map_angles(trjs)) 
-                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 10)
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 1)
                         trjs_Ps_w_theta, index_w = self.PreSamp(trjs_theta, myn_clusters = 200)
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
                         newPoints = trjs[newPoints_index_orig[0]] 
