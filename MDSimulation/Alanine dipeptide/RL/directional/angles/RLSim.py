@@ -123,14 +123,18 @@ class mockSimulation:
         def reward_state(self, S, theta_mean, theta_std, W_):
                 # no direction
                 r_s = 0
+                import numpy as np
                 for k in range(len(W_)):
                     if theta_std[k]==0:
                         print(theta_std[k])
                         theta_std[k]=1
+                    dist = np.min([abs(S[k] - theta_mean[k]), abs(S[k] - theta_mean[k]-2*np.pi), abs(S[k] - theta_mean[k]+2*np.pi)])
                     if (S[k] - theta_mean[k]) < 0:  # direstional
-                        r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k]) # W_[k][0] is weight for W_ negetive direction
+                         r_s = r_s + W_[k][0]*(dist/theta_std[k]) 
+                        #r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k]) # W_[k][0] is weight for W_ negetive direction
                     else:
-                        r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k]) # W_[k][1] is weight for W_ positive direction
+                        r_s = r_s + W_[k][1]*(dist/theta_std[k])
+                        #r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k]) # W_[k][1] is weight for W_ positive direction
                 return r_s
         
 
@@ -138,13 +142,13 @@ class mockSimulation:
                 """
                 circular statistics
                 """
-                #import numpy as np
+                import numpy as np
                 import scipy
                 theta_mean = []
                 theta_std = []
                 for theta in range(len(trj_Sp_theta)):
-                        theta_mean.append(scipy.stats.circmean(trj_Sp_theta[theta]))
-                        theta_std.append(scipy.stats.circstd(trj_Sp_theta[theta]))
+                        theta_mean.append(scipy.stats.circmean(trj_Sp_theta[theta], high=np.pi, low=-np.pi))
+                        theta_std.append(scipy.stats.circstd(trj_Sp_theta[theta], high=np.pi, low=-np.pi))
                 self.theta_std = theta_std
                 self.theta_mean = theta_mean
         
@@ -361,8 +365,10 @@ class mockSimulation:
                         com_trjs = trjs.join(trj1) 
                         trjs = com_trjs
                         trjs_theta = np.array(self.map_angles(trjs)) 
-                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 10)
-                        trjs_Ps_w_theta, index_w = self.PreSamp(trjs_theta, myn_clusters = 200)
+                        trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
+                        myn_clusters1 = 100 #int(10*(round)+1)
+                        trjs_Ps_w_theta = trjs_Ps_theta
+                        #trjs_Ps_w_theta, index_w = self.PreSamp(trjs_theta, myn_clusters =  myn_clusters1)
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
                         newPoints = trjs[newPoints_index_orig[0]] 
                         
@@ -370,13 +376,14 @@ class mockSimulation:
                         newPoints_name = 'start_r_'+str(count)+'.pdb'
                         newPoints.save_pdb(newPoints_name)
 
-                        print(len(trjs), len(trjs_theta[0]), s)
+                        print( myn_clusters1, W_1, self.theta_mean)
                         plt.scatter(trjs_theta[0], trjs_theta[1], color='dodgerblue', s=5, alpha=0.2)
                         plt.xlim([-np.pi, np.pi])
                         plt.ylim([-np.pi, np.pi])
                         newPoints_theta_x = trjs_theta[0][newPoints_index_orig[0]]
                         newPoints_theta_y = trjs_theta[1][newPoints_index_orig[0]]
                         plt.scatter(newPoints_theta_x, newPoints_theta_y, color='red', s=50)
+                        plt.scatter(trjs_Ps_w_theta[0], trjs_Ps_w_theta[1], color='green', s=5)
                         plt.xlabel(r'$\phi$')
                         plt.ylabel(r'$\psi$')
                         plt.savefig('fig_'+str(count))
@@ -386,3 +393,4 @@ class mockSimulation:
                 np.save('trjs_theta', trjs_theta)
                 return 
                         
+
