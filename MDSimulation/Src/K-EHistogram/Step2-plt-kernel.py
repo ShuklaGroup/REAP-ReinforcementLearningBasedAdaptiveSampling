@@ -3,6 +3,12 @@ import numpy as np
 
 from scipy import io as sio
 import matplotlib.pyplot as plt
+zfonsize = 18
+font = {'size'   : zfonsize}
+
+plt.rc('font', **font)
+plt.rc('xtick', labelsize=zfonsize)
+plt.rc('ytick', labelsize=zfonsize)
 
 n_trjs = 100
 totalData = 201
@@ -20,9 +26,6 @@ for j in range(n_trjs):
 	except:
 		print('zzz')	
 
-
-
-
 means = np.zeros((totalData, 1))
 stds = np.zeros((totalData, 1))
 print(fulldata)
@@ -34,7 +37,6 @@ print(stds)
 np.save('means', np.concatenate(means))
 np.save('stds', np.concatenate(stds))
 
-
 means = np.load('means.npy')
 stds = np.load('stds.npy')
 
@@ -43,7 +45,6 @@ ydata = means
 yerror = stds
 
 print(means, stds)
-
 print(ydata[0])
 print(yerror[0])
 print(len(ydata+yerror))
@@ -51,5 +52,7 @@ color="orangered"
 plt.plot(xdata, ydata, color=color)
 plt.fill_between(xdata, ydata-yerror, ydata+yerror, alpha=0.3, color=color)
 plt.ylim([0,4])
+plt.xlabel('K-E distances (nm)')
+plt.ylabel('Probability density')
 plt.savefig('fig-z.png')
 plt.show()
