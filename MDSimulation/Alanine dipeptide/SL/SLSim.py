@@ -157,7 +157,6 @@ class mockSimulation:
                 
                 newPoints.save_pdb(newPoints_name)
                 trjs_theta = trj1_theta
-                trjs_Ps_theta = trj1_Ps_theta
 
                 for round in range(R):
                         s = 1000
