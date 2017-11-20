@@ -89,7 +89,7 @@ class mockSimulation:
                 return trj
                 
 
-        def runSimulation(self, R=1000, N=1,s=1000, method='RL'):
+        def runSimulation_single(self, N=1,s=1000, method='RL'):
                 """
                 theta is the set of sine and cosine of the angles
                 theta2 is set of the angles
@@ -130,4 +130,50 @@ class mockSimulation:
                 trjs_theta = trj1_theta
                 np.save('trjs_theta', trjs_theta)
                 return 
+
+        
+        def runSimulation(self, R=1000, N=1,s=1000, method='RL'):
+                global n_ec
+                import numpy as np
+                import matplotlib.pyplot as plt
+                import matplotlib
+                matplotlib.use('Agg')
+                matplotlib.pyplot.switch_backend('agg')
+                # step = 2 fs
+                # each round is 2 fs * 1000 = 2 ps
+
+                init = 'ala2_1stFrame.pdb' #pdb name
+                inits = init
+                
+                count = 1
+                newPoints_name = 'start_r_'+str(count)+'.pdb'
+                trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
+                comb_trj1 = trj1 # single trajectory
+                trjs = comb_trj1
+                trj1_theta = self.map_angles(trj1)
+                
+                newPoints_index_orig = -1
+                newPoints = trj1[newPoints_index_orig]
+                
+                newPoints.save_pdb(newPoints_name)
+                trjs_theta = trj1_theta
+                trjs_Ps_theta = trj1_Ps_theta
+
+                for round in range(R):
+                        s = 1000
+                        trj1 = self.run(production_steps = s, start=newPoints_name, production='trj_R_'+str(count)+'.pdb') # return mdtraj object
+
+                        com_trjs = trjs.join(trj1) 
+                        trjs = com_trjs
                         
+                        trjs_theta = np.array(self.map_angles(trjs))
+                        newPoints_index_orig = -1
+                        newPoints = trjs[newPoints_index_orig] 
+                        
+                        count = count + 1
+                        newPoints_name = 'start_r_'+str(count)+'.pdb'
+                        newPoints.save_pdb(newPoints_name)
+  
+                np.save('trjs_theta', trjs_theta)
+                return 
+       
