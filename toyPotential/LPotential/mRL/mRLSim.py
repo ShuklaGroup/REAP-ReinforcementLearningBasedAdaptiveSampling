@@ -3,7 +3,7 @@ class mockSimulation:
         ## public
         def __init__(self):
                 self.theta_mean = [0, 0, 0]
-                self.theta_std = [1,1,1]
+                self.theta_std = [0,0,0]
                 self.r = 1#number of rounds
                 self.s = 1# length of simulations
                 self.N = 1# number of parallel simulations
@@ -111,9 +111,15 @@ class mockSimulation:
                 import numpy as np
                 theta_mean = []
                 theta_std = []
+                epsilon=0.001
                 for theta in range(len(trj_Sp_theta)):
+                        if np.std(trj_Sp_theta[theta])==0:
+                            theta_std.append(epsilon)
+                        else:
+                            theta_std.append(np.std(trj_Sp_theta[theta]))
+
                         theta_mean.append(np.mean(trj_Sp_theta[theta]))
-                        theta_std.append(np.std(trj_Sp_theta[theta]))
+                        
                 self.theta_std = theta_std
                 self.theta_mean = theta_mean
         
@@ -136,6 +142,7 @@ class mockSimulation:
                 for state_index in range(len(trj_Sp_theta[0])):
                         #print('trj_Sp_theta', trj_Sp_theta)
                         state_theta = trj_Sp_theta[:, state_index]
+                        #print('self.theta_std',self.theta_std)
                         r_s = self.reward_state(state_theta, self.theta_mean, self.theta_std, W_)
                         
                         r.append(r_s)
@@ -164,43 +171,21 @@ class mockSimulation:
                 alpha = 0.02
                 delta = alpha
                 cons = ({'type': 'eq',
-                          'fun' : lambda x: np.array([x[0]+x[1]+x[2]+x[3]+x[4]+x[5]-1])},
+                          'fun' : lambda x: np.array([np.sum(x)-1])},
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[1]])},
+                          'fun' : lambda x: np.array([np.min(x)])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[0]-x0[0])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[0]])},
+                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[2]])},
+                          'fun' : lambda x: np.array([-np.abs(x[2]-x0[2])+delta])}, # greater than zero     
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[3]])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[4]])},
+                          'fun' : lambda x: np.array([-np.abs(x[3]-x0[3])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[5]])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[0]-x0[0]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x0[0]-x[0]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[1]-x0[1]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x0[1]-x[1]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[2]-x0[2]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x0[2]-x[2]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[3]-x0[3]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x0[3]-x[3]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[4]-x0[4]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x0[4]-x[4]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x[5]-x0[5]+delta])},
-                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([x0[5]-x[5]+delta])},
+                          'fun' : lambda x: np.array([-np.abs(x[4]-x0[4])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[5]-x0[5])+delta])}
                           )
 
 
@@ -210,6 +195,10 @@ class mockSimulation:
                 res = minimize(fun, x0, constraints=cons)
                 x = res.x
                 W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]]]
+                if np.isnan(x[0]):
+                    W = W_0
+                    print('Nan')
+                
                 return W
                 
         def findStarting(self, trj_Sp_theta, trj_Sp, W_1, starting_n=10 , method = 'RL'):
