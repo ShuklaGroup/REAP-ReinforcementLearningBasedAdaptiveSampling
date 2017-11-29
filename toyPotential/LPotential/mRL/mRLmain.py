@@ -1,6 +1,6 @@
 
 def RLmain(i):
-	import mRLSim as rl
+	import RLSim as rl
 	import numpy as np 
 
 	X_0 = [1.1,1.1,1.1]
@@ -11,24 +11,17 @@ def RLmain(i):
 
 	# run first round of simulation
 	my_sim = rl.mockSimulation()
-	W_0 = [[1/6, 1/6], [1/6, 1/6],[1/6, 1/6]] # initial geuss of weights for + - in x and y directions
+	W_0 = [[1/6, 1/6], [1/6, 1/6], [1/6, 1/6]] # initial geuss of weights for + - in x and y directions
 	Ws = [] # series of weights
 
 
 	# first round
 	trj1 = my_sim.run_noPlt([X_0, Y_0, Z_0], nstepmax = 10)
-	print('trj1', trj1)
 	trj1 = my_sim.PreAll(trj1)
-	print('trj1_ pre All', trj1)
-
 
 	trjs = trj1
 	trj1_Sp = my_sim.PreSamp(trj1, starting_n = N, myn_clusters = 20) # pre analysis
-	print('trj1_ pre Samp', trj1_Sp)
-
 	trj1_Sp_theta = my_sim.map(trj1_Sp)
-	print('trj1_ pre Samp theta', trj1_Sp_theta)
-
 	newPoints = my_sim.findStarting(trj1_Sp_theta, trj1_Sp, W_0, starting_n = N , method = 'RL')
 
 	trjs_theta = trj1_Sp_theta
