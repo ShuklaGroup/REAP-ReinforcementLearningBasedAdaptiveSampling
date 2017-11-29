@@ -2,8 +2,8 @@ class mockSimulation:
 
         ## public
         def __init__(self):
-                self.theta_mean = [0, 0, 0]
-                self.theta_std = [0,0,0]
+                self.theta_mean = [0, 0]
+                self.theta_std = [0, 0]
                 self.r = 1#number of rounds
                 self.s = 1# length of simulations
                 self.N = 1# number of parallel simulations
@@ -27,7 +27,7 @@ class mockSimulation:
                 import numpy as np
                 comb_trj = []
                 for theta in range(len(trj)):
-                    comb_trj.append(np.concatenate(np.concatenate(trj[theta])))
+                        comb_trj.append(np.concatenate(np.concatenate(trj[theta])))
                 trj_Sp = np.array(comb_trj) # pick all
                 
                 return trj_Sp
@@ -46,8 +46,7 @@ class mockSimulation:
                
                 from sklearn.cluster import KMeans
 
-                #comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
-                comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i], comb_trj[2][i]] for i in range(len(comb_trj[0]))])
+                comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))])
                 cluster = KMeans(n_clusters=myn_clusters)
                 cluster.fit(comb_trj_xy)
                 cl_trjs = cluster.labels_
@@ -68,8 +67,7 @@ class mockSimulation:
                                 counter = counter + 1
                                 init_index.append(i)
                                 init_trj_xy.append(comb_trj_xy[i])
-                #init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))]] 
-                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))], [init_trj_xy[i][2] for i in range(len(init_trj_xy))]]    
+                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))], [0 for i in range(len(init_trj_xy))]]     
                 trj_Sp = init_trj
 
                 while len(trj_Sp[0])<starting_n:
@@ -90,36 +88,23 @@ class mockSimulation:
                 
                 r_s = 0
                 for k in range(len(W_)):
+                        if theta_std[k]==0:
+                            theta_std[k]=0.001
                         if (S[k] - theta_mean[k]) < 0: 
                                 r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k])
                         else:
                                 r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k])
                 return r_s
 
-        def reward_state_withoutStd(self, S, theta_mean, theta_std, W_):
-                
-                r_s = 0
-                for k in range(len(W_)):
-                        if (S[k] - theta_mean[k]) < 0: 
-                                r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k]))
-                        else:
-                                r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k]))
-                return r_s
 
 
         def updateStat(self, trj_Sp_theta):      
                 import numpy as np
                 theta_mean = []
                 theta_std = []
-                epsilon=0.001
                 for theta in range(len(trj_Sp_theta)):
-                        if np.std(trj_Sp_theta[theta])==0:
-                            theta_std.append(epsilon)
-                        else:
-                            theta_std.append(np.std(trj_Sp_theta[theta]))
-
                         theta_mean.append(np.mean(trj_Sp_theta[theta]))
-                        
+                        theta_std.append(np.std(trj_Sp_theta[theta]))
                 self.theta_std = theta_std
                 self.theta_mean = theta_mean
         
@@ -142,7 +127,6 @@ class mockSimulation:
                 for state_index in range(len(trj_Sp_theta[0])):
                         #print('trj_Sp_theta', trj_Sp_theta)
                         state_theta = trj_Sp_theta[:, state_index]
-                        #print('self.theta_std',self.theta_std)
                         r_s = self.reward_state(state_theta, self.theta_mean, self.theta_std, W_)
                         
                         r.append(r_s)
@@ -159,7 +143,7 @@ class mockSimulation:
                 """
                 def fun(x):
                         global trj_Sp_theta_z
-                        W_0 = [[x[0], x[1]],[x[2], x[3]], [x[4], x[5]]]
+                        W_0 = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]]]
                         r_0 = self.reward_trj(trj_Sp_theta, W_0)
                         return -1*r_0                        
                 import numpy as np
@@ -171,34 +155,51 @@ class mockSimulation:
                 alpha = 0.02
                 delta = alpha
                 cons = ({'type': 'eq',
-                          'fun' : lambda x: np.array([np.sum(x)-1])},
+                          'fun' : lambda x: np.array([x[0]+x[1]+x[2]+x[3]+x[4]+x[5]-1])},
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([np.min(x)])},
+                          'fun' : lambda x: np.array([x[0]])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[1]])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[2]])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[3]])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[4]])},
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[5]])},
                           {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[0]-x0[0])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[2]-x0[2])+delta])}, # greater than zero     
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[3]-x0[3])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[4]-x0[4])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[5]-x0[5])+delta])}
+                          'fun' : lambda x: np.array([x[0]-x0[0]+delta])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([x0[0]-x[0]+delta])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[1]-x0[1]+delta])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([x0[1]-x[1]+delta])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[2]-x0[2]+delta])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([x0[2]-x[2]+delta])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[3]-x0[3]+delta])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([x0[3]-x[3]+delta])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[4]-x0[4]+delta])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([x0[4]-x[4]+delta])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([x[5]-x0[5]+delta])},
+                          {'type': 'ineq',
+                          'fun' : lambda x: np.array([x0[5]-x[5]+delta])},
                           )
-
 
 
                 x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1], W_0[2][0], W_0[2][1]]    
                 
                 res = minimize(fun, x0, constraints=cons)
                 x = res.x
-                W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]]]
-                if np.isnan(x[0]):
-                    W = W_0
-                    print('Nan')
-                
+                W = [[x[0], x[1]],[x[2], x[3]], [x[4], x[5]]]
                 return W
                 
         def findStarting(self, trj_Sp_theta, trj_Sp, W_1, starting_n=10 , method = 'RL'):
@@ -255,8 +256,7 @@ class mockSimulation:
                 import time 
                 from scipy.interpolate import interp1d
                 inits_x = inits[0]
-                inits_y = inits[1]
-                inits_z = inits[2]                    
+                inits_y = inits[1]                    
                 #plt.ion()
                 # max number of iterations
                 
@@ -278,8 +278,7 @@ class mockSimulation:
                 n1 = len(inits_x)
                 # time-step (limited by the ODE step on line 83 & 84 but independent of n1)
                 h = 1e-4
-                #h = 5e-5
-                #h = 1e-5
+
                 # end points of the initial string
                 # notice that they do NOT have to be at minima of V -- the method finds
                 # those automatically
@@ -288,9 +287,6 @@ class mockSimulation:
                 
                 x = np.array(inits_x)
                 y = np.array(inits_y)
-
-                z = np.array(inits_z)
-
                 dx = x-np.roll(x, 1)
                 dy = y-np.roll(y, 1)
                 dx[0] = 0
@@ -358,14 +354,14 @@ class mockSimulation:
                         y = y - h*dVy + np.sqrt(h*mu)*np.random.randn(1,n1)
                         trj_x.append(x) 
                         trj_y.append(y)
-                        trj_z.append(np.array([[0, 0,0]]))
+                        trj_z.append(np.array([[0, 0, 0]]))
                         #for j in range(len(trj_x)):
                         #        ax.plot(trj_x[j], trj_y[j], 'o', color='w')
                                 
                         #ax.plot(x,y, 'o', color='r')
                         #fig.canvas.draw()
                         #print('zz')
-
+                        
                 return trj_x, trj_y, trj_z    
 
         def run(self, inits, nstepmax = 10):
@@ -440,8 +436,6 @@ class mockSimulation:
 
                 plt.xlabel('x')
                 plt.ylabel('y')
-
-
 ##### Main loop
 
                 trj_x = []
