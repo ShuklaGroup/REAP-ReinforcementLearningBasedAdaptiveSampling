@@ -78,7 +78,7 @@ class mockSimulation:
                 while len(trj_Sp[0])<starting_n:
                         print('trj_Sp<starting_n')
                         print(len(trj_Sp[0]), starting_n)
-                        trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]]), np.concatenate([trj_Sp[2], trj_Sp[2]]),np.concatenate([trj_Sp[3], trj_Sp[3]])])
+                        trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]]), np.concatenate([trj_Sp[2], trj_Sp[2]]), np.concatenate([trj_Sp[3], trj_Sp[3]])])
                         #trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
                 return trj_Sp, init_index
 
