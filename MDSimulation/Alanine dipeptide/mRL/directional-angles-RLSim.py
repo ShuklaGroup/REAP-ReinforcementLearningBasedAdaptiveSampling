@@ -74,7 +74,6 @@ class mockSimulation:
                         trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
                 return trj_Sp, init_index
 
-        
         def map_angles(self, trj):
                 """
                 trj:
@@ -90,11 +89,13 @@ class mockSimulation:
                 z_phi = np.array([phi[i][0] for i in range(len(phi))]) # in rad
                 psi = md.compute_psi(trj)[1]
                 z_psi = np.array([psi[i][0] for i in range(len(psi))]) # in rad
-                
-                atom_indix_theta = ?!
+                # (name CA or name N and resid 2) or ((name C or name O) and resname ACE)
+                atom_indix_theta = trj.topology.select('name O or name C or name N or name CA')
                 theta = md.compute_angles(trj, atom_indix_theta)
                 z_theta = np.array([theta[i][0] for i in range(len(theta))])
-                atom_indix_ksi = ?!
+                
+                # (name CA) or ((name C and resname ALA) or ((name N or name H) and resname NME))
+                atom_indix_ksi = trj.topology.select('name CA or name C or name N or name H')
                 ksi = md.compute_angles(trj, atom_indix_ksi)
                 z_ksi = np.array([ksi[i][0] for i in range(len(ksi))])
                
@@ -105,7 +106,6 @@ class mockSimulation:
                 trj_theta2.append(z_ksi)
                 return trj_theta2
 
-                
         def map(self, trj):
                 """
                 trj:
