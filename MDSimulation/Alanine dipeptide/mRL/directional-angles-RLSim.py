@@ -37,13 +37,19 @@ class mockSimulation:
                 
                 # clustering
                 from sklearn.cluster import KMeans
-                comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))]) ### Needs to be changed for diffretn directions
+                #comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i]] for i in range(len(comb_trj[0]))]) ### Needs to be changed for diffretn directions
+                comb_trj_xy = np.array([[comb_trj[0][i], comb_trj[1][i], comb_trj[2][i], comb_trj[3][i]] for i in range(len(comb_trj[0]))])
                 trj_phi_sin = np.sin(np.array(comb_trj[0]))
                 trj_phi_cos = np.cos(np.array(comb_trj[0]))
                 trj_psi_sin = np.sin(np.array(comb_trj[1]))
                 trj_psi_cos = np.cos(np.array(comb_trj[1]))                  
-
-                comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i]] for i in range(len(trj_phi_sin))])
+                trj_theta_sin = np.sin(np.array(comb_trj[2]))
+                trj_theta_cos = np.cos(np.array(comb_trj[2]))
+                trj_ksi_sin = np.sin(np.array(comb_trj[3]))
+                trj_ksi_cos = np.cos(np.array(comb_trj[3]))
+                
+                #comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i]] for i in range(len(trj_phi_sin))])
+                comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i], trj_theta_sin[i], trj_theta_cos[i], trj_ksi_sin[i], trj_ksi_cos[i]] for i in range(len(trj_phi_sin))])
                 cluster = KMeans(n_clusters=myn_clusters)
                 cluster.fit(comb_trj_sincos)
                 cl_trjs = cluster.labels_
@@ -63,7 +69,8 @@ class mockSimulation:
                                 counter = counter + 1
                                 init_index.append(i)
                                 init_trj_xy.append(comb_trj_xy[i])
-                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))]]
+                #init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))]]
+                init_trj = [[init_trj_xy[i][0] for i in range(len(init_trj_xy))], [init_trj_xy[i][1] for i in range(len(init_trj_xy))], [init_trj_xy[i][2] for i in range(len(init_trj_xy))],[init_trj_xy[i][3] for i in range(len(init_trj_xy))]]
                 
                 trj_Sp = init_trj
 
@@ -71,7 +78,8 @@ class mockSimulation:
                 while len(trj_Sp[0])<starting_n:
                         print('trj_Sp<starting_n')
                         print(len(trj_Sp[0]), starting_n)
-                        trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
+                        trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]]), np.concatenate([trj_Sp[2], trj_Sp[2]]),np.concatenate([trj_Sp[3], trj_Sp[3]])])
+                        #trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
                 return trj_Sp, init_index
 
         def map_angles(self, trj):
@@ -92,13 +100,13 @@ class mockSimulation:
                 # (name CA or name N and resname ALA) or ((name C or name O) and resname ACE)
                 #atom_indix_theta = trj.topology.select('name O or name C or name N or name CA')
                 atom_indix_theta = trj.topology.select('(name O and resname ACE) or (name C and resname ACE) or (name N and resname ALA) or (name CA and resname ALA)')
-                theta = md.compute_dihedrals(trj, [atom_indix_theta[0]])
+                theta = md.compute_dihedrals(trj, [atom_indix_theta])
                 z_theta = np.array([theta[i][0] for i in range(len(theta))])
                 
                 # (name CA) or ((name C and resname ALA) or ((name N or name H) and resname NME))
                 #atom_indix_ksi = trj.topology.select('name CA or name C or name N or name H')
                 atom_indix_ksi = trj.topology.select('(name CA and resname ALA) or (name C and resname ALA) or (name N and resname NME) or (name H and resname NME)')
-                ksi = md.compute_dihedrals(trj, [atom_indix_ksi[0]])
+                ksi = md.compute_dihedrals(trj, [atom_indix_ksi])
                 z_ksi = np.array([ksi[i][0] for i in range(len(ksi))])
                
                 trj_theta2 = []
