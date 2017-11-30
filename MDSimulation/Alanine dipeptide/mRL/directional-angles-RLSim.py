@@ -44,8 +44,6 @@ class mockSimulation:
                 trj_psi_cos = np.cos(np.array(comb_trj[1]))                  
 
                 comb_trj_sincos = np.array([[trj_phi_sin[i], trj_phi_cos[i], trj_psi_sin[i], trj_psi_cos[i]] for i in range(len(trj_phi_sin))])
-
-
                 cluster = KMeans(n_clusters=myn_clusters)
                 cluster.fit(comb_trj_sincos)
                 cl_trjs = cluster.labels_
@@ -91,11 +89,21 @@ class mockSimulation:
                 z_phi = np.array([phi[i][0] for i in range(len(phi))]) # in rad
                 psi = md.compute_psi(trj)[1]
                 z_psi = np.array([psi[i][0] for i in range(len(psi))]) # in rad
+                
+                atom_indix_theta = ?!
+                theta = md.compute_angles(trj, atom_indix_theta)
+                z_theta = np.array([theta[i][0] for i in range(len(theta))])
+                atom_indix_ksi = ?!
+                ksi = md.compute_angles(trj, atom_indix_ksi)
+                z_ksi = np.array([ksi[i][0] for i in range(len(ksi))])
+               
                 trj_theta2 = []
                 trj_theta2.append(z_phi)
                 trj_theta2.append(z_psi)
+                trj_theta2.append(z_theta)
+                trj_theta2.append(z_ksi)
                 return trj_theta2
-        
+
                 
         def map(self, trj):
                 """
@@ -113,11 +121,20 @@ class mockSimulation:
                 psi = md.compute_psi(trj)[1]
                 z_psi = np.array([psi[i][0] for i in range(len(psi))])
                 
+                atom_indix_theta = ?!
+                theta = md.compute_angles(trj, atom_indix_theta)
+                z_theta = np.array([theta[i][0] for i in range(len(theta))])
+                
+                atom_indix_ksi = ?!
+                ksi = md.compute_angles(trj, atom_indix_ksi)
+                z_ksi = np.array([ksi[i][0] for i in range(len(ksi))])
+                
                 trj_theta = []
                 trj_theta.append(np.sin(z_phi)) # sin's input is in Radian
                 trj_theta.append(np.cos(z_phi))
                 trj_theta.append(np.sin(z_psi))
                 trj_theta.append(np.cos(z_psi))
+                
                 return trj_theta
  
         def reward_state(self, S, theta_mean, theta_std, W_):
