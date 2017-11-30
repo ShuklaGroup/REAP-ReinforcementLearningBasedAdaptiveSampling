@@ -73,6 +73,7 @@ class mockSimulation:
                         print(len(trj_Sp[0]), starting_n)
                         trj_Sp = np.array([np.concatenate([trj_Sp[0], trj_Sp[0]]), np.concatenate([trj_Sp[1], trj_Sp[1]])])
                 return trj_Sp, init_index
+
         
         def map_angles(self, trj):
                 """
@@ -134,7 +135,6 @@ class mockSimulation:
                 trj_theta.append(np.cos(z_phi))
                 trj_theta.append(np.sin(z_psi))
                 trj_theta.append(np.cos(z_psi))
-                
                 return trj_theta
  
         def reward_state(self, S, theta_mean, theta_std, W_):
@@ -331,6 +331,7 @@ class mockSimulation:
                 init = 'ala2_1stFrame.pdb' #pdb name
                 inits = init
                 n_ec = 2 # angles
+                n_ec = 4 # four angles
                 count = 1
                 newPoints_name = 'start_r_'+str(count)+'.pdb'
                 
@@ -354,7 +355,6 @@ class mockSimulation:
                 newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL') #need change
                 newPoints = trj1[newPoints_index_orig[0]]
                 newPoints.save_pdb(newPoints_name)
-                
                 
                 print('trj1_theta[0]',trj1_theta[0])
                 plt.scatter(trj1_theta[0], trj1_theta[1], color='dodgerblue', s=5, alpha=0.2)
