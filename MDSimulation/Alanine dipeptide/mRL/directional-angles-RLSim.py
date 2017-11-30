@@ -201,8 +201,8 @@ class mockSimulation:
                 """
                 def fun(x):
                         global trj_Sp_theta_z
-                        #W_0 = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]] # sin cos
-                        W_0 = [[x[0], x[1]],[x[2], x[3]]] # with dir
+                        W_0 = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]] # sin cos
+                        #W_0 = [[x[0], x[1]],[x[2], x[3]]] # with dir
                         #W_0 = x
                         r_0 = self.reward_trj(trj_Sp_theta, W_0) 
                         return -1*r_0                        
@@ -225,13 +225,21 @@ class mockSimulation:
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([-np.abs(x[2]-x0[2])+delta])}, # greater than zero
                          {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[3]-x0[3])+delta])}) # greater than zero
+                          'fun' : lambda x: np.array([-np.abs(x[3]-x0[3])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[4]-x0[4])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[5]-x0[5])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[6]-x0[6])+delta])}, # greater than zero
+                         {'type': 'ineq',
+                          'fun' : lambda x: np.array([-np.abs(x[7]-x0[7])+delta])})
 
                 #x0 = W_0
-                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1]]   # with dir
+                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1], W_0[2][0], W_0[2][1], W_0[3][0], W_0[3][1]]   # with dir
                 res = minimize(fun, x0, constraints=cons)
                 x = res.x
-                W = [[x[0], x[1]],[x[2], x[3]]] # with dir
+                W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]]] # with dir
                 return W
         
         def findStarting(self, trj_Ps_theta, index_orig, W_1, starting_n=1 , method = 'RL'):
