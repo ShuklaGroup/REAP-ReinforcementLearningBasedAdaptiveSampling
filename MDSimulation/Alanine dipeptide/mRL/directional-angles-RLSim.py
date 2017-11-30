@@ -107,13 +107,14 @@ class mockSimulation:
                 trj_theta2.append(z_theta)
                 trj_theta2.append(z_ksi)
                 return trj_theta2
-"""
+
         def map(self, trj):
-                
+                """
                 trj:
                       mdtraj pbject
                 output:
                       n_ec x n_frames
+                """
                 
                 # map coordinate space to reaction coorinates space
                 import mdtraj as md
@@ -124,11 +125,11 @@ class mockSimulation:
                 psi = md.compute_psi(trj)[1]
                 z_psi = np.array([psi[i][0] for i in range(len(psi))])
                 
-                atom_indix_theta = ?!
+                #atom_indix_theta = ?!
                 theta = md.compute_angles(trj, atom_indix_theta)
                 z_theta = np.array([theta[i][0] for i in range(len(theta))])
                 
-                atom_indix_ksi = ?!
+                #atom_indix_ksi = ?!
                 ksi = md.compute_angles(trj, atom_indix_ksi)
                 z_ksi = np.array([ksi[i][0] for i in range(len(ksi))])
                 
@@ -138,7 +139,7 @@ class mockSimulation:
                 trj_theta.append(np.sin(z_psi))
                 trj_theta.append(np.cos(z_psi))
                 return trj_theta
- """
+
  
         def reward_state(self, S, theta_mean, theta_std, W_):
                 # no direction
