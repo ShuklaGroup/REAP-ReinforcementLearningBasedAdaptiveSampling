@@ -89,13 +89,15 @@ class mockSimulation:
                 z_phi = np.array([phi[i][0] for i in range(len(phi))]) # in rad
                 psi = md.compute_psi(trj)[1]
                 z_psi = np.array([psi[i][0] for i in range(len(psi))]) # in rad
-                # (name CA or name N and resid 2) or ((name C or name O) and resname ACE)
-                atom_indix_theta = trj.topology.select('name O or name C or name N or name CA')
+                # (name CA or name N and resname ALA) or ((name C or name O) and resname ACE)
+                #atom_indix_theta = trj.topology.select('name O or name C or name N or name CA')
+                atom_indix_theta = trj.topology.select('(name O and resname ACE) or (name C and resname ACE) or (name N and resname ALA) or (name CA and resname ALA)')
                 theta = md.compute_angles(trj, atom_indix_theta)
                 z_theta = np.array([theta[i][0] for i in range(len(theta))])
                 
                 # (name CA) or ((name C and resname ALA) or ((name N or name H) and resname NME))
-                atom_indix_ksi = trj.topology.select('name CA or name C or name N or name H')
+                #atom_indix_ksi = trj.topology.select('name CA or name C or name N or name H')
+                atom_indix_ksi = trj.topology.select('(name CA and resname ALA) or (name C and resname ALA) or (name N and resname NME) or (name H and resname NME)')
                 ksi = md.compute_angles(trj, atom_indix_ksi)
                 z_ksi = np.array([ksi[i][0] for i in range(len(ksi))])
                
@@ -105,14 +107,14 @@ class mockSimulation:
                 trj_theta2.append(z_theta)
                 trj_theta2.append(z_ksi)
                 return trj_theta2
-
+"""
         def map(self, trj):
-                """
+                
                 trj:
                       mdtraj pbject
                 output:
                       n_ec x n_frames
-                """
+                
                 # map coordinate space to reaction coorinates space
                 import mdtraj as md
                 import numpy as np
@@ -136,6 +138,7 @@ class mockSimulation:
                 trj_theta.append(np.sin(z_psi))
                 trj_theta.append(np.cos(z_psi))
                 return trj_theta
+ """
  
         def reward_state(self, S, theta_mean, theta_std, W_):
                 # no direction
