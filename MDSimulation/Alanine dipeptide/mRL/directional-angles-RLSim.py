@@ -92,13 +92,13 @@ class mockSimulation:
                 # (name CA or name N and resname ALA) or ((name C or name O) and resname ACE)
                 #atom_indix_theta = trj.topology.select('name O or name C or name N or name CA')
                 atom_indix_theta = trj.topology.select('(name O and resname ACE) or (name C and resname ACE) or (name N and resname ALA) or (name CA and resname ALA)')
-                theta = md.compute_angles(trj, atom_indix_theta[0])
+                theta = md.compute_dihedrals(trj, [atom_indix_theta[0]])
                 z_theta = np.array([theta[i][0] for i in range(len(theta))])
                 
                 # (name CA) or ((name C and resname ALA) or ((name N or name H) and resname NME))
                 #atom_indix_ksi = trj.topology.select('name CA or name C or name N or name H')
                 atom_indix_ksi = trj.topology.select('(name CA and resname ALA) or (name C and resname ALA) or (name N and resname NME) or (name H and resname NME)')
-                ksi = md.compute_angles(trj, atom_indix_ksi[0])
+                ksi = md.compute_dihedrals(trj, [atom_indix_ksi[0]])
                 z_ksi = np.array([ksi[i][0] for i in range(len(ksi))])
                
                 trj_theta2 = []
