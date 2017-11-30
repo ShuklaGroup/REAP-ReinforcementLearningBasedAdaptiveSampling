@@ -239,7 +239,7 @@ class mockSimulation:
                 x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1], W_0[2][0], W_0[2][1], W_0[3][0], W_0[3][1]]   # with dir
                 res = minimize(fun, x0, constraints=cons)
                 x = res.x
-                W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]]] # with dir
+                W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]] # with dir
                 return W
         
         def findStarting(self, trj_Ps_theta, index_orig, W_1, starting_n=1 , method = 'RL'):
