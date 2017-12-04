@@ -1,6 +1,5 @@
 import numpy as np
 
-
 xedges = np.linspace(-180, 180, num=181)
 yedges = np.linspace(-180, 180, num=181)
 
