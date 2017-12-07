@@ -307,10 +307,10 @@ class mockSimulation:
 
                 simulation.context.setVelocitiesToTemperature(temperature)
 
-                simulation.reporters.append(app.PDBReporter(production, save_frequency))
-                simulation.reporters.append(app.StateDataReporter('stateReporter_constantPressure.txt', 1000, step=True, 
-                   totalEnergy=True, temperature=True, volume=True, progress=True, remainingTime=True, 
-                    speed=True, totalSteps=production_steps, separator='\t'))
+                #simulation.reporters.append(app.PDBReporter(production, save_frequency))
+                #simulation.reporters.append(app.StateDataReporter('stateReporter_constantPressure.txt', 1000, step=True, 
+                #   totalEnergy=True, temperature=True, volume=True, progress=True, remainingTime=True, 
+                #    speed=True, totalSteps=production_steps, separator='\t'))
 
                 print('Running Production...')
                 simulation.step(production_steps)
