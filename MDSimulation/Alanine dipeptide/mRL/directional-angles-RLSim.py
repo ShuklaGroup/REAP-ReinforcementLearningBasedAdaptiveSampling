@@ -406,7 +406,7 @@ class mockSimulation:
                         newPoints_name = 'start_r_'+str(count)+'.pdb'
                         newPoints.save_pdb(newPoints_name)
 
-                        print( myn_clusters1, W_1, self.theta_mean)
+                        #print( myn_clusters1, W_1, self.theta_mean)
                         plt.scatter(trjs_theta[0], trjs_theta[1], color='dodgerblue', s=5, alpha=0.2)
                         plt.xlim([-np.pi, np.pi])
                         plt.ylim([-np.pi, np.pi])
