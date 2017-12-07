@@ -405,19 +405,19 @@ class mockSimulation:
                         count = count + 1
                         newPoints_name = 'start_r_'+str(count)+'.pdb'
                         newPoints.save_pdb(newPoints_name)
-
-                        #print( myn_clusters1, W_1, self.theta_mean)
-                        plt.scatter(trjs_theta[0], trjs_theta[1], color='dodgerblue', s=5, alpha=0.2)
-                        plt.xlim([-np.pi, np.pi])
-                        plt.ylim([-np.pi, np.pi])
-                        newPoints_theta_x = trjs_theta[0][newPoints_index_orig[0]]
-                        newPoints_theta_y = trjs_theta[1][newPoints_index_orig[0]]
-                        plt.scatter(newPoints_theta_x, newPoints_theta_y, color='red', s=50)
-                        plt.scatter(trjs_Ps_w_theta[0], trjs_Ps_w_theta[1], color='green', s=5)
-                        plt.xlabel(r'$\phi$')
-                        plt.ylabel(r'$\psi$')
-                        plt.savefig('fig_'+str(count))
-                        plt.close()
+                        if round:
+                                plt.scatter(trjs_theta[0], trjs_theta[1], color='dodgerblue', s=5, alpha=0.2)
+                                plt.xlim([-np.pi, np.pi])
+                                plt.ylim([-np.pi, np.pi])
+                                newPoints_theta_x = trjs_theta[0][newPoints_index_orig[0]]
+                                newPoints_theta_y = trjs_theta[1][newPoints_index_orig[0]]
+                                plt.scatter(newPoints_theta_x, newPoints_theta_y, color='red', s=50)
+                                plt.scatter(trjs_Ps_w_theta[0], trjs_Ps_w_theta[1], color='green', s=5)
+                                plt.xlabel(r'$\phi$')
+                                plt.ylabel(r'$\psi$')
+                                plt.savefig('fig_'+str(count))
+                                plt.close()
+                                np.save('w_'+'r'+str(int(round))+'N'+str(N)+'s'+str(s), Ws)
   
                 np.save('w_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), Ws)
                 np.save('trjs_theta', trjs_theta)
