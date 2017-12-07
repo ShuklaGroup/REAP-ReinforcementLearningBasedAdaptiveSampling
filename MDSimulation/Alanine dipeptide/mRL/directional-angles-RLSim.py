@@ -307,7 +307,7 @@ class mockSimulation:
 
                 simulation.context.setVelocitiesToTemperature(temperature)
 
-                #simulation.reporters.append(app.PDBReporter(production, save_frequency))
+                simulation.reporters.append(app.PDBReporter(production, save_frequency))
                 #simulation.reporters.append(app.StateDataReporter('stateReporter_constantPressure.txt', 1000, step=True, 
                 #   totalEnergy=True, temperature=True, volume=True, progress=True, remainingTime=True, 
                 #    speed=True, totalSteps=production_steps, separator='\t'))
@@ -405,7 +405,7 @@ class mockSimulation:
                         count = count + 1
                         newPoints_name = 'start_r_'+str(count)+'.pdb'
                         newPoints.save_pdb(newPoints_name)
-                        if round:
+                        if round % 20 ==0:
                                 plt.scatter(trjs_theta[0], trjs_theta[1], color='dodgerblue', s=5, alpha=0.2)
                                 plt.xlim([-np.pi, np.pi])
                                 plt.ylim([-np.pi, np.pi])
