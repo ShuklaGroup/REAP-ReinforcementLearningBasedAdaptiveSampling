@@ -214,9 +214,7 @@ class mockSimulation:
                 alpha = 0.005
                 alpha = 0.1
                 delta = alpha
-                cons = ({'type': 'eq',
-                          'fun' : lambda x: np.array([np.sum(x)-1])},
-                         {'type': 'ineq',
+                cons = ({'type': 'ineq',
                           'fun' : lambda x: np.array([np.min(x)])}, # greater than zero
                          {'type': 'ineq',
                           'fun' : lambda x: np.array([-np.abs(x[0]-x0[0])+delta])}, # greater than zero
@@ -239,6 +237,7 @@ class mockSimulation:
                 x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1], W_0[2][0], W_0[2][1], W_0[3][0], W_0[3][1]]   # with dir
                 res = minimize(fun, x0, constraints=cons)
                 x = res.x
+                x = x/np.sum(x)
                 W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]] # with dir
                 return W
         
@@ -361,7 +360,9 @@ class mockSimulation:
                 trj1_theta = self.map_angles(trj1) # changed for angles to display
                 print('trj1_theta', len(trj1_theta), len(trj1_theta[0]))
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
-                trj1_Ps_w_theta, index_w = self.PreSamp(trj1_theta, myn_clusters = 100) # for updating the weights
+                trj1_Ps_w_theta = trj1_Ps_theta
+                index_w = index
+                #trj1_Ps_w_theta, index_w = self.PreSamp(trj1_theta, myn_clusters = 100) # for updating the weights
                 print('trj1_Ps_theta', len(trj1_Ps_theta), len(trj1_Ps_theta[0]))
 
                 newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL') #need change
@@ -370,8 +371,8 @@ class mockSimulation:
                 
                 print('trj1_theta[0]',trj1_theta[0])
                 plt.scatter(trj1_theta[0], trj1_theta[1], color='dodgerblue', s=5, alpha=0.2)
-                plt.xlim([-180, 180])
-                plt.ylim([-180, 180])
+                plt.xlim([-np.pi, np.pi])
+                plt.ylim([-np.pi, np.pi])
                 newPoints_theta_x = trj1_theta[0][newPoints_index_orig[0]]
                 newPoints_theta_y = trj1_theta[1][newPoints_index_orig[0]]
                 plt.scatter(newPoints_theta_x, newPoints_theta_y, color='red', s=50)
@@ -395,7 +396,7 @@ class mockSimulation:
                         trjs = com_trjs
                         trjs_theta = np.array(self.map_angles(trjs)) 
                         trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
-                        myn_clusters1 = 100 #int(10*(round)+1)
+                        #myn_clusters1 = 100 #int(10*(round)+1)
                         trjs_Ps_w_theta = trjs_Ps_theta
                         #trjs_Ps_w_theta, index_w = self.PreSamp(trjs_theta, myn_clusters =  myn_clusters1)
                         newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
