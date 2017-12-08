@@ -157,91 +157,8 @@ class mockSimulation:
                         r_s = r_s + W_[k][1]*(dist/theta_std[k])
                         #r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k]) # W_[k][1] is weight for W_ positive direction
                 return r_s
-        
 
-        def updateStat(self, trj_Sp_theta):
-                """
-                circular statistics
-                """
-                import numpy as np
-                import scipy
-                theta_mean = []
-                theta_std = []
-                for theta in range(len(trj_Sp_theta)):
-                        theta_mean.append(scipy.stats.circmean(trj_Sp_theta[theta], high=np.pi, low=-np.pi))
-                        theta_std.append(scipy.stats.circstd(trj_Sp_theta[theta], high=np.pi, low=-np.pi))
-                self.theta_std = theta_std
-                self.theta_mean = theta_mean
-        
-
-        def reward_trj(self, trj_Sp_theta, W_):
-                """
-                with direction depending on self.reward_state
-                """
-                import numpy as np
-
-                r = []
-                # for over all dicovered states
-                trj_Sp_theta = np.array(trj_Sp_theta)
-                for state_index in range(len(trj_Sp_theta[0])):
-                        state_theta = trj_Sp_theta[:, state_index]
-                        r_s = self.reward_state(state_theta, self.theta_mean, self.theta_std, W_)
-                        
-                        r.append(r_s)
-                        
-                R = np.sum(np.array(r))
-                return R
-                
-
-        def updateW(self, trj_Sp_theta, W_0):
-                """
-                update weigths 
-                prior_weigths = W_0
-                no direction
-                """
-                def fun(x):
-                        global trj_Sp_theta_z
-                        W_0 = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]] # sin cos
-                        #W_0 = [[x[0], x[1]],[x[2], x[3]]] # with dir
-                        #W_0 = x
-                        r_0 = self.reward_trj(trj_Sp_theta, W_0) 
-                        return -1*r_0                        
-                import numpy as np
-                from scipy.optimize import minimize
-                
-                global trj_Sp_theta_z 
-                trj_Sp_theta_z = trj_Sp_theta
-                alpha = 0.005
-                alpha = 0.1
-                delta = alpha
-                cons = ({'type': 'ineq',
-                          'fun' : lambda x: np.array([np.min(x)])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[0]-x0[0])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[1]-x0[1])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[2]-x0[2])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[3]-x0[3])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[4]-x0[4])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[5]-x0[5])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[6]-x0[6])+delta])}, # greater than zero
-                         {'type': 'ineq',
-                          'fun' : lambda x: np.array([-np.abs(x[7]-x0[7])+delta])})
-
-                #x0 = W_0
-                x0 = [W_0[0][0], W_0[0][1], W_0[1][0], W_0[1][1], W_0[2][0], W_0[2][1], W_0[3][0], W_0[3][1]]   # with dir
-                res = minimize(fun, x0, constraints=cons)
-                x = res.x
-                x = x/np.sum(x)
-                W = [[x[0], x[1]], [x[2], x[3]], [x[4], x[5]], [x[6], x[7]]] # with dir
-                return W
-        
-        def findStarting(self, trj_Ps_theta, index_orig, W_1, starting_n=1 , method = 'RL'):
+        def findStarting(self, trj_Ps_theta, index_orig, starting_n=1 , method = 'LC'):
                 """
                 trj_Ps_theta: 
                          size n_theta x n_frames
@@ -251,29 +168,14 @@ class mockSimulation:
                 
                 # calculate stat for the pre-sampled trj
                 import numpy as np               
-                theta_mean = []
-                theta_std = []
-                for theta in range(len(W_1)):
-                        theta_mean.append(np.mean(trj_Ps_theta[theta]))
-                        theta_std.append(np.std(trj_Ps_theta[theta]))
-                        
-                ranks = {}
-                trj_Ps_theta = np.array(trj_Ps_theta)
-                for state_index in range(len(trj_Ps_theta[0])):
-                        state_theta = trj_Ps_theta[:,state_index]
-                        
-                        r = self.reward_state(state_theta, theta_mean, theta_std, W_1)
-                        
-                        ranks[state_index] = r
 
-                newPoints_index0 = sorted(ranks.items(), key=lambda x: x[1], reverse=True)[0:starting_n] 
-                newPoints_index = np.array(newPoints_index0)[:,0]   
-                
-
-                n_coord = 1                     
+                newPoints_index = range(starting_n)   
+                 
                 newPoints_index_orig = [index_orig[int(i)] for i in newPoints_index]
-                return newPoints_index_orig       
-        
+                return newPoints_index_orig
+
+                
+                
         def run(self, production_steps = 200, start='ala2_1stFrame.pdb', production='ala2_production.pdb'): #### ?!!!!!!!!!!!!!!!!
                 #from __future__ import print_function
                 from simtk.openmm import app
@@ -346,26 +248,14 @@ class mockSimulation:
                 count = 1
                 newPoints_name = 'start_r_'+str(count)+'.pdb'
                 
-                #W_0 = [1/n_ec for i in range(n_ec)] # no direction
-                #W_0 = [[0.25, 0.25], [0.25, 0.25]]
-                W_0 = [[1/(2*n_ec), 1/(2*n_ec)] for i in range(n_ec)] # directional
-                print(W_0)
-
-                Ws = []
-                Ws.append(W_0)
-               
                 trj1 = self.run(production_steps = s, start=inits, production='trj_R_0.pdb') # return mdtraj object
                 comb_trj1 = trj1 # single trajectory
                 trjs = comb_trj1
                 trj1_theta = self.map_angles(trj1) # changed for angles to display
                 print('trj1_theta', len(trj1_theta), len(trj1_theta[0]))
                 trj1_Ps_theta, index = self.PreSamp(trj1_theta, myn_clusters = 10) # pre analysis (least count)
-                trj1_Ps_w_theta = trj1_Ps_theta
-                index_w = index
-                #trj1_Ps_w_theta, index_w = self.PreSamp(trj1_theta, myn_clusters = 100) # for updating the weights
-                print('trj1_Ps_theta', len(trj1_Ps_theta), len(trj1_Ps_theta[0]))
 
-                newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, W_0, starting_n = N , method = 'RL') #need change
+                newPoints_index_orig = self.findStarting(trj1_Ps_theta, index, starting_n = N , method = 'LC') #need change
                 newPoints = trj1[newPoints_index_orig[0]]
                 newPoints.save_pdb(newPoints_name)
                 
@@ -380,26 +270,20 @@ class mockSimulation:
                 plt.ylabel(r'$\psi$')
                 plt.savefig('fig_'+str(count))
                 plt.close()
+                
                 trjs_theta = trj1_theta
                 trjs_Ps_theta = trj1_Ps_theta
-                trjs_Ps_w_theta = trj1_Ps_w_theta 
                 for round in range(R):
-                        self.updateStat(trjs_theta) # based on all trajectories
-                        #W_1 = self.updateW(trjs_Ps_theta, W_0) 
-                        W_1 = self.updateW(trjs_Ps_w_theta, W_0) 
-                        W_0 = W_1
-                        W_1 = W_0
-                        Ws.append(W_0)
                         s = 1000
                         trj1 = self.run(production_steps = s, start=newPoints_name, production='trj_R_'+str(count)+'.pdb') # return mdtraj object
                         com_trjs = trjs.join(trj1) 
                         trjs = com_trjs
+                        
                         trjs_theta = np.array(self.map_angles(trjs)) 
                         trjs_Ps_theta, index = self.PreSamp(trjs_theta, myn_clusters = 100)
-                        #myn_clusters1 = 100 #int(10*(round)+1)
-                        trjs_Ps_w_theta = trjs_Ps_theta
-                        #trjs_Ps_w_theta, index_w = self.PreSamp(trjs_theta, myn_clusters =  myn_clusters1)
-                        newPoints_index_orig = self.findStarting(trjs_Ps_theta, index, W_1, starting_n = N , method = 'RL')
+
+
+                        newPoints_index_orig = self.findStarting(trjs_Ps_theta, index,starting_n = N , method = 'LC')
                         newPoints = trjs[newPoints_index_orig[0]] 
                         
                         count = count + 1
@@ -412,14 +296,11 @@ class mockSimulation:
                                 newPoints_theta_x = trjs_theta[0][newPoints_index_orig[0]]
                                 newPoints_theta_y = trjs_theta[1][newPoints_index_orig[0]]
                                 plt.scatter(newPoints_theta_x, newPoints_theta_y, color='red', s=50)
-                                plt.scatter(trjs_Ps_w_theta[0], trjs_Ps_w_theta[1], color='green', s=5)
                                 plt.xlabel(r'$\phi$')
                                 plt.ylabel(r'$\psi$')
                                 plt.savefig('fig_'+str(count))
                                 plt.close()
-                                np.save('w_'+'r'+str(int(round))+'N'+str(N)+'s'+str(s), Ws)
-  
-                np.save('w_'+'r'+str(int(R))+'N'+str(N)+'s'+str(s), Ws)
+
                 np.save('trjs_theta', trjs_theta)
                 return 
                         
