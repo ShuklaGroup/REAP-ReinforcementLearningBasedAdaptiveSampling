@@ -2,7 +2,6 @@ import numpy as np
 
 Atimes = []
 n_trj = 95
-
 for i in range(n_trj):
 	try:
 		trjs_theta = np.load('../data/trjs-theta/trjs_theta' + str(i) + '.npy')
