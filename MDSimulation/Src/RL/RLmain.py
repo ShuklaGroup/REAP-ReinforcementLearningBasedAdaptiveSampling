@@ -12,7 +12,6 @@ def rlmain(i):
 	nstepmax = 40
 	print('Simulation length: ', nstepmax*0.005)
 	W_0 = [[0.25, 0.25], [0.25, 0.25]] # initial geuss of weights for + - in x and y directions
-	#W_0 = [0.5, 0.5]
 	Ws = [] # series of weights
 	newPoints_all=[]
 	Ws.append(W_0)
