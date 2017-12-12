@@ -13,7 +13,7 @@ nstepmax = 80
 print('Simulation length: ', nstepmax*0.005)
 # W_0 = [[1/4, 1/4], [1/4, 1/4]] # initial geuss of weights for + - in x and y directions
 # W_0 = [0.5, 0.5] 
-W_0 = 1/n_op*np.ones(n_op)
+W_0 = 1/float(n_op)*np.ones(n_op)
 
 Ws = [] # time series of weights
 Ws.append(W_0)
