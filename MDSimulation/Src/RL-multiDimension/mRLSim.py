@@ -129,8 +129,6 @@ class mockSimulation:
 
             fig = plt.figure()
             ax = fig.add_subplot(111)
-            
-            
             ax.scatter(x , y, color='darkorange', s=10, alpha=0.4)
             #ax.scatter(x + np.random.normal(0, 0.06/4, len(x)), y+np.random.normal(0, 0.06, len(y)), color='darkorange', s=10, alpha=0.5)
             plt.xlabel('RMSD of A-loop (nm)')
@@ -143,14 +141,16 @@ class mockSimulation:
             plt.xlim([0, 1])
 #            plt.show()
             fig.savefig('fig.png', dpi=1000, bbox_inches='tight')
-
             return 
 
         def reward_state(self, S, theta_mean, theta_std, W_):
-                
                 r_s = 0
                 for k in range(len(W_)):
-                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
+                        cv =  theta_std[k]/theta_mean[k] # coefficient of variation
+                        if cv<0.05:
+                                r_s = r_s 
+                        else:
+                                r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])/theta_std[k]) #No direction
                         """
                         if (S[k] - theta_mean[k]) < 0: 
                                 r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k])/theta_std[k])
@@ -158,22 +158,6 @@ class mockSimulation:
                                 r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k])/theta_std[k])
                         """
                 return r_s
-
-        def reward_state_withoutStd(self, S, theta_mean, theta_std, W_):
-                
-                r_s = 0
-                for k in range(len(W_)):
-                        
-                        r_s = r_s + W_[k]*(abs(S[k] - theta_mean[k])) # no direction
-                        """
-                        if (S[k] - theta_mean[k]) < 0: 
-                                r_s = r_s + W_[k][0]*(abs(S[k] - theta_mean[k]))
-                        else:
-                                r_s = r_s + W_[k][1]*(abs(S[k] - theta_mean[k]))
-                        """
-                return r_s
-
-
         def updateStat(self, trj_Sp_theta):      
                 import numpy as np
                 theta_mean = []
@@ -183,7 +167,6 @@ class mockSimulation:
                         theta_std.append(np.std(trj_Sp_theta[theta]))
                 self.theta_std = theta_std
                 self.theta_mean = theta_mean
-        
 
         def reward_trj(self, trj_Sp_theta, W_):
                 """
@@ -195,8 +178,6 @@ class mockSimulation:
                 #for theta in range(len(W_)):
                 #        theta_mean.append(np.mean(trj_Sp_theta[theta]))
                 #        theta_std.append(np.std(trj_Sp_theta[theta]))
-                
-
                 r = []
                 # for over all dicovered states
                 trj_Sp_theta = np.array(trj_Sp_theta)
@@ -204,14 +185,10 @@ class mockSimulation:
                         #print('trj_Sp_theta', trj_Sp_theta)
                         state_theta = trj_Sp_theta[:, state_index]
                         r_s = self.reward_state(state_theta, self.theta_mean, self.theta_std, W_)
-                        
                         r.append(r_s)
-                        
                 R = np.sum(np.array(r))
                 return R
-                
-        
-        
+                        
         def updateW(self, trj_Sp_theta, W_0):
                 """
                 update weigths 
