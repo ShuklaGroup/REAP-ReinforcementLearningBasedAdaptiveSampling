@@ -1,5 +1,5 @@
 ## step 1:
-calculate all EC distances for each state.
+Calculate all EC distances for each state.
 
 > ipython step1_ECdistCal.py
 
@@ -8,6 +8,6 @@ calculate all EC distances for each state.
 > import RLSim as rl
 > z = rl.mockSimulation()
 > z.multiSim_timeCal_script()
-> 
 
-## step 3
+
+
