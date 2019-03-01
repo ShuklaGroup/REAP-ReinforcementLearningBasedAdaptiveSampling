@@ -2,13 +2,14 @@
 
 
 ## Single round 
-
+```
 import RLSim
 
 X_0 = [1,0.5,1.4]
 Y_0 = [0.5,0.2,.79]
 
 N = len(X_0)
+```
 ### Run first round of simulation
 
 my_sim = RLSim.mockSimulation()
