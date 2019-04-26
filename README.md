@@ -40,3 +40,9 @@ newPoints_index = my_sim.findStarting(trj1_Sp_theta, W_1, starting_n = N , metho
 X_1, Y_1 = trj1_Sp[newPoints_index]
 trj2 = my_sim.run(X_1, Y_1)
 ```
+
+### Reference
+If you use this code, please cite the following paper:
+
+Shamsi, Z., Cheng, K. J., & Shukla, D. (2018). Reinforcement learning based adaptive sampling: REAPing rewards by exploring protein conformational landscapes. The Journal of Physical Chemistry B, 122(35), 8386-8395.
+
