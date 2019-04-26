@@ -1,4 +1,5 @@
-# Reinforcement-Learning-
+# REAP-ReinforcementLearningBasedAdaptiveSampling
+One of the key limitations of Molecular Dynamics (MD) simulations is the computational intractability of sampling protein conformational landscapes associated with either large system size or long time scales. To overcome this bottleneck, we present the REinforcement learning based Adaptive samPling (REAP) algorithm that aims to efficiently sample conformational space by learning the relative importance of each order parameter as it samples the landscape. In this package, we present a demo of REAP and the original source code used for the proposed algorithm in the publication; "Shamsi, Z., Cheng, K. J., & Shukla, D. (2018). Reinforcement learning based adaptive sampling: REAPing rewards by exploring protein conformational landscapes. The Journal of Physical Chemistry B.".
 
 
 ## Single round 
