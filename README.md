@@ -7,7 +7,7 @@ In this package, we present a demo of REAP and the original source code used for
 Python code to use REAP algorithm to find the best starting points for each round of simulations.
 
 ## Installation instructions
-Dependecies:
+Dependencies:
 * numpy
 * msmbuilder
 * mdtraj
