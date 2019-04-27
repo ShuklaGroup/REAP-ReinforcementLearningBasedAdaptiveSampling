@@ -13,7 +13,7 @@ Dependencies:
 * mdtraj
 
 ## Tutorial
-For a tutorial on how to use REAP on MD simulations and toy potentials to get starting structures for the next simulation round, please see the included file [tutorial.md](https://github.com/ShuklaGroup/REAP-ReinforcementLearningBasedAdaptiveSampling/blob/master/example/tutorial.md).
+For a tutorial on how to use REAP on MD simulations and toy potentials to get starting structures for the next simulation round, please see the included file [Tutorial-LShapedLandscape.ipynb](https://github.com/ShuklaGroup/REAP-ReinforcementLearningBasedAdaptiveSampling/blob/master/Tutorial-LShapedLandscape.ipynb).
 
 ## Reference
 If you use this code, please cite the following paper:
